@@ -1,0 +1,19 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Cortex Debug",
+            "cwd": "${workspaceFolder}",
+            "executable": "${command:cmake.launchTargetPath}",
+            "request": "launch",
+            "type": "cortex-debug",
+            "servertype": "stlink",
+            "device": "STM32G431KB",
+            "interface": "swd",
+            "runToEntryPoint": "main",
+            "svdFile": "STM32G4_svd_V2.0/STM32G431xx.svd",
+            "v1": false,
+            "showDevDebugOutput": "both"
+        }
+    ]
+}
