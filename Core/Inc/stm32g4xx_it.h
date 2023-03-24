@@ -18,8 +18,8 @@
 /* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef CORE_INC_STM32G4XX_IT
-#define CORE_INC_STM32G4XX_IT
+#ifndef __STM32G4xx_IT_H
+#define __STM32G4xx_IT_H
 
 #ifdef __cplusplus
  extern "C" {
@@ -62,4 +62,4 @@ void TIM6_DAC_IRQHandler(void);
 }
 #endif
 
-#endif    /* CORE_INC_STM32G4XX_IT */
+#endif /* __STM32G4xx_IT_H */

@@ -18,11 +18,8 @@
   */
 /* USER CODE END Header */
 /* Define to prevent recursive inclusion -------------------------------------*/
-
 #ifndef CORE_INC_TIM
 #define CORE_INC_TIM
-#ifndef __TIM_H__
-#define __TIM_H__
 
 #ifdef __cplusplus
 extern "C" {
@@ -55,8 +52,5 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
 }
 #endif
 
-#endif /* __TIM_H__ */
-
-
-
 #endif    /* CORE_INC_TIM */
+

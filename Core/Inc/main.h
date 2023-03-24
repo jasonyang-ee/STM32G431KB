@@ -20,9 +20,6 @@
 
 /* Define to prevent recursive inclusion -------------------------------------*/
 
-
-#ifndef CORE_INC_MAIN
-#define CORE_INC_MAIN
 #ifndef __MAIN_H
 #define __MAIN_H
 
@@ -80,6 +77,3 @@ void Error_Handler(void);
 #endif
 
 #endif /* __MAIN_H */
-
-
-#endif    /* CORE_INC_MAIN */
