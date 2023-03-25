@@ -12,6 +12,8 @@ void CLI::init() {
 
     lwshell_register_cmd("help", &CLI::help, NULL);
     lwshell_register_cmd("led", &CLI::led, NULL);
+    lwshell_register_cmd("flash", &CLI::flash, NULL);
+    lwshell_register_cmd("show", &CLI::show, NULL);
 }
 
 bool CLI::parse() {
@@ -41,10 +43,22 @@ int32_t CLI::led(int32_t argc, char** argv) {
     return 0;
 }
 
+int32_t CLI::flash(int32_t argc, char** argv) {
+	xTaskResumeFromISR(thread.app_1_Handle);
+}
+
+int32_t CLI::show(int32_t argc, char** argv) {
+	xTaskResumeFromISR(thread.app_2_Handle);
+}
+
 int32_t CLI::help(int32_t argc, char** argv) {
     const char* help_menu =
         "\nUsage:  led\t[help] [on] [off]\n"
-        "\t\t[breath] [blink] [rapid]\n";
+        "\t\t[breath] [blink] [rapid]\n"
+		"\n"
+		"\tflash\n";
+		"\n"
+		"\tshow\n";
     serialCOM.sendString(help_menu);
     return 0;
 }

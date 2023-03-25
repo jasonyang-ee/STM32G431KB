@@ -14,6 +14,8 @@ class CLI {
     static void output(const char*, lwshell*);
 
     static int32_t led(int32_t, char**);
+    static int32_t flash(int32_t, char**);
+    static int32_t show(int32_t, char**);
     static int32_t help(int32_t, char**);
 
 	private:

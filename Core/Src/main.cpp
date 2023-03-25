@@ -20,6 +20,7 @@ CLI cli{};
 Thread thread{};
 LED led_user{1000, 1};
 SerialCOM serialCOM{};
+Flash flash{};
 
 /**
  * @brief  The application entry point.
