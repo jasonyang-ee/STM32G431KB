@@ -125,11 +125,9 @@ void LED::scheduler() {
     if (m_schedule == 0) {
         if (m_breath_toggle) {
             if (++m_breath_itr < 25)
-                m_level = m_breath[m_breath_itr];
+                *m_CCR = m_breath[m_breath_itr] / m_scale;
             else
                 m_breath_itr = 0;
-
-            *m_CCR = m_level / m_scale;
         }
 
         // Slow Blinking LED Logic

@@ -1,5 +1,7 @@
 #include "Flash.hpp"
 
+#include "instances.hpp"
+
 Flash::Flash() {}
 
 Flash::~Flash() {}
@@ -32,7 +34,7 @@ int32_t Flash::Save(const uint64_t *data, uint8_t size) {
         if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD, address,
                               data[data_ptr]) == HAL_OK) {
             data_ptr++;     // Next data to write
-            address -= 64;  // Move target flash address a row (64 bits)
+            address -= 8;  // Move target flash address a row (64 bits)
         } else
             return 1;
     }
@@ -67,7 +69,7 @@ int32_t Flash::Unload() {
         if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD, address,
                               m_flash_data.front()) == HAL_OK) {
             m_flash_data.pop();
-            address -= 64;  // Move target flash address a row (64 bits)
+            address -= 8;  // Move target flash address a row (64 bits)
         } else
             return 1;
     }
@@ -79,9 +81,11 @@ int32_t Flash::Unload() {
 std::queue<uint64_t> Flash::Load() {
     // Clear previoud data
     uint32_t address{m_address_end};
-    for (int i = 0; i < 32; i++) {
+    while (*(__IO uint32_t *)address != 0xFFFFFFFF) {
+		serialCOM.sendNumber(*(__IO uint32_t *)address);
+		serialCOM.sendLn();
         m_flash_data.push(*(__IO uint32_t *)address);
-        address -= 64;
+        address -= 8;
     }
     return m_flash_data;
 }

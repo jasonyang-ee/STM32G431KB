@@ -35,9 +35,11 @@ void SerialCOM::sendNumber(double value) { m_buffer_msg.append(std::to_string(va
 void SerialCOM::sendNumber(uint8_t value) { m_buffer_msg.append(std::to_string(value)); }
 void SerialCOM::sendNumber(uint16_t value) { m_buffer_msg.append(std::to_string(value)); }
 void SerialCOM::sendNumber(uint32_t value) { m_buffer_msg.append(std::to_string(value)); }
+void SerialCOM::sendNumber(uint64_t value) { m_buffer_msg.append(std::to_string(value)); }
 void SerialCOM::sendNumber(int8_t value) { m_buffer_msg.append(std::to_string(value)); }
 void SerialCOM::sendNumber(int16_t value) { m_buffer_msg.append(std::to_string(value)); }
 void SerialCOM::sendNumber(int32_t value) { m_buffer_msg.append(std::to_string(value)); }
+void SerialCOM::sendNumber(int64_t value) { m_buffer_msg.append(std::to_string(value)); }
 
 /**
  * @brief Periodically send uart in DMA mode if buffer !empty.

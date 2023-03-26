@@ -3,6 +3,7 @@
 
 #include "main.h"
 
+
 #include "algorithm"
 #include "iterator"
 #include "queue"
@@ -19,7 +20,7 @@ class Flash {
 
    private:
 	const uint32_t m_address_begin{0x08000000};
-	const uint32_t m_address_end{0x0801FFFF-64};
+	const uint32_t m_address_end{0x08020000 - 0x8};
 	const uint8_t m_page_total{63};
 
 };

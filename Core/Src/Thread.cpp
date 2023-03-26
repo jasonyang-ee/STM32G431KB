@@ -42,6 +42,7 @@ void Thread::app_1() {
 		vTaskSuspend(NULL);
 		flash.m_flash_data.push((uint64_t)led_user.getLevel());
 		flash.m_flash_data.push((uint64_t)led_user.getscale());
+		flash.Unload();
     }
 }
 
@@ -62,6 +63,11 @@ void Thread::app_3() {
 		serialCOM.sendNumber(led_user.getLevel());
 		serialCOM.sendLn();
 		serialCOM.sendNumber(led_user.getscale());
+		serialCOM.sendLn();
+		serialCOM.sendNumber((int)flash.m_flash_data.size());
+		serialCOM.sendLn();
+		if(!flash.m_flash_data.empty())
+			serialCOM.sendNumber(flash.m_flash_data.back());
 		serialCOM.sendLn();
     }
 }

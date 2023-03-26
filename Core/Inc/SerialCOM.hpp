@@ -30,9 +30,11 @@ class SerialCOM {
     void sendNumber(uint8_t);
     void sendNumber(uint16_t);
     void sendNumber(uint32_t);
+    void sendNumber(uint64_t);
     void sendNumber(int8_t);
     void sendNumber(int16_t);
     void sendNumber(int32_t);
+    void sendNumber(int64_t);
 
 	
     bool sendOut();
