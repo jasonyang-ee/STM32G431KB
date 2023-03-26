@@ -3,16 +3,25 @@
 
 #include "main.h"
 
+#include "algorithm"
+#include "iterator"
+#include "queue"
+
 class Flash {
    public:
     Flash();
     virtual ~Flash();
-    void Write(const uint64_t*, uint32_t);
-	uint64_t* Read();
+    int32_t Save(const uint64_t*, uint8_t);
+	std::queue<uint64_t> Load();
+    int32_t Unload();
+
+	std::queue<uint64_t> m_flash_data{};
 
    private:
-	const uint32_t m_address{0x0803F800};		// Page 250 to Page 255; 16KB Total
-	uint64_t m_flash_data[32];
+	const uint32_t m_address_begin{0x08000000};
+	const uint32_t m_address_end{0x0801FFFF-64};
+	const uint8_t m_page_total{63};
+
 };
 
 

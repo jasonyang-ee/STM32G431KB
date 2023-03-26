@@ -83,6 +83,10 @@ void LED::setLevel(int32_t value) {
     }
 }
 
+uint32_t LED::getscale() { return m_scale; }
+
+uint32_t LED::getLevel() { return m_level; }
+
 /**
  * @brief Increase or Decrease current level
  *
@@ -113,10 +117,11 @@ void LED::addLevel(int32_t value) {
  * @note Timer interrupt frequency is set during object initializaiton.
  */
 void LED::scheduler() {
-	// Supporting both thread or timer interrupt active mode schedule for consistant 20Hz
-    if (m_ext_freq != 0) ++m_schedule %= (m_ext_freq/20);
+    // Supporting both thread or timer interrupt active mode schedule for
+    // consistant 20Hz
+    if (m_ext_freq != 0) ++m_schedule %= (m_ext_freq / 20);
 
-	// Active mode schedule logic
+    // Active mode schedule logic
     if (m_schedule == 0) {
         if (m_breath_toggle) {
             if (++m_breath_itr < 25)

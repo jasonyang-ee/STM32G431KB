@@ -19,6 +19,9 @@ class Thread {
     TaskHandle_t app_2_Handle;
     void app_2();
 
+    TaskHandle_t app_3_Handle;
+    void app_3();
+
     TaskHandle_t schedule_20Hz_Handle;
     void schedule_20Hz();
 

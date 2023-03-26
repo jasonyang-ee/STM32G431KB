@@ -22,6 +22,9 @@ class LED {
     void setLevel(int32_t);
     void addLevel(int32_t);
 
+    uint32_t getscale();
+    uint32_t getLevel();
+
     void on();
     void off();
     void toggle();
@@ -40,11 +43,11 @@ class LED {
     void activeModeOff();
 
     // Setting
-    __IO uint32_t *m_CCR;         // Ex: htim3.Instance->CCR2 for Timer3 Channel2
-    int32_t m_level{0};           // light level
-    int32_t m_scale{1};           // light scale
-	uint16_t m_ext_freq{0};
-	uint16_t m_schedule{0};
+    __IO uint32_t *m_CCR;  // Ex: htim3.Instance->CCR2 for Timer3 Channel2
+    int32_t m_level{0};    // light level
+    int32_t m_scale{1};    // light scale
+    uint16_t m_ext_freq{0};
+    uint16_t m_schedule{0};
 
     // Time Based for 20Hz Scheduling
     bool m_breath_toggle{0};
@@ -55,8 +58,9 @@ class LED {
     uint16_t m_rapid_timer{0};
 
     uint8_t m_breath_itr{0};
-    uint16_t m_breath[25] = {0,   50,  100, 170, 290, 430, 600, 690, 770, 830, 910, 970, 990,
-                             990, 840, 700, 550, 450, 370, 290, 230, 190, 160, 100, 60};
+    uint16_t m_breath[25] = {0,   50,  100, 170, 290, 430, 600, 690, 770,
+                             830, 910, 970, 990, 990, 840, 700, 550, 450,
+                             370, 290, 230, 190, 160, 100, 60};
 };
 
 #endif /* CORE_INC_LED */

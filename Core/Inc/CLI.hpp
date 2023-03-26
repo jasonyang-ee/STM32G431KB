@@ -3,6 +3,7 @@
 
 #include "lwshell.h"
 #include "string.h"
+#include "ctype.h"
 
 class CLI {
    public:
