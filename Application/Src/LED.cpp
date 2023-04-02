@@ -83,7 +83,7 @@ void LED::setLevel(int32_t value) {
     }
 }
 
-uint32_t LED::getscale() { return m_scale; }
+uint32_t LED::getScale() { return m_scale; }
 
 uint32_t LED::getLevel() { return m_level; }
 

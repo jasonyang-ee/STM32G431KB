@@ -67,7 +67,7 @@ int32_t CLI::flash(int32_t argc, char** argv) {
 	// Sub Command
     if (argc == 2) {
 		if (!strcmp(argv[1], "help")) serialCOM.sendString(help_text);
-		if (!strcmp(argv[1], "unload")) xTaskResumeFromISR(thread.app_1_Handle);
+		if (!strcmp(argv[1], "save")) xTaskResumeFromISR(thread.app_1_Handle);
 		if (!strcmp(argv[1], "load")) xTaskResumeFromISR(thread.app_2_Handle);
 	}
 

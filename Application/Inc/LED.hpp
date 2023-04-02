@@ -22,7 +22,7 @@ class LED {
     void setLevel(int32_t);
     void addLevel(int32_t);
 
-    uint32_t getscale();
+    uint32_t getScale();
     uint32_t getLevel();
 
     void on();
