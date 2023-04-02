@@ -7,32 +7,22 @@ Flash::Flash() {}
 Flash::~Flash() {}
 
 void Flash::Save() {
+    Flash::Config_Arr current_config{};
+    current_config.config.led_level = led_user.getLevel();
+    current_config.config.led_scale = led_user.getScale();
+    // current_config.config.led_level = 1;
+    // current_config.config.led_scale = 4;
+    // current_config.config.something = 6;
 
-
-    // IMPORTANT:
-    // Struct has padding alignment. And one of the member has to be uint64_t
-    // This will force the object be sizeof(uint64_t) aligned for flash write.
-	Flash::Config config{123,led_user.getLevel(), led_user.getScale()};
-
-	// config.led_level = led_user.getLevel();
-	// config.led_scale = led_user.getScale();
-	
-    uint8_t size{sizeof(config)};
-	Write(reinterpret_cast<const uint64_t*>(&config), size);
-    // Write((const uint64_t *)&config, size);
-
+    Write(current_config.config_arr, config_arr_size);
 }
-
 
 // Reading 2KB (2048) = 32 x uint64_t of data at page 127 (0x0803F800)
 void Flash::Load() {
-
-	led_user.setLevel(data.front());
-	data.pop();
-
-	led_user.setScale(data.front());
-	data.pop();
-}
+    Flash::Config_Arr loaded_config{};
+    Read(&loaded_config, config_arr_size);
+	led_user.setLevel(loaded_config.config.led_level);
+    led_user.setScale(loaded_config.config.led_scale);
 }
 
 // Private Functions
@@ -73,14 +63,14 @@ int32_t Flash::Write(const uint64_t *data, uint8_t size) {
     return 0;
 }
 
-std::queue<uint64_t> Flash::Read(uint16_t range) {
-    std::queue<uint64_t> data;
+void Flash::Read(Flash::Config_Arr *loaded_config, uint8_t) {
+    uint16_t data_ptr{0};
     uint32_t address{m_address_end};
-    while (*(__IO uint32_t *)address != 0xFFFFFFFF) {
-		serialCOM.sendNumber(*(__IO uint32_t *)address);
-		serialCOM.sendLn();
-        data.push(*(__IO uint32_t *)address);  // 64 bits of reading width
+    for(int i=0; i<config_arr_size; i++){
+        // serialCOM.sendNumber(*(__IO uint64_t *)address);
+        // serialCOM.sendLn();
+        loaded_config->config_arr[data_ptr] = (*(__IO uint64_t *)address);
         address -= 8;
+        data_ptr++;
     }
-    return data;
 }
