@@ -6,24 +6,40 @@ Flash::Flash() {}
 
 Flash::~Flash() {}
 
+
+/**
+ * @brief Saving user configuration into flash. Config structure must be defined in header.
+ * 
+ */
 void Flash::Save() {
     Flash::Config_Arr current_config{};
+
+	// Gether config from all instances into one object
     current_config.config.led_level = led_user.getLevel();
     current_config.config.led_scale = led_user.getScale();
-    // current_config.config.led_level = 1;
-    // current_config.config.led_scale = 4;
-    // current_config.config.something = 6;
 
+	// Save config object aligned into uint64_t array into flash
     Write(current_config.config_arr, config_arr_size);
 }
 
-// Reading 2KB (2048) = 32 x uint64_t of data at page 127 (0x0803F800)
+
+/**
+ * @brief Loading user configuration from flash. Config structure must be defined in header.
+ * 
+ */
 void Flash::Load() {
     Flash::Config_Arr loaded_config{};
+
+	// Read config and save into the prepared config object
     Read(&loaded_config, config_arr_size);
+
+	// Unpack all config back to instances
 	led_user.setLevel(loaded_config.config.led_level);
     led_user.setScale(loaded_config.config.led_scale);
 }
+
+
+
 
 // Private Functions
 
@@ -66,9 +82,9 @@ int32_t Flash::Write(const uint64_t *data, uint8_t size) {
 void Flash::Read(Flash::Config_Arr *loaded_config, uint8_t) {
     uint16_t data_ptr{0};
     uint32_t address{m_address_end};
+
+	// Read 64 bits (a row) per loop and save into config object
     for(int i=0; i<config_arr_size; i++){
-        // serialCOM.sendNumber(*(__IO uint64_t *)address);
-        // serialCOM.sendLn();
         loaded_config->config_arr[data_ptr] = (*(__IO uint64_t *)address);
         address -= 8;
         data_ptr++;

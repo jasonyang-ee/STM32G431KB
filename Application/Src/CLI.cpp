@@ -16,15 +16,40 @@ void CLI::init() {
     lwshell_register_cmd("show", &CLI::show, NULL);
 }
 
+/**
+ * @brief Parse c++ wrapper function to call lwshell_input
+ * 
+ * @return bool: repeat lwshell parsing result
+ */
 bool CLI::parse() {
     if (lwshell_input(serialCOM.m_rx_data, m_cmd_size) == lwshellOK)
         return true;
     return false;
 }
 
+/**
+ * @brief Buffer received command size
+ * 
+ * This is needed to correctly process right amount of char
+ * 
+ * @param size UART rx interrupt size
+ */
 void CLI::setSize(uint16_t size) { m_cmd_size = size; }
 
+/**
+ * @brief Output c++ wrapper function to echo cmd, parse result, and help menu
+ * 
+ * @param str 
+ * @param lwobj 
+ */
 void CLI::output(const char* str, lwshell* lwobj) { serialCOM.sendString(str); }
+
+
+
+
+// Start of user defined command list
+// Nested command must be determined using if
+// Make your unknow command return when not found
 
 int32_t CLI::led(int32_t argc, char** argv) {
     // Detailed Menu
@@ -95,6 +120,11 @@ int32_t CLI::show(int32_t argc, char** argv) {
     return 0;
 }
 
+
+
+// Default lwshell has only -h option
+// If using git style where help is better syntax,
+// Then, you need to do this help menu manually
 int32_t CLI::help(int32_t argc, char** argv) {
     const char* help_menu =
         "\nUsage:  led\t[help] [on] [off]\n"
