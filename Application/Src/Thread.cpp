@@ -2,7 +2,7 @@
 
 #include "Thread.hpp"
 
-#include "instances.hpp"
+#include "Instances.hpp"
 
 Thread::Thread() {
     // Template for creating task

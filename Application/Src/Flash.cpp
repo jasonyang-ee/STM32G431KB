@@ -1,6 +1,6 @@
 #include "Flash.hpp"
 
-#include "instances.hpp"
+#include "Instances.hpp"
 
 Flash::Flash() {}
 

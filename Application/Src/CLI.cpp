@@ -1,6 +1,6 @@
 #include "CLI.hpp"
 
-#include "instances.hpp"
+#include "Instances.hpp"
 
 CLI::CLI() {}
 
