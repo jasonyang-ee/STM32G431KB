@@ -27,7 +27,7 @@ set(EXECUTABLE                      ${CMAKE_PROJECT_NAME})
 
 # USE .\getIncludeList.sh and .\getSourceList.sh to generate file list
 # Include List, Source List, and MCU Sepecific Setting
-include(STM32L432xx_HAL_PARA)
+include(STM32G4xx_HAL_Driver)
 include(SourceList)
 include(IncludeList)
 
