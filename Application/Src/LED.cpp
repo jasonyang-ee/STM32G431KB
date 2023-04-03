@@ -1,13 +1,11 @@
 #include "LED.hpp"
 
-LED::LED(int32_t level, int32_t scale) {
-    m_level = level;
-    m_scale = scale;
-}
+LED::LED() {}
 
-LED::LED(int32_t level, int32_t scale, uint16_t freq) {
-    m_level = level;
-    m_scale = scale;
+LED::LED(int32_t pwm_period) { m_CCR_ratio = pwm_period / 100; }
+
+LED::LED(int32_t pwm_period, int32_t freq) {
+    m_CCR_ratio = pwm_period / 100;
     m_ext_freq = freq;
 }
 
@@ -25,13 +23,13 @@ void LED::setPort(__IO uint32_t *CCR) { m_CCR = CCR; }
  * @brief Turn on LED
  *
  */
-void LED::on() { setState(1); }
+void LED::on() { setState(LED::State::s_on); }
 
 /**
  * @brief Turn off LED
  *
  */
-void LED::off() { setState(0); }
+void LED::off() { setState(LED::State::s_off); }
 
 /**
  * @brief Toggle LED on/off state
@@ -45,47 +43,64 @@ void LED::toggle() {
 }
 
 /**
- * @brief Programmable On/Off setter.
- * @param state on=true, off=false
+ * @brief Activate breathing effect mode
+ *
  */
-void LED::setState(bool state) {
-    activeModeOff();
-    if (state)
-        applyCCR();
-    else
-        zeroCCR();
+void LED::breath() {setState(LED::State::s_breath);
 }
+
+/**
+ * @brief Activate blinking effect mode
+ *
+ */
+void LED::blink() {setState(LED::State::s_blink);
+}
+
+/**
+ * @brief Activate rapid blinking effect mode
+ *
+ */
+void LED::rapid() {setState(LED::State::s_rapid);
+}
+
+/**
+ * @brief Set LED state for flash config loading
+ *
+ * @param uint8_t - 0=off, 1=on, 2=breath, 3=blink, 4=rapid
+ */
+void LED::setState(uint8_t cmd) { setState(static_cast<LED::State>(cmd)); }
+
+/**
+ * @brief Return current LED state for flash config saving
+ *
+ * @return uint8_t - 0=off, 1=on, 2=breath, 3=blink, 4=rapid
+ */
+uint8_t LED::getState() { return static_cast<uint8_t>(state); }
 
 /**
  * @brief Set brightness dimming scale.
- * @param value division value
+ *
+ * @param int32_t dimming division value. CANNOT be 0.
  */
 void LED::setScale(int32_t value) {
-    if (getActiveModeState())
-        m_scale = value;
-    else {
-        m_scale = value;
-        applyCCR();
-    }
+    if (value == 0) value = 1;  // Prevent dividing 0
+    m_scale = value;
+    applyCCR();
 }
 
 /**
- * @brief Set brightness max level.
+ * @brief Set brightness level.
  *
- * @param value max to be PWM period value
+ * @param int32_t - value from 0 to 100
  */
 void LED::setLevel(int32_t value) {
-    if (getActiveModeState())
-        m_level = value;
-    else {
-        m_level = value;
-        applyCCR();
-    }
+    m_level = value;
+    applyCCR();
 }
 
-uint32_t LED::getScale() { return m_scale; }
+int32_t LED::getScale() { return m_scale; }
 
-uint32_t LED::getLevel() { return m_level; }
+int32_t LED::getLevel() { return m_level; }
 
 /**
  * @brief Increase or Decrease current level
@@ -93,22 +108,10 @@ uint32_t LED::getLevel() { return m_level; }
  * @param value supports both positive and negative int32_t
  */
 void LED::addLevel(int32_t value) {
-    if (value > 0) {
-        if ((m_level + value) < 1000)
-            m_level += value;
-        else {
-            m_level = 1000;
-        }
-    } else if (value < 0) {
-        {
-            if ((m_level + value) > 0)
-                m_level += value;
-            else {
-                m_level = 0;
-            }
-        }
-    }
-    if (!getActiveModeState()) on();
+    m_level += value;
+    if (m_level > 1000) m_level = 1000;
+    if (m_level < 0) m_level = 0;
+    applyCCR();
 }
 
 /**
@@ -123,15 +126,15 @@ void LED::scheduler() {
 
     // Active mode schedule logic
     if (m_schedule == 0) {
-        if (m_breath_toggle) {
+        if (state == LED::State::s_breath) {
             if (++m_breath_itr < 25)
-                *m_CCR = m_breath[m_breath_itr] / m_scale;
+                *m_CCR = m_breath[m_breath_itr] / m_scale * m_CCR_ratio;
             else
                 m_breath_itr = 0;
         }
 
         // Slow Blinking LED Logic
-        else if (m_blink_toggle) {
+        else if (state == LED::State::s_blink) {
             if (m_blink_timer > 5) {
                 toggle();
                 m_blink_timer = 0;
@@ -140,7 +143,7 @@ void LED::scheduler() {
         }
 
         // Fast Blinking LED Logic
-        else if (m_rapid_toggle) {
+        else if (state == LED::State::s_rapid) {
             if (m_rapid_timer > 1) {
                 toggle();
                 m_rapid_timer = 0;
@@ -150,51 +153,31 @@ void LED::scheduler() {
     }
 }
 
-/**
- * @brief Start breathing effect.
- *
- * LED breathing turn on. The brightness will change based on scheduler().
- */
-void LED::breath() {
-    activeModeOff();
-    zeroCCR();
-    m_breath_toggle = true;
-}
-
-/**
- * @brief Start slow blinking.
- *
- * LED blinking turn on. The on/off will change based on scheduler().
- */
-void LED::blink() {
-    activeModeOff();
-    zeroCCR();
-    m_blink_toggle = true;
-}
-
-/**
- * @brief Start fast blinking.
- *
- * Led blinking turn on. The on/off will change based on scheduler().
- */
-void LED::rapid() {
-    activeModeOff();
-    zeroCCR();
-    m_rapid_toggle = true;
-}
-
 // Private Functions
 
-void LED::applyCCR() { *m_CCR = m_level / m_scale; }
+void LED::applyCCR() {
+    *m_CCR = static_cast<uint32_t>(m_level / m_scale * m_CCR_ratio);
+}
 
 void LED::zeroCCR() { *m_CCR = 0; }
 
-bool LED::getActiveModeState() {
-    return (m_breath_toggle || m_blink_toggle || m_rapid_toggle);
-}
-
-void LED::activeModeOff() {
-    m_breath_toggle = false;
-    m_blink_toggle = false;
-    m_rapid_toggle = false;
+void LED::setState(LED::State cmd) {
+    switch (cmd) {
+        case LED::State::s_off:
+            zeroCCR();
+            break;
+        case LED::State::s_on:
+            applyCCR();
+            break;
+        case LED::State::s_breath:
+            zeroCCR();
+            break;
+        case LED::State::s_blink:
+            zeroCCR();
+            break;
+        case LED::State::s_rapid:
+            zeroCCR();
+            break;
+    }
+    state = cmd;
 }

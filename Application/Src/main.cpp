@@ -18,7 +18,7 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *);
 // Instances Objects
 CLI cli{};
 Thread thread{};
-LED led_user{1000, 1};
+LED led_user{1000};
 SerialCOM serialCOM{};
 Flash flash{};
 
