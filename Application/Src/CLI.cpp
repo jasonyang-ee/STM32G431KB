@@ -130,7 +130,7 @@ int32_t CLI::help(int32_t argc, char** argv) {
         "\nUsage:  led\t[help] [on] [off]\n"
         "\t\t[breath] [blink] [rapid]\n"
         "\n"
-        "\tflash\t[load] [unload]\n"
+        "\tflash\t[save] [load]\n"
         "\n"
         "\tshow\n";
     serialCOM.sendString(help_menu);
