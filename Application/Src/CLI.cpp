@@ -81,12 +81,14 @@ int32_t CLI::led(int32_t argc, char** argv) {
 
     // Sub Command with values
     if (argc == 3) {
-        if (!isdigit(*argv[2]))
+        if (!isdigit(*argv[2]) && *argv[2] != '-')
             return 1;  // Check if number on input
         else if (!strcmp(argv[1], "level"))
             led_user.setLevel(atof(argv[2]));  // Apply input number
         else if (!strcmp(argv[1], "scale"))
             led_user.setScale(atof(argv[2]));  // Apply input number
+        else if (!strcmp(argv[1], "add"))
+            led_user.addLevel(atof(argv[2]));  // Apply input number
         else
             serialCOM.sendString("Unknown Command\n");
     }
@@ -129,6 +131,7 @@ int32_t CLI::help(int32_t argc, char** argv) {
     const char* help_menu =
         "\nUsage:  led\t[help] [on] [off]\n"
         "\t\t[breath] [blink] [rapid]\n"
+        "\t\t[scale #] [level #] [add #]\n"
         "\n"
         "\tflash\t[save] [load]\n"
         "\n"

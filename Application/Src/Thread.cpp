@@ -53,6 +53,7 @@ void Thread::app_2() {
 
 void Thread::app_3() {
     while (1) {
+		//Show
 		vTaskSuspend(NULL);
 		serialCOM.sendNumber(led_user.getLevel());
 		serialCOM.sendLn();
