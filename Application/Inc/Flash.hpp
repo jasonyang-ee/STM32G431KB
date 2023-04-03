@@ -23,6 +23,7 @@ class Flash {
         struct Config {
             uint32_t led_level;
             uint32_t led_scale;
+			uint8_t led_state;
         } config;
 
         uint64_t config_arr[config_arr_size];

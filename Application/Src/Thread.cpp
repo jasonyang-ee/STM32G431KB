@@ -46,8 +46,8 @@ void Thread::app_1() {
 
 void Thread::app_2() {
     while (1) {
-		vTaskSuspend(NULL);
 		flash.Load();
+		vTaskSuspend(NULL);
     }
 }
 

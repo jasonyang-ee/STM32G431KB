@@ -17,6 +17,7 @@ void Flash::Save() {
 	// Gether config from all instances into one object
     current_config.config.led_level = led_user.getLevel();
     current_config.config.led_scale = led_user.getScale();
+    current_config.config.led_state = led_user.getState();
 
 	// Save config object aligned into uint64_t array into flash
     Write(current_config.config_arr, config_arr_size);
@@ -36,6 +37,7 @@ void Flash::Load() {
 	// Unpack all config back to instances
 	led_user.setLevel(loaded_config.config.led_level);
     led_user.setScale(loaded_config.config.led_scale);
+    led_user.setState(loaded_config.config.led_state);
 }
 
 
