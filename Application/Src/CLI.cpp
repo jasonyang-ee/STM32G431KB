@@ -55,11 +55,14 @@ int32_t CLI::led(int32_t argc, char** argv) {
     // Detailed Menu
     const char* help_text =
         "\nLED Functions:\n"
-        "  on\tTurns ON LED\n"
-        "  off\tTurns OFF LED\n"
-        "  breath\tLED in breath effect mode\n"
-        "  blink\tLED in slow blink mode\n"
-        "  rapid\tLED in fast blink mode\n\n";
+        "  on\t\tTurns ON LED\n"
+        "  off\t\tTurns OFF LED\n"
+        "  breath\t\tLED in breath effect mode\n"
+        "  blink\t\tLED in slow blink mode\n"
+        "  rapid\t\tLED in fast blink mode\n"
+        "  scale #value\tSet LED dimmer scale\n"
+        "  level #value\tSet LED light level\n"
+        "  add #value\tIncrease or Decrease LED light level\n\n";
 
     // Sub Command
     if (argc == 2) {
