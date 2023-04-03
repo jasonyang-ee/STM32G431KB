@@ -1,9 +1,9 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * @file    tim.h
+  * @file    adc.h
   * @brief   This file contains all the function prototypes for
-  *          the tim.c file
+  *          the adc.c file
   ******************************************************************************
   * @attention
   *
@@ -19,10 +19,10 @@
 /* USER CODE END Header */
 /* Define to prevent recursive inclusion -------------------------------------*/
 
-#ifndef CORE_INC_TIM
-#define CORE_INC_TIM
-#ifndef __TIM_H__
-#define __TIM_H__
+#ifndef CORE_INC_ADC
+#define CORE_INC_ADC
+#ifndef __ADC_H__
+#define __ADC_H__
 
 #ifdef __cplusplus
 extern "C" {
@@ -35,21 +35,13 @@ extern "C" {
 
 /* USER CODE END Includes */
 
-extern TIM_HandleTypeDef htim2;
-extern TIM_HandleTypeDef htim4;
-extern TIM_HandleTypeDef htim7;
-extern TIM_HandleTypeDef htim8;
+extern ADC_HandleTypeDef hadc2;
 
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
 
-void MX_TIM2_Init(void);
-void MX_TIM4_Init(void);
-void MX_TIM7_Init(void);
-void MX_TIM8_Init(void);
-
-void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
+void MX_ADC2_Init(void);
 
 /* USER CODE BEGIN Prototypes */
 
@@ -59,8 +51,8 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
 }
 #endif
 
-#endif /* __TIM_H__ */
+#endif /* __ADC_H__ */
 
 
 
-#endif    /* CORE_INC_TIM */
+#endif    /* CORE_INC_ADC */

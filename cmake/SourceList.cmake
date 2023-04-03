@@ -6,6 +6,8 @@ ${PROJ_PATH}/Application/Src/LED.cpp
 ${PROJ_PATH}/Application/Src/main.cpp
 ${PROJ_PATH}/Application/Src/SerialCOM.cpp
 ${PROJ_PATH}/Application/Src/Thread.cpp
+${PROJ_PATH}/Core/Src/adc.c
+${PROJ_PATH}/Core/Src/dac.c
 ${PROJ_PATH}/Core/Src/gpio.c
 ${PROJ_PATH}/Core/Src/stm32g4xx_hal_msp.c
 ${PROJ_PATH}/Core/Src/stm32g4xx_hal_timebase_tim.c
@@ -16,7 +18,11 @@ ${PROJ_PATH}/Core/Src/tim.c
 ${PROJ_PATH}/Core/Src/usart.c
 ${PROJ_PATH}/Core/startup_stm32g431xx.s
 ${PROJ_PATH}/Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal.c
+${PROJ_PATH}/Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_adc.c
+${PROJ_PATH}/Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_adc_ex.c
 ${PROJ_PATH}/Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_cortex.c
+${PROJ_PATH}/Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_dac.c
+${PROJ_PATH}/Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_dac_ex.c
 ${PROJ_PATH}/Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_dma.c
 ${PROJ_PATH}/Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_dma_ex.c
 ${PROJ_PATH}/Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_exti.c
@@ -32,6 +38,7 @@ ${PROJ_PATH}/Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_tim.c
 ${PROJ_PATH}/Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_tim_ex.c
 ${PROJ_PATH}/Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_uart.c
 ${PROJ_PATH}/Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_uart_ex.c
+${PROJ_PATH}/Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_ll_adc.c
 ${PROJ_PATH}/Middlewares/Third_Party/FreeRTOS/Source/croutine.c
 ${PROJ_PATH}/Middlewares/Third_Party/FreeRTOS/Source/event_groups.c
 ${PROJ_PATH}/Middlewares/Third_Party/FreeRTOS/Source/list.c
