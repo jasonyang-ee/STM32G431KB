@@ -13,37 +13,36 @@ void CLI::init() {
     lwshell_register_cmd("help", &CLI::help, NULL);
     lwshell_register_cmd("led", &CLI::led, NULL);
     lwshell_register_cmd("flash", &CLI::flash, NULL);
+    lwshell_register_cmd("motor", &CLI::motor, NULL);
     lwshell_register_cmd("show", &CLI::show, NULL);
 }
 
 /**
  * @brief Parse c++ wrapper function to call lwshell_input
- * 
+ *
  * @return bool: repeat lwshell parsing result
  */
 bool CLI::parse() {
-    if (lwshell_input(serialCOM.m_rx_data, m_cmd_size) == lwshellOK)
-        return true;
+    if (lwshell_input(serialCOM.m_rx_data, m_cmd_size) == lwshellOK) return true;
     return false;
 }
 
 /**
  * @brief Buffer received command size
- * 
+ *
  * This is needed to correctly process right amount of char
- * 
+ *
  * @param size UART rx interrupt size
  */
 void CLI::setSize(uint16_t size) { m_cmd_size = size; }
 
 /**
  * @brief Output c++ wrapper function to echo cmd, parse result, and help menu
- * 
- * @param str 
- * @param lwobj 
+ *
+ * @param str
+ * @param lwobj
  */
 void CLI::output(const char* str, lwshell* lwobj) { serialCOM.sendString(str); }
-
 
 
 
@@ -81,7 +80,6 @@ int32_t CLI::led(int32_t argc, char** argv) {
         else
             serialCOM.sendString("Unknown Command\n");
     }
-
     // Sub Command with values
     if (argc == 3) {
         if (!isdigit(*argv[2]) && *argv[2] != '-')
@@ -97,6 +95,8 @@ int32_t CLI::led(int32_t argc, char** argv) {
     }
     return 0;
 }
+
+
 
 int32_t CLI::flash(int32_t argc, char** argv) {
     // Detailed Menu
@@ -120,12 +120,34 @@ int32_t CLI::flash(int32_t argc, char** argv) {
     return 0;
 }
 
-int32_t CLI::show(int32_t argc, char** argv) {
-    xTaskResumeFromISR(thread.app_3_Handle);
+
+int32_t CLI::motor(int32_t argc, char** argv) {
+    // Detailed Menu
+    const char* help_text =
+        "\nMotor Functions:\n"
+        "  level #value\tSet LED light level\n"
+        "  add #value\tIncrease or Decrease LED light level\n\n";
+
+    // Sub Command
+    if (argc == 3) {
+        if (!strcmp(argv[1], "help"))
+            serialCOM.sendString(help_text);
+        else if (!strcmp(argv[1], "level"))
+            motor_dac.setLevel(atof(argv[2]));
+        else if (!strcmp(argv[1], "add"))
+            motor_dac.addLevel(atof(argv[2]));
+        else
+            serialCOM.sendString("Unknown Command\n");
+    }
+
     return 0;
 }
 
 
+int32_t CLI::show(int32_t argc, char** argv) {
+    xTaskResumeFromISR(thread.app_3_Handle);
+    return 0;
+}
 
 // Default lwshell has only -h option
 // If using git style where help is better syntax,

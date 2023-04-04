@@ -14,10 +14,11 @@ class CLI {
     void setSize(uint16_t);
     static void output(const char*, lwshell*);
 
+    static int32_t help(int32_t, char**);
     static int32_t led(int32_t, char**);
     static int32_t flash(int32_t, char**);
+    static int32_t motor(int32_t, char**);
     static int32_t show(int32_t, char**);
-    static int32_t help(int32_t, char**);
 
 	private:
 	uint16_t m_cmd_size;

@@ -5,6 +5,7 @@
 #include "SerialCOM.hpp"
 #include "CLI.hpp"
 #include "Thread.hpp"
+#include "DAC.hpp"
 #include "Flash_STM32G431KB.hpp"
 
 #define UART_BUFFER 64
@@ -14,5 +15,6 @@ extern SerialCOM serialCOM;
 extern CLI cli;
 extern Thread thread;
 extern Flash flash;
+extern MotorDAC motor_dac;
 
 #endif    /* APPLICATION_INC_INSTANCES */

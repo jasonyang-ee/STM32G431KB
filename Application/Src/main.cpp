@@ -20,6 +20,7 @@ Thread thread{};
 LED led_user{1000};
 SerialCOM serialCOM{};
 Flash flash{};
+MotorDAC motor_dac{};
 
 /**
  * @brief  The application entry point.
@@ -46,6 +47,7 @@ int main(void) {
     cli.init();
     serialCOM.setPort(&huart2);
     led_user.setPort(&htim8.Instance->CCR2);
+	motor_dac.setPort(&hdac1, DAC_CHANNEL_2);
 
     // FreeRTOS Start
     vTaskStartScheduler();
@@ -54,8 +56,7 @@ int main(void) {
     }
 }
 
-/* ------------------------- Call Back Functions
- * ---------------------------------*/
+/* ------------------------- Call Back Functions * ---------------------------------*/
 
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart) {
     xTaskResumeFromISR(thread.serial_send_Handle);
@@ -72,8 +73,7 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size) {
     }
 }
 
-/* ------------------------- System Start Up Functions
- * ---------------------------*/
+/* ------------------------- System Start Up Functions * ---------------------------*/
 
 /**
  * @brief System Clock Configuration
@@ -104,8 +104,8 @@ void SystemClock_Config(void) {
     }
     /** Initializes the CPU, AHB and APB buses clocks
      */
-    RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK |
-                                  RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
+    RCC_ClkInitStruct.ClockType =
+        RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
     RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
     RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
     RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
