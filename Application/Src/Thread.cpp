@@ -25,7 +25,7 @@ Thread::Thread() {
     xTaskCreate(a4, "app 4", 128, this, 0, &app_4_Handle);
 
     auto a5 = [](void *arg) { static_cast<Thread *>(arg)->app_5(); };
-    xTaskCreate(a5, "app 4", 128, this, 0, &app_5_Handle);
+    xTaskCreate(a5, "app 5", 128, this, 0, &app_5_Handle);
 
     auto s1 = [](void *arg) { static_cast<Thread *>(arg)->schedule_20Hz(); };
     xTaskCreate(s1, "schedule 20Hz", 128, this, -2, &schedule_20Hz_Handle);
@@ -73,16 +73,16 @@ void Thread::app_3() {
 void Thread::app_4() {
     while (1) {
 		//motor
-		motor_dac.setLevel(2.5);
 		vTaskSuspend(NULL);
+		motor_dac.setLevel(2.5);
     }
 }
 
 void Thread::app_5() {
     while (1) {
 		//motor
-		motor_dac.addLevel(0.1);
 		vTaskSuspend(NULL);
+		motor_dac.addLevel(0.1);
     }
 }
 
