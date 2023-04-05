@@ -1,0 +1,4 @@
+{
+	"name": "STM32",
+	"image": "jasonyangee/stm32-builder:Ubuntu-latest"
+}
