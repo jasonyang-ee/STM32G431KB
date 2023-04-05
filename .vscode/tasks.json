@@ -74,6 +74,7 @@
 			"label": "Linux: Flash Firmware",
 			"command": "st-flash",
 			"args": [
+				"--reset",
 				"write",
 				"${command:cmake.launchTargetDirectory}/${command:cmake.buildTargetName}.bin",
 				"0x08000000"
