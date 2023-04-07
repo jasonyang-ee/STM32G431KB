@@ -1,4 +1,4 @@
-[![Build Binary](https://github.com/jasonyang-ee/STM32G431KB/actions/workflows/build-all.yml/badge.svg)](https://github.com/jasonyang-ee/STM32G431KB/actions/workflows/build-all.yml)
+[![Build Binary](https://github.com/jasonyang-ee/STM32G431KB/actions/workflows/build-all.yml/badge.svg?branch=main)](https://github.com/jasonyang-ee/STM32G431KB/actions/workflows/build-all.yml)
 
 # STM32G431 Playground
 
