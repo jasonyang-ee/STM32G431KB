@@ -10,13 +10,26 @@ class MotorDAC {
     void setPort(DAC_HandleTypeDef *, uint32_t);
     void setVoltRef(double);
 
+	// Unscoped to allow config saving to flash
+    enum State {
+        s_off,
+        s_on,
+    } m_state;
+
     void setLevel(double);
     void addLevel(double);
     double getLevel();
 
+	void setState(uint8_t);
+    uint8_t getState();
+
+    void on();
+    void off();
 
    private:
     void applyLevel();
+	void zeroLevel();
+	void setState(MotorDAC::State);
 
     double m_level{0};
     double m_vref{3.3};
