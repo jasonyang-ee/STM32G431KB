@@ -49,6 +49,10 @@ int main(void) {
     serialCOM.setPort(&huart2);
     led_user.setPort(&htim8.Instance->CCR2);
 	motor_dac.setPort(&hdac1, DAC_CHANNEL_2);
+	sensor_adc.setPort(&hadc2);
+
+	motor_dac.setLevel(1.5);
+	motor_dac.on();
 
     // FreeRTOS Start
     vTaskStartScheduler();

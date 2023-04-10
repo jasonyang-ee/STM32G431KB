@@ -16,7 +16,7 @@ class SensorADC {
 
    private:
 	uint32_t m_value{};
-	ADC_HandleTypeDef *m_port{};
+	ADC_HandleTypeDef *m_port;
 };
 
 #endif    /* APPLICATION_INC_ADC */
