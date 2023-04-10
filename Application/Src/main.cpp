@@ -21,6 +21,7 @@ LED led_user{1000};
 SerialCOM serialCOM{};
 Flash flash{};
 MotorDAC motor_dac{};
+SensorADC sensor_adc{};
 
 /**
  * @brief  The application entry point.

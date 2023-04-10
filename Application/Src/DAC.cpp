@@ -19,6 +19,8 @@ void MotorDAC::addLevel(double value) {
     if (m_level < 0) m_level = 0;
 }
 
+double MotorDAC::getLevel() { return m_level; }
+
 void MotorDAC::on() { setState(MotorDAC::State::s_on); }
 
 void MotorDAC::off() { setState(MotorDAC::State::s_off); }

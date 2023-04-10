@@ -1,5 +1,6 @@
 set(source_list ${source_list}
 ${PROJ_PATH}/Application/Inc/lwshell/lwshell.c
+${PROJ_PATH}/Application/Src/ADC.cpp
 ${PROJ_PATH}/Application/Src/CLI.cpp
 ${PROJ_PATH}/Application/Src/DAC.cpp
 ${PROJ_PATH}/Application/Src/Flash_STM32G431KB.cpp
