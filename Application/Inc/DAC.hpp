@@ -31,7 +31,7 @@ class MotorDAC {
 	void zeroLevel();
 	void setState(MotorDAC::State);
 
-    double m_level{0};
+    double m_level{0.0};
     double m_vref{3.3};
 
 	/**
@@ -39,7 +39,7 @@ class MotorDAC {
 	 * Options: DAC_CHANNEL_1, DAC_CHANNEL_2
 	 * Options: DAC_ALIGN_12B_R, DAC_ALIGN_12B_L, DAC_ALIGN_8B_R
 	 */
-    DAC_HandleTypeDef *m_port{};
+    DAC_HandleTypeDef *m_port;
     uint32_t m_channel{DAC_CHANNEL_1};
     uint32_t m_alignment{DAC_ALIGN_12B_R};
 };
