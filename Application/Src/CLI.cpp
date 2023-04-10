@@ -110,9 +110,9 @@ int32_t CLI::flash(int32_t argc, char** argv) {
         if (!strcmp(argv[1], "help"))
             serialCOM.sendString(help_text);
         else if (!strcmp(argv[1], "save"))
-            xTaskResumeFromISR(thread.app_1_Handle);
+            xTaskResumeFromISR(thread.app_save_config_handle);
         else if (!strcmp(argv[1], "load"))
-            xTaskResumeFromISR(thread.app_2_Handle);
+            xTaskResumeFromISR(thread.app_load_config_handle);
         else
             serialCOM.sendString("Unknown Command\n");
     }
@@ -145,7 +145,7 @@ int32_t CLI::motor(int32_t argc, char** argv) {
 
 
 int32_t CLI::show(int32_t argc, char** argv) {
-    xTaskResumeFromISR(thread.app_3_Handle);
+    xTaskResumeFromISR(thread.app_telemetry_handle);
     return 0;
 }
 
