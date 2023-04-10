@@ -12,7 +12,7 @@ class SensorADC {
 	uint32_t sample();
 	uint32_t getValue();
 
-
+	uint32_t m_buffer;
 
    private:
 	uint32_t m_value{};

@@ -36,8 +36,7 @@ uint8_t MotorDAC::getState() { return static_cast<uint8_t>(m_state); }
 // Private Functions
 
 void MotorDAC::applyLevel() {
-    if(HAL_DAC_SetValue(m_port, m_channel, m_alignment, static_cast<uint32_t>(m_level)) == HAL_OK)
-		serialCOM.sendString("DAC run ok\n");
+    HAL_DAC_SetValue(m_port, m_channel, m_alignment, static_cast<uint32_t>(m_level));
 }
 
 void MotorDAC::zeroLevel() { HAL_DAC_SetValue(m_port, m_channel, m_alignment, 0); }

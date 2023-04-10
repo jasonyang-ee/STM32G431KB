@@ -202,3 +202,11 @@ void Flash::Load() {
 The memory save example:
 
 ![FlashMem](doc/img/FlashMem.png)
+
+
+
+## ADC
+
+hadcx.Init.DMAContiniousRequests = ENABLE
+
+or set it in CubeMX
