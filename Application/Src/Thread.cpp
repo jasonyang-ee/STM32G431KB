@@ -63,18 +63,23 @@ void Thread::app_telemetry() {
     while (1) {
 		//Show
 		vTaskSuspend(NULL);
+		serialCOM.sendString("LED level: ");
 		serialCOM.sendNumber(led_user.getLevel());
-		serialCOM.sendLn();
+		serialCOM.sendString("\nLED scale: ");
 		serialCOM.sendNumber(led_user.getScale());
+		serialCOM.sendString("\nDAC value: ");
+		serialCOM.sendNumber(motor_dac.getLevel());
+		serialCOM.sendString("\nADC value: ");
+		serialCOM.sendNumber(sensor_adc.getValue());
 		serialCOM.sendLn();
     }
 }
 
 void Thread::app_dac() {
     while (1) {
-		//motor
-		vTaskSuspend(NULL);
-		motor_dac.setLevel(2.5);
+		// ADC + DAC
+		sensor_adc.sample();
+		vTaskDelay(200);
     }
 }
 
