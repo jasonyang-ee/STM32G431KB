@@ -10,6 +10,7 @@ ${PROJ_PATH}/Application/Src/SerialCOM.cpp
 ${PROJ_PATH}/Application/Src/Thread.cpp
 ${PROJ_PATH}/Core/Src/adc.c
 ${PROJ_PATH}/Core/Src/dac.c
+${PROJ_PATH}/Core/Src/dma.c
 ${PROJ_PATH}/Core/Src/gpio.c
 ${PROJ_PATH}/Core/Src/stm32g4xx_hal_msp.c
 ${PROJ_PATH}/Core/Src/stm32g4xx_hal_timebase_tim.c

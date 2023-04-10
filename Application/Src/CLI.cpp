@@ -125,17 +125,21 @@ int32_t CLI::motor(int32_t argc, char** argv) {
     // Detailed Menu
     const char* help_text =
         "\nMotor Functions:\n"
-        "  level #value\tSet LED light level\n"
-        "  add #value\tIncrease or Decrease LED light level\n\n";
+        "  level #value\tSet DAC level\n"
+        "  add #value\tIncrease or Decrease DAC level\n\n";
 
     // Sub Command
     if (argc == 3) {
         if (!strcmp(argv[1], "help"))
             serialCOM.sendString(help_text);
-        else if (!strcmp(argv[1], "level"))
+        else if (!strcmp(argv[1], "level")) {
             motor_dac.setLevel(atof(argv[2]));
-        else if (!strcmp(argv[1], "add"))
+			motor_dac.on();
+		}
+        else if (!strcmp(argv[1], "add")){
             motor_dac.addLevel(atof(argv[2]));
+			motor_dac.on();
+		}
         else
             serialCOM.sendString("Unknown Command\n");
     }
@@ -159,6 +163,8 @@ int32_t CLI::help(int32_t argc, char** argv) {
         "\t\t[scale #] [level #] [add #]\n"
         "\n"
         "\tflash\t[save] [load]\n"
+        "\n"
+        "\tmotor\t[level *] [add *]\n"
         "\n"
         "\tshow\n";
     serialCOM.sendString(help_menu);
