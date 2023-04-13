@@ -89,6 +89,11 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc) {
     // xTaskResumeFromISR(thread.app_telemetry_handle);
 }
 
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
+    if (htim->Instance == TIM17) {
+        HAL_IncTick();
+    }
+}
 
 /* ------------------------- System Start Up Functions * ---------------------------*/
 
@@ -135,11 +140,7 @@ void SystemClock_Config(void) {
     }
 }
 
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
-    if (htim->Instance == TIM17) {
-        HAL_IncTick();
-    }
-}
+
 
 /**
  * @brief  This function is executed in case of error occurrence.
