@@ -14,7 +14,9 @@ void MotorDAC::setPort(DAC_HandleTypeDef *port, uint32_t channel) {
 void MotorDAC::setVoltRef(double value) { m_vref = value; }
 
 void MotorDAC::setLevel(double value) {
+	HAL_DAC_Start(m_port, m_channel);
     m_level = value;
+	on();
 }
 
 void MotorDAC::addLevel(double value) {
@@ -36,7 +38,8 @@ uint8_t MotorDAC::getState() { return static_cast<uint8_t>(m_state); }
 // Private Functions
 
 void MotorDAC::applyLevel() {
-    HAL_DAC_SetValue(m_port, m_channel, m_alignment, static_cast<uint32_t>(m_level));
+    HAL_DAC_SetValue(m_port, m_channel, m_alignment, static_cast<uint32_t>(m_level*4096/3.3));
+	serialCOM.sendNumber(static_cast<uint32_t>(m_level*4096/3.3));
 }
 
 void MotorDAC::zeroLevel() { HAL_DAC_SetValue(m_port, m_channel, m_alignment, 0); }

@@ -77,17 +77,25 @@ void Thread::app_telemetry() {
 
 void Thread::app_dac() {
     while (1) {
-		// vTaskSuspend(NULL);
 		// ADC + DAC
+
 		// sensor_adc.sample();
 		// if (sensor_adc.getValue()>3000) motor_dac.setLevel(0);
 		// else motor_dac.addLevel(0.1);
-		serialCOM.sendString("ADC value: ");
-		serialCOM.sendNumber(sensor_adc.getValue());
-		serialCOM.sendLn();
+
+		
 		motor_dac.setLevel(2.0);
-    	motor_dac.on();
-		vTaskDelay(1000);
+		motor_dac.on();
+
+		// serialCOM.sendString("HAL value: ");
+		// serialCOM.sendNumber(HAL_GetTick());
+		// serialCOM.sendLn();
+		// motor_dac.setLevel(2.0);
+    	// motor_dac.on();
+
+
+		vTaskSuspend(NULL);
+		// vTaskDelay(1000);
     }
 }
 

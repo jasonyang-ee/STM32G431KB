@@ -18,8 +18,8 @@
 /* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __STM32G4xx_IT_H
-#define __STM32G4xx_IT_H
+#ifndef CORE_INC_STM32G4XX_IT
+#define CORE_INC_STM32G4XX_IT
 
 #ifdef __cplusplus
  extern "C" {
@@ -55,6 +55,7 @@ void DebugMon_Handler(void);
 void PVD_PVM_IRQHandler(void);
 void DMA1_Channel1_IRQHandler(void);
 void ADC1_2_IRQHandler(void);
+void TIM1_TRG_COM_TIM17_IRQHandler(void);
 void USART2_IRQHandler(void);
 void TIM6_DAC_IRQHandler(void);
 /* USER CODE BEGIN EFP */
@@ -65,4 +66,4 @@ void TIM6_DAC_IRQHandler(void);
 }
 #endif
 
-#endif /* __STM32G4xx_IT_H */
+#endif    /* CORE_INC_STM32G4XX_IT */

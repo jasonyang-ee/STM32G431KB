@@ -19,6 +19,9 @@
 /* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
+
+#ifndef CORE_INC_STM32G4XX_HAL_CONF
+#define CORE_INC_STM32G4XX_HAL_CONF
 #ifndef STM32G4xx_HAL_CONF_H
 #define STM32G4xx_HAL_CONF_H
 
@@ -378,3 +381,6 @@ void assert_failed(uint8_t *file, uint32_t line);
 #endif
 
 #endif /* STM32G4xx_HAL_CONF_H */
+
+
+#endif    /* CORE_INC_STM32G4XX_HAL_CONF */

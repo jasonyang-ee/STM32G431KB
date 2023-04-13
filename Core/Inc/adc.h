@@ -18,9 +18,6 @@
   */
 /* USER CODE END Header */
 /* Define to prevent recursive inclusion -------------------------------------*/
-
-#ifndef CORE_INC_ADC
-#define CORE_INC_ADC
 #ifndef __ADC_H__
 #define __ADC_H__
 
@@ -53,6 +50,3 @@ void MX_ADC2_Init(void);
 
 #endif /* __ADC_H__ */
 
-
-
-#endif    /* CORE_INC_ADC */
