@@ -18,9 +18,6 @@
   */
 /* USER CODE END Header */
 /* Define to prevent recursive inclusion -------------------------------------*/
-
-#ifndef CORE_INC_DAC
-#define CORE_INC_DAC
 #ifndef __DAC_H__
 #define __DAC_H__
 
@@ -53,6 +50,3 @@ void MX_DAC1_Init(void);
 
 #endif /* __DAC_H__ */
 
-
-
-#endif    /* CORE_INC_DAC */
