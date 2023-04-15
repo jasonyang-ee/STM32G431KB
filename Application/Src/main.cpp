@@ -52,10 +52,9 @@ int main(void) {
     // Instances Initialization
     cli.init();
     serialCOM.setPort(&huart2);
-	led_user.setPort(&htim8.Instance->CCR2);
+    led_user.setPort(&htim8.Instance->CCR2);
     motor_dac.setPort(&hdac1, DAC_CHANNEL_2);
     sensor_adc.setPort(&hadc2);
-
 
     // FreeRTOS Start
     vTaskStartScheduler();
@@ -81,10 +80,7 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size) {
     }
 }
 
-void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc) {
-    sensor_adc.sample();
-    // xTaskResumeFromISR(thread.app_telemetry_handle);
-}
+void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc) { sensor_adc.sample(); }
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
     if (htim->Instance == TIM17) {
@@ -136,8 +132,6 @@ void SystemClock_Config(void) {
         Error_Handler();
     }
 }
-
-
 
 /**
  * @brief  This function is executed in case of error occurrence.

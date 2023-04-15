@@ -11,6 +11,7 @@ class CustomADC {
 
 	uint32_t sample();
 	uint32_t getValue();
+	double getVolt();
 
 	uint32_t m_buffer;
 
