@@ -1,15 +1,15 @@
 
 #include "ADC.hpp"
 
-SensorADC::SensorADC() {}
+CustomADC::CustomADC() {}
 
-SensorADC::~SensorADC() {}
+CustomADC::~CustomADC() {}
 
-void SensorADC::setPort(ADC_HandleTypeDef *port) { m_port = port; }
+void CustomADC::setPort(ADC_HandleTypeDef *port) { m_port = port; }
 
-uint32_t SensorADC::sample() {
+uint32_t CustomADC::sample() {
     m_value = m_buffer;
     return m_value;
 }
 
-uint32_t SensorADC::getValue() { return m_value; }
+uint32_t CustomADC::getValue() { return m_value; }

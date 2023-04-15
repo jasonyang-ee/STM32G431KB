@@ -16,7 +16,7 @@ extern SerialCOM serialCOM;
 extern CLI cli;
 extern Thread thread;
 extern Flash flash;
-extern MotorDAC motor_dac;
-extern SensorADC sensor_adc;
+extern CustomDAC motor_dac;
+extern CustomADC sensor_adc;
 
 #endif    /* APPLICATION_INC_INSTANCES */
