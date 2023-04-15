@@ -10,11 +10,11 @@ void CLI::init() {
     lwshell_init();
     lwshell_set_output_fn(&CLI::output);
 
-    lwshell_register_cmd("help", &CLI::help, NULL);
-    lwshell_register_cmd("led", &CLI::led, NULL);
-    lwshell_register_cmd("flash", &CLI::flash, NULL);
-    lwshell_register_cmd("motor", &CLI::motor, NULL);
-    lwshell_register_cmd("show", &CLI::show, NULL);
+    lwshell_register_cmd("help", &CLI::cmd_help, NULL);
+    lwshell_register_cmd("led", &CLI::cmd_led, NULL);
+    lwshell_register_cmd("flash", &CLI::cmd_flash, NULL);
+    lwshell_register_cmd("motor", &CLI::cmd_motor, NULL);
+    lwshell_register_cmd("show", &CLI::cmd_show, NULL);
 }
 
 /**
@@ -44,13 +44,11 @@ void CLI::setSize(uint16_t size) { m_cmd_size = size; }
  */
 void CLI::output(const char* str, lwshell* lwobj) { serialCOM.sendString(str); }
 
-
-
 // Start of user defined command list
 // Nested command must be determined using if
 // Make your unknow command return when not found
 
-int32_t CLI::led(int32_t argc, char** argv) {
+int32_t CLI::cmd_led(int32_t argc, char** argv) {
     // Detailed Menu
     const char* help_text =
         "\nLED Functions:\n"
@@ -96,9 +94,7 @@ int32_t CLI::led(int32_t argc, char** argv) {
     return 0;
 }
 
-
-
-int32_t CLI::flash(int32_t argc, char** argv) {
+int32_t CLI::cmd_flash(int32_t argc, char** argv) {
     // Detailed Menu
     const char* help_text =
         "\nFlash Functions:\n"
@@ -110,9 +106,9 @@ int32_t CLI::flash(int32_t argc, char** argv) {
         if (!strcmp(argv[1], "help"))
             serialCOM.sendString(help_text);
         else if (!strcmp(argv[1], "save"))
-            xTaskResumeFromISR(thread.app_save_config_handle);
+            flash.Save();
         else if (!strcmp(argv[1], "load"))
-            xTaskResumeFromISR(thread.app_load_config_handle);
+            flash.Load();
         else
             serialCOM.sendString("Unknown Command\n");
     }
@@ -120,8 +116,7 @@ int32_t CLI::flash(int32_t argc, char** argv) {
     return 0;
 }
 
-
-int32_t CLI::motor(int32_t argc, char** argv) {
+int32_t CLI::cmd_motor(int32_t argc, char** argv) {
     // Detailed Menu
     const char* help_text =
         "\nMotor Functions:\n"
@@ -134,21 +129,16 @@ int32_t CLI::motor(int32_t argc, char** argv) {
             serialCOM.sendString(help_text);
         else if (!strcmp(argv[1], "level")) {
             motor_dac.setLevel(atof(argv[2]));
-			motor_dac.on();
-		}
-        else if (!strcmp(argv[1], "add")){
+        } else if (!strcmp(argv[1], "add")) {
             motor_dac.addLevel(atof(argv[2]));
-			motor_dac.on();
-		}
-        else
+        } else
             serialCOM.sendString("Unknown Command\n");
     }
 
     return 0;
 }
 
-
-int32_t CLI::show(int32_t argc, char** argv) {
+int32_t CLI::cmd_show(int32_t argc, char** argv) {
     xTaskResumeFromISR(thread.app_telemetry_handle);
     return 0;
 }
@@ -156,7 +146,7 @@ int32_t CLI::show(int32_t argc, char** argv) {
 // Default lwshell has only -h option
 // If using git style where help is better syntax,
 // Then, you need to do this help menu manually
-int32_t CLI::help(int32_t argc, char** argv) {
+int32_t CLI::cmd_help(int32_t argc, char** argv) {
     const char* help_menu =
         "\nUsage:  led\t[help] [on] [off]\n"
         "\t\t[breath] [blink] [rapid]\n"
