@@ -11,10 +11,9 @@
 
 /**
  * @brief Construct a new Uart serial COM port
- *
  * @warning setPort(&huartX) is required to run.
- *
  * @note define UART_BUFFER to overwrite the default 64 byte
+ * @note Need linker option: -u _printf_float
  */
 class SerialCOM {
    public:

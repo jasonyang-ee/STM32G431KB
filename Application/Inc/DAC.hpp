@@ -3,10 +3,10 @@
 
 #include "main.h"
 
-class MotorDAC {
+class CustomDAC {
    public:
-    MotorDAC();
-    virtual ~MotorDAC();
+    CustomDAC();
+    virtual ~CustomDAC();
     void setPort(DAC_HandleTypeDef *, uint32_t);
     void setVoltRef(double);
 
@@ -29,7 +29,7 @@ class MotorDAC {
    private:
     void applyLevel();
 	void zeroLevel();
-	void setState(MotorDAC::State);
+	void setState(CustomDAC::State);
 
     double m_level{0.0};
     double m_vref{3.3};

@@ -23,8 +23,8 @@ Thread thread{};
 LED led_user{1000};
 SerialCOM serialCOM{};
 Flash flash{};
-MotorDAC motor_dac{};
-SensorADC sensor_adc{};
+CustomDAC motor_dac{};
+CustomADC sensor_adc{};
 
 /**
  * @brief  The application entry point.
@@ -52,13 +52,10 @@ int main(void) {
     // Instances Initialization
     cli.init();
     serialCOM.setPort(&huart2);
-    led_user.setPort(&htim8.Instance->CCR2);
+	led_user.setPort(&htim8.Instance->CCR2);
     motor_dac.setPort(&hdac1, DAC_CHANNEL_2);
     sensor_adc.setPort(&hadc2);
 
-    
-
-    // DAC1->DHR12R2 = 2500;
 
     // FreeRTOS Start
     vTaskStartScheduler();

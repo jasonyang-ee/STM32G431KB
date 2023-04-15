@@ -1,14 +1,13 @@
-#ifndef CORE_INC_LED
-#define CORE_INC_LED
+#ifndef APPLICATION_INC_LED
+#define APPLICATION_INC_LED
 
 #include "main.h"
 
 /**
  * @brief Construct a new LED::led object
- * @param int32_t(opt) Set PWM reload period.
- * @param int32_t(opt) Set scheduler running frequency in Hz.
+ * @param pwm_period(opt) Set PWM reload period.
+ * @param freq(opt) Set scheduler running frequency in Hz.
  * @warning setPort(&htimX->CCRX) is required to run.
- *
  */
 class LED {
    public:
@@ -65,4 +64,4 @@ class LED {
                              99, 84, 70, 55, 45, 37, 29, 23, 19, 16, 10, 0};
 };
 
-#endif /* CORE_INC_LED */
+#endif    /* APPLICATION_INC_LED */

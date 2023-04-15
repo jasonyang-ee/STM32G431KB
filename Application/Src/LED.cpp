@@ -14,7 +14,7 @@ LED::~LED() { zeroCCR(); }
 /**
  * @brief Initialize with Timer PWM CCR register address reference.
  * @param port Timer PWM CCR register.
- * @note Must use after HAL_TIM_PWM_Start().
+ * @note Must use after MX_TIMx_Init().
  * @note Timer_1 Channel_3: setPort(&htim1.Instance->CCR3)
  */
 void LED::setPort(__IO uint32_t *CCR) { m_CCR = CCR; }
@@ -46,22 +46,19 @@ void LED::toggle() {
  * @brief Activate breathing effect mode
  *
  */
-void LED::breath() {setState(LED::State::s_breath);
-}
+void LED::breath() { setState(LED::State::s_breath); }
 
 /**
  * @brief Activate blinking effect mode
  *
  */
-void LED::blink() {setState(LED::State::s_blink);
-}
+void LED::blink() { setState(LED::State::s_blink); }
 
 /**
  * @brief Activate rapid blinking effect mode
  *
  */
-void LED::rapid() {setState(LED::State::s_rapid);
-}
+void LED::rapid() { setState(LED::State::s_rapid); }
 
 /**
  * @brief Set LED state for flash config loading
@@ -155,9 +152,7 @@ void LED::scheduler() {
 
 // Private Functions
 
-void LED::applyCCR() {
-    *m_CCR = static_cast<uint32_t>(m_level / m_scale * m_CCR_ratio);
-}
+void LED::applyCCR() { *m_CCR = static_cast<uint32_t>(m_level / m_scale * m_CCR_ratio); }
 
 void LED::zeroCCR() { *m_CCR = 0; }
 

@@ -3,10 +3,10 @@
 
 #include "main.h"
 
-class SensorADC {
+class CustomADC {
    public:
-	SensorADC();
-	virtual ~SensorADC();
+	CustomADC();
+	virtual ~CustomADC();
 	void setPort(ADC_HandleTypeDef *);
 
 	uint32_t sample();
