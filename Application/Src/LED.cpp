@@ -77,7 +77,7 @@ uint8_t LED::getState() { return static_cast<uint8_t>(state); }
 /**
  * @brief Set brightness dimming scale.
  *
- * @param int32_t dimming division value. CANNOT be 0.
+ * @param value dimming division value. CANNOT be 0.
  */
 void LED::setScale(int32_t value) {
     if (value == 0) value = 1;  // Prevent dividing 0
@@ -86,9 +86,9 @@ void LED::setScale(int32_t value) {
 }
 
 /**
- * @brief Set brightness level.
+ * @brief Set brightness level %.
  *
- * @param int32_t - value from 0 to 100
+ * @param value - value from 0 to 100
  */
 void LED::setLevel(int32_t value) {
     m_level = value;
@@ -100,13 +100,13 @@ int32_t LED::getScale() { return m_scale; }
 int32_t LED::getLevel() { return m_level; }
 
 /**
- * @brief Increase or Decrease current level
+ * @brief Increase or Decrease current level %
  *
  * @param value supports both positive and negative int32_t
  */
 void LED::addLevel(int32_t value) {
     m_level += value;
-    if (m_level > 1000) m_level = 1000;
+    if (m_level > 100) m_level = 100;
     if (m_level < 0) m_level = 0;
     applyCCR();
 }

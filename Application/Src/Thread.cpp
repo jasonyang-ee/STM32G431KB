@@ -44,11 +44,8 @@ void Thread::init() {
     while (1) {
         cli.init();
         motor_dac.init();
-
         flash.Load();
-
-        motor_dac.setLevel(2.0);
-
+        motor_dac.setLevel(0);
         vTaskSuspend(NULL);
     }
 }
@@ -78,7 +75,6 @@ void Thread::app_telemetry() {
 void Thread::app_dac() {
     while (1) {
         // ADC + DAC
-
         if (sensor_adc.getValue() > 3000)
             motor_dac.setLevel(0);
         else
