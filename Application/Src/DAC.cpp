@@ -25,7 +25,7 @@ void CustomDAC::addLevel(double value) {
 	on();
 }
 
-double CustomDAC::getLevel() { return m_vref; }
+double CustomDAC::getLevel() { return m_level; }
 
 void CustomDAC::on() { setState(CustomDAC::State::s_on); }
 

@@ -13,3 +13,5 @@ uint32_t CustomADC::sample() {
 }
 
 uint32_t CustomADC::getValue() { return m_value; }
+
+double CustomADC::getVolt() { return static_cast<double>(m_value) / 4096 * 3.3; }
