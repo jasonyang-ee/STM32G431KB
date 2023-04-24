@@ -13,7 +13,7 @@ void CLI::init() {
     lwshell_register_cmd("help", &CLI::cmd_help, NULL);
     lwshell_register_cmd("led", &CLI::cmd_led, NULL);
     lwshell_register_cmd("flash", &CLI::cmd_flash, NULL);
-    lwshell_register_cmd("motor", &CLI::cmd_motor, NULL);
+    lwshell_register_cmd("dac", &CLI::cmd_motor, NULL);
     lwshell_register_cmd("show", &CLI::cmd_show, NULL);
 }
 
@@ -98,8 +98,8 @@ int32_t CLI::cmd_flash(int32_t argc, char** argv) {
     // Detailed Menu
     const char* help_text =
         "\nFlash Functions:\n"
-        "  load\tUse setting from flash\n"
-        "  unload\tSave setting to flash\n\n";
+        "  load\t\tse setting from flash\n"
+        "  unload\t\tSave setting to flash\n\n";
 
     // Sub Command
     if (argc == 2) {
@@ -119,15 +119,19 @@ int32_t CLI::cmd_flash(int32_t argc, char** argv) {
 int32_t CLI::cmd_motor(int32_t argc, char** argv) {
     // Detailed Menu
     const char* help_text =
-        "\nMotor Functions:\n"
+        "\nDAC Functions:\n"
         "  level #value\tSet DAC level\n"
         "  add #value\tIncrease or Decrease DAC level\n\n";
 
     // Sub Command
-    if (argc == 3) {
+    if (argc == 2) {
         if (!strcmp(argv[1], "help"))
             serialCOM.sendString(help_text);
-        else if (!strcmp(argv[1], "level")) {
+		else
+            serialCOM.sendString("Unknown Command\n");
+	}
+    if (argc == 3) {
+        if (!strcmp(argv[1], "level")) {
             motor_dac.setLevel(atof(argv[2]));
         } else if (!strcmp(argv[1], "add")) {
             motor_dac.addLevel(atof(argv[2]));
@@ -162,7 +166,7 @@ int32_t CLI::cmd_help(int32_t argc, char** argv) {
         "\n"
         "\tflash\t[save] [load]\n"
         "\n"
-        "\tmotor\t[level *] [add *]\n"
+        "\tdac\t[help] [level *] [add *]\n"
         "\n"
         "\tshow\n";
     serialCOM.sendString(help_menu);

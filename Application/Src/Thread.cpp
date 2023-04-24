@@ -42,7 +42,6 @@ void Thread::init() {
         cli.init();
         motor_dac.init();
         flash.Load();
-        motor_dac.setLevel(2.0);
         vTaskSuspend(NULL);
     }
 }
@@ -57,19 +56,19 @@ void Thread::app_dac() {
     while (1) {
         // ADC + DAC
 
-        if (sensor_adc.getValue() > 3000)
-            motor_dac.setLevel(0);
-        else
-            motor_dac.addLevel(0.1);
+        // if (sensor_adc.getValue() > 3000)
+        //     motor_dac.setLevel(0);
+        // else
+        //     motor_dac.addLevel(0.1);
 
-        serialCOM.sendString("DAC value: ");
-        serialCOM.sendNumber(motor_dac.getLevel());
-        serialCOM.sendString("\nADC value: ");
-        serialCOM.sendNumber(sensor_adc.getVolt());
-        serialCOM.sendLn();
+        // serialCOM.sendString("DAC value: ");
+        // serialCOM.sendNumber(motor_dac.getLevel());
+        // serialCOM.sendString("\nADC value: ");
+        // serialCOM.sendNumber(sensor_adc.getVolt());
+        // serialCOM.sendLn();
 
-        // vTaskSuspend(NULL);
-        vTaskDelay(10000);
+        vTaskSuspend(NULL);
+        // vTaskDelay(10000);
     }
 }
 
@@ -81,7 +80,7 @@ void Thread::schedule_20Hz() {
 }
 void Thread::serial_send() {
     while (1) {
-        ulTaskNotifyTake(pdTRUE, 50);
+        ulTaskNotifyTake(pdTRUE, 300);
         serialCOM.sendOut();
     }
 }
