@@ -65,14 +65,18 @@ int main(void) {
 /* ------------------------- Call Back Functions * ---------------------------------*/
 
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart) {
-    xTaskResumeFromISR(thread.serial_send_handle);
+	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+    vTaskNotifyGiveFromISR(thread.serial_send_handle, &xHigherPriorityTaskWoken);
+	portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
 }
 
 void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size) {
     if (huart->Instance == USART2) {
         // Parse Command
+		BaseType_t xHigherPriorityTaskWoken = pdFALSE;
         cli.setSize(Size);
-        xTaskResumeFromISR(thread.parse_handle);
+        vTaskNotifyGiveFromISR(thread.parse_handle, &xHigherPriorityTaskWoken);
+		portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
 
         // Start the DMA again
         HAL_UARTEx_ReceiveToIdle_IT(&huart2, serialCOM.m_rx_data, UART_BUFFER);

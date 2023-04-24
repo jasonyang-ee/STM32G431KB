@@ -19,9 +19,6 @@ class Thread {
     TaskHandle_t utilities_handle;
     void utilities();
 
-    TaskHandle_t app_telemetry_handle;
-    void app_telemetry();
-
     TaskHandle_t app_dac_handle;
     void app_dac();
 
