@@ -10,10 +10,10 @@ Thread::Thread() {
     // xTaskCreate(_task, "", 512, this, 2, &_Handle);
 
     auto t1 = [](void *arg) { static_cast<Thread *>(arg)->parse(); };
-    xTaskCreate(t1, "cli parsing", 512, this, 1, &parse_handle);
+    xTaskCreate(t1, "cli parsing", 512, this, 2, &parse_handle);
 
     auto t2 = [](void *arg) { static_cast<Thread *>(arg)->init(); };
-    xTaskCreate(t2, "system init", 256, this, 2, &init_handle);
+    xTaskCreate(t2, "system init", 256, this, 6, &init_handle);
 
     // auto t3 = [](void *arg) { static_cast<Thread *>(arg)->utilities(); };
     // xTaskCreate(t3, "utilities", 64, this, 1, &utilities_handle);
@@ -22,10 +22,10 @@ Thread::Thread() {
     xTaskCreate(a2, "dac + adc", 64, this, 0, &app_dac_handle);
 
     auto s1 = [](void *arg) { static_cast<Thread *>(arg)->schedule_20Hz(); };
-    xTaskCreate(s1, "schedule 20Hz", 64, this, 3, &schedule_20Hz_handle);
+    xTaskCreate(s1, "schedule 20Hz", 64, this, 5, &schedule_20Hz_handle);
 
     auto s2 = [](void *arg) { static_cast<Thread *>(arg)->serial_send(); };
-    xTaskCreate(s2, "serial send out", 128, this, 2, &serial_send_handle);
+    xTaskCreate(s2, "serial send out", 128, this, 0, &serial_send_handle);
 }
 
 Thread::~Thread() {}
