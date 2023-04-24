@@ -106,7 +106,7 @@ int32_t LED::getLevel() { return m_level; }
  */
 void LED::addLevel(int32_t value) {
     m_level += value;
-    if (m_level > 1000) m_level = 1000;
+    if (m_level > 100) m_level = 100;
     if (m_level < 0) m_level = 0;
     applyCCR();
 }

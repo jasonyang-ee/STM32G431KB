@@ -49,8 +49,7 @@ int main(void) {
     HAL_UARTEx_ReceiveToIdle_IT(&huart2, serialCOM.m_rx_data, UART_BUFFER);
     HAL_ADC_Start_DMA(&hadc2, &sensor_adc.m_buffer, 1);
 
-    // Instances Initialization
-    cli.init();
+    // Instances Dependency Injection
     serialCOM.setPort(&huart2);
     led_user.setPort(&htim8.Instance->CCR2);
     motor_dac.setPort(&hdac1, DAC_CHANNEL_2);
@@ -66,14 +65,14 @@ int main(void) {
 /* ------------------------- Call Back Functions * ---------------------------------*/
 
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart) {
-    xTaskResumeFromISR(thread.serial_send_handle);
+    vTaskNotifyGiveFromISR(thread.serial_send_handle, NULL);
 }
 
 void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size) {
     if (huart->Instance == USART2) {
         // Parse Command
         cli.setSize(Size);
-        xTaskResumeFromISR(thread.parse_handle);
+        vTaskNotifyGiveFromISR(thread.parse_handle, NULL);
 
         // Start the DMA again
         HAL_UARTEx_ReceiveToIdle_IT(&huart2, serialCOM.m_rx_data, UART_BUFFER);

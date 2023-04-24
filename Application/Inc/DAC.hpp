@@ -9,6 +9,7 @@ class CustomDAC {
     virtual ~CustomDAC();
     void setPort(DAC_HandleTypeDef *, uint32_t);
     void setVoltRef(double);
+	void init();
 
 	// Unscoped to allow config saving to flash
     enum State {

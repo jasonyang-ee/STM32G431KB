@@ -13,6 +13,8 @@ void CustomDAC::setPort(DAC_HandleTypeDef *port, uint32_t channel) {
 
 void CustomDAC::setVoltRef(double value) { m_vref = value; }
 
+void CustomDAC::init() { HAL_DAC_Start(m_port, m_channel); }
+
 void CustomDAC::setLevel(double value) {
     m_level = value;
     on();
@@ -22,7 +24,7 @@ void CustomDAC::addLevel(double value) {
     m_level += value;
     if (m_level > m_vref) m_level = m_vref;
     if (m_level < 0) m_level = 0;
-	on();
+    on();
 }
 
 double CustomDAC::getLevel() { return m_level; }
@@ -50,7 +52,6 @@ void CustomDAC::setState(CustomDAC::State cmd) {
             zeroLevel();
             break;
         case CustomDAC::State::s_on:
-            HAL_DAC_Start(m_port, m_channel);
             applyLevel();
             break;
     }
