@@ -145,7 +145,9 @@ void MX_TIM7_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN TIM7_Init 2 */
-
+  __TIM7_CLK_ENABLE();
+  HAL_TIM_Base_Init(&htim7);
+  HAL_TIM_Base_Start(&htim7);
   /* USER CODE END TIM7_Init 2 */
 
 }

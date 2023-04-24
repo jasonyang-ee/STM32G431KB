@@ -139,7 +139,15 @@ int32_t CLI::cmd_motor(int32_t argc, char** argv) {
 }
 
 int32_t CLI::cmd_show(int32_t argc, char** argv) {
-    xTaskResumeFromISR(thread.app_telemetry_handle);
+	serialCOM.sendString("LED level: ");
+	serialCOM.sendNumber(led_user.getLevel());
+	serialCOM.sendString("\nLED scale: ");
+	serialCOM.sendNumber(led_user.getScale());
+	serialCOM.sendString("\nDAC Target Value: ");
+	serialCOM.sendNumber(motor_dac.getLevel());
+	serialCOM.sendString("\nADC Sensing Value: ");
+	serialCOM.sendNumber(sensor_adc.getVolt());
+	serialCOM.sendLn();
     return 0;
 }
 
