@@ -1,0 +1,17 @@
+name: "PR Test"
+on:
+  pull_request:
+    branches:
+      - main
+    paths-ignore:
+      - '**.md'
+
+jobs:
+  pr-check:
+    runs-on: ubuntu-latest
+    container:
+      image: "ghcr.io/jasonyang-ee/stm32-builder:Ubuntu-latest"
+    steps:
+      - uses: actions/checkout@v3
+      - name: BUILD
+        run: build.sh

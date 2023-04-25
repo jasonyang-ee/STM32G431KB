@@ -12,15 +12,16 @@ Flash::~Flash() {}
  * 
  */
 void Flash::Save() {
-    Flash::Config_Arr current_config{};
+    Flash::Config_Arr config{};
 
 	// Gether config from all instances into one object
-    current_config.config.led_level = led_user.getLevel();
-    current_config.config.led_scale = led_user.getScale();
-    current_config.config.led_state = led_user.getState();
+    config.list.led_level = led_user.getLevel();
+    config.list.led_scale = led_user.getScale();
+    config.list.led_state = led_user.getState();
+	config.list.dac_level = motor_dac.getLevel();
 
 	// Save config object aligned into uint64_t array into flash
-    Write(current_config.config_arr, config_arr_size);
+    Write(config.config_arr, config_arr_size);
 }
 
 
@@ -29,15 +30,16 @@ void Flash::Save() {
  * 
  */
 void Flash::Load() {
-    Flash::Config_Arr loaded_config{};
+    Flash::Config_Arr config{};
 
 	// Read config and save into the prepared config object
-    Read(&loaded_config, config_arr_size);
+    Read(&config, config_arr_size);
 
 	// Unpack all config back to instances
-	led_user.setLevel(loaded_config.config.led_level);
-    led_user.setScale(loaded_config.config.led_scale);
-    led_user.setState(loaded_config.config.led_state);
+	led_user.setLevel(config.list.led_level);
+    led_user.setScale(config.list.led_scale);
+    led_user.setState(config.list.led_state);
+	motor_dac.setLevel(config.list.dac_level);
 }
 
 
@@ -81,13 +83,13 @@ int32_t Flash::Write(const uint64_t *data, uint8_t size) {
     return 0;
 }
 
-void Flash::Read(Flash::Config_Arr *loaded_config, uint8_t) {
+void Flash::Read(Flash::Config_Arr *config, uint8_t) {
     uint16_t data_ptr{0};
     uint32_t address{m_address_end};
 
 	// Read 64 bits (a row) per loop and save into config object
     for(int i=0; i<config_arr_size; i++){
-        loaded_config->config_arr[data_ptr] = (*(__IO uint64_t *)address);
+        config->config_arr[data_ptr] = (*(__IO uint64_t *)address);
         address -= 8;
         data_ptr++;
     }

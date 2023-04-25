@@ -65,9 +65,7 @@ int main(void) {
 /* ------------------------- Call Back Functions * ---------------------------------*/
 
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart) {
-	BaseType_t priorityISR = pdFALSE;
-	vTaskNotifyGiveFromISR(thread.serial_send_handle, &priorityISR);
-	portYIELD_FROM_ISR(priorityISR);
+    vTaskNotifyGiveFromISR(thread.serial_send_handle, NULL);
 }
 
 void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size) {
@@ -76,7 +74,6 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size) {
 		BaseType_t priorityISR = pdFALSE;
         cli.setSize(Size);
         vTaskNotifyGiveFromISR(thread.parse_handle, NULL);
-		portYIELD_FROM_ISR(priorityISR);
 
         // Start the DMA again
         HAL_UARTEx_ReceiveToIdle_IT(&huart2, serialCOM.m_rx_data, UART_BUFFER);
