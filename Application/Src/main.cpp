@@ -71,7 +71,6 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart) {
 void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size) {
     if (huart->Instance == USART2) {
         // Parse Command
-		BaseType_t priorityISR = pdFALSE;
         cli.setSize(Size);
         vTaskNotifyGiveFromISR(thread.parse_handle, NULL);
 

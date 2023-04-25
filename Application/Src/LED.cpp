@@ -63,7 +63,7 @@ void LED::rapid() { setState(LED::State::s_rapid); }
 /**
  * @brief Set LED state for flash config loading
  *
- * @param uint8_t - 0=off, 1=on, 2=breath, 3=blink, 4=rapid
+ * @param cmd - 0=off, 1=on, 2=breath, 3=blink, 4=rapid
  */
 void LED::setState(uint8_t cmd) { setState(static_cast<LED::State>(cmd)); }
 
