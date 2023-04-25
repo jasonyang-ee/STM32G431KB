@@ -63,7 +63,7 @@ void LED::rapid() { setState(LED::State::s_rapid); }
 /**
  * @brief Set LED state for flash config loading
  *
- * @param uint8_t - 0=off, 1=on, 2=breath, 3=blink, 4=rapid
+ * @param cmd - 0=off, 1=on, 2=breath, 3=blink, 4=rapid
  */
 void LED::setState(uint8_t cmd) { setState(static_cast<LED::State>(cmd)); }
 
@@ -77,7 +77,7 @@ uint8_t LED::getState() { return static_cast<uint8_t>(state); }
 /**
  * @brief Set brightness dimming scale.
  *
- * @param int32_t dimming division value. CANNOT be 0.
+ * @param value dimming division value. CANNOT be 0.
  */
 void LED::setScale(int32_t value) {
     if (value == 0) value = 1;  // Prevent dividing 0
@@ -86,9 +86,9 @@ void LED::setScale(int32_t value) {
 }
 
 /**
- * @brief Set brightness level.
+ * @brief Set brightness level %.
  *
- * @param int32_t - value from 0 to 100
+ * @param value - value from 0 to 100
  */
 void LED::setLevel(int32_t value) {
     m_level = value;
@@ -100,7 +100,7 @@ int32_t LED::getScale() { return m_scale; }
 int32_t LED::getLevel() { return m_level; }
 
 /**
- * @brief Increase or Decrease current level
+ * @brief Increase or Decrease current level %
  *
  * @param value supports both positive and negative int32_t
  */
