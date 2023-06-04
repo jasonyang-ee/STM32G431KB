@@ -4,6 +4,7 @@ ${PROJ_PATH}/Application/Src/ADC.cpp
 ${PROJ_PATH}/Application/Src/CLI.cpp
 ${PROJ_PATH}/Application/Src/DAC.cpp
 ${PROJ_PATH}/Application/Src/Flash_STM32G431KB.cpp
+${PROJ_PATH}/Application/Src/GPIO.cpp
 ${PROJ_PATH}/Application/Src/LED.cpp
 ${PROJ_PATH}/Application/Src/main.cpp
 ${PROJ_PATH}/Application/Src/SerialCOM.cpp
