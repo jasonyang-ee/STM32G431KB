@@ -15,11 +15,11 @@ Thread::Thread() {
     auto t2 = [](void *arg) { static_cast<Thread *>(arg)->init(); };
     xTaskCreate(t2, "system init", 256, this, 6, &init_handle);
 
-    // auto t3 = [](void *arg) { static_cast<Thread *>(arg)->utilities(); };
-    // xTaskCreate(t3, "utilities", 64, this, 1, &utilities_handle);
+    auto t3 = [](void *arg) { static_cast<Thread *>(arg)->utilities(); };
+    xTaskCreate(t3, "utilities", 128, this, 1, &utilities_handle);
 
     auto a2 = [](void *arg) { static_cast<Thread *>(arg)->app_dac(); };
-    xTaskCreate(a2, "dac + adc", 64, this, 0, &app_dac_handle);
+    xTaskCreate(a2, "dac + adc", 128, this, 0, &app_dac_handle);
 
     auto s1 = [](void *arg) { static_cast<Thread *>(arg)->schedule_20Hz(); };
     xTaskCreate(s1, "schedule 20Hz", 64, this, 5, &schedule_20Hz_handle);
@@ -48,27 +48,21 @@ void Thread::init() {
 
 void Thread::utilities() {
     while (1) {
-        vTaskSuspend(NULL);
+		serialCOM.sendString("\nDAC Target Value: ");
+		serialCOM.sendNumber(motor_dac.getLevel());
+		serialCOM.sendString("\nADC Sensing Value: ");
+		serialCOM.sendNumber(sensor_adc.getVolt());
+		serialCOM.sendLn();
+        // vTaskSuspend(NULL);
+        vTaskDelay(1000);
     }
 }
 
 void Thread::app_dac() {
     while (1) {
-        // ADC + DAC
-
-        // if (sensor_adc.getValue() > 3000)
-        //     motor_dac.setLevel(0);
-        // else
-        //     motor_dac.addLevel(0.1);
-
-        // serialCOM.sendString("DAC value: ");
-        // serialCOM.sendNumber(motor_dac.getLevel());
-        // serialCOM.sendString("\nADC value: ");
-        // serialCOM.sendNumber(sensor_adc.getVolt());
-        // serialCOM.sendLn();
-
-        vTaskSuspend(NULL);
-        // vTaskDelay(10000);
+        motor_dac.schedule();
+        // vTaskSuspend(NULL);
+        vTaskDelay(1000);
     }
 }
 

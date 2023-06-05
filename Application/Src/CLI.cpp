@@ -120,16 +120,24 @@ int32_t CLI::cmd_motor(int32_t argc, char** argv) {
     // Detailed Menu
     const char* help_text =
         "\nDAC Functions:\n"
+        "  breath \tBreathing DAC\n"
         "  level #value\tSet DAC level\n"
         "  add #value\tIncrease or Decrease DAC level\n\n";
 
     // Sub Command
     if (argc == 2) {
-        if (!strcmp(argv[1], "help"))
+        if (!strcmp(argv[1], "help")) {
             serialCOM.sendString(help_text);
-		else
+        } else if (!strcmp(argv[1], "on")) {
+            motor_dac.on();
+        } else if (!strcmp(argv[1], "off")) {
+            motor_dac.off();
+        } else if (!strcmp(argv[1], "breath")) {
+            motor_dac.breath();
+        } else {
             serialCOM.sendString("Unknown Command\n");
-	}
+        }
+    }
     if (argc == 3) {
         if (!strcmp(argv[1], "level")) {
             motor_dac.setLevel(atof(argv[2]));

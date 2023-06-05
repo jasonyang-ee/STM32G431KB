@@ -15,6 +15,7 @@ class CustomDAC {
     enum State {
         s_off,
         s_on,
+		s_breath,
     } m_state;
 
     void setLevel(double);
@@ -26,6 +27,9 @@ class CustomDAC {
 
     void on();
     void off();
+	void breath();
+
+	void schedule();
 
    private:
     void applyLevel();
@@ -34,6 +38,8 @@ class CustomDAC {
 
     double m_level{0.0};
     double m_vref{3.3};
+
+	uint32_t m_breeath_period{325};
 
 	/**
 	 * @brief Using HAL predefined bit mask for DAC output options

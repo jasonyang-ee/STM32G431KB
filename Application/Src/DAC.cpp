@@ -1,6 +1,7 @@
 #include "DAC.hpp"
 
 #include "Instances.hpp"
+#include "cmath"
 
 CustomDAC::CustomDAC() {}
 
@@ -33,6 +34,15 @@ void CustomDAC::on() { setState(CustomDAC::State::s_on); }
 
 void CustomDAC::off() { setState(CustomDAC::State::s_off); }
 
+void CustomDAC::breath() { setState(CustomDAC::State::s_breath); }
+
+void CustomDAC::schedule() {
+    if (m_state == CustomDAC::State::s_breath) {
+        m_level = abs(sin(HAL_GetTick() % m_breeath_period)) * 3.3;
+    }
+	applyLevel();
+}
+
 void CustomDAC::setState(uint8_t cmd) { setState(static_cast<CustomDAC::State>(cmd)); }
 
 uint8_t CustomDAC::getState() { return static_cast<uint8_t>(m_state); }
@@ -53,6 +63,9 @@ void CustomDAC::setState(CustomDAC::State cmd) {
             break;
         case CustomDAC::State::s_on:
             applyLevel();
+            break;
+        case CustomDAC::State::s_breath:
+			zeroLevel();
             break;
     }
     m_state = cmd;
