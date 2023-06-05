@@ -134,6 +134,10 @@ int32_t CLI::cmd_motor(int32_t argc, char** argv) {
             motor_dac.off();
         } else if (!strcmp(argv[1], "breath")) {
             motor_dac.breath();
+        } else if (!strcmp(argv[1], "stream_on")) {
+			xTaskResumeFromISR(thread.utilities_handle);
+        } else if (!strcmp(argv[1], "stream_off")) {
+			vTaskSuspend(thread.utilities_handle);
         } else {
             serialCOM.sendString("Unknown Command\n");
         }

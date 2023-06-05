@@ -42,6 +42,7 @@ void Thread::init() {
         cli.init();
         motor_dac.init();
         flash.Load();
+		vTaskSuspend(utilities_handle);
         vTaskSuspend(NULL);
     }
 }
