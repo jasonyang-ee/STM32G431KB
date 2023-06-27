@@ -9,14 +9,6 @@
 #include "tim.h"
 #include "usart.h"
 
-void SystemClock_Config(void);
-
-// Interrupts Functions
-void PWM_PulseFinishedCallback(TIM_HandleTypeDef *);
-void HAL_UART_TxCpltCallback(UART_HandleTypeDef *);
-void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *);
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *);
-
 // Instances Objects
 CLI cli{};
 Thread thread{};
@@ -25,6 +17,8 @@ SerialCOM serialCOM{};
 Flash flash{};
 CustomDAC motor_dac{};
 CustomADC sensor_adc{};
+
+sml::sm<MotorState> motor_sm{&motor_dac, &thread};
 
 /**
  * @brief  The application entry point.

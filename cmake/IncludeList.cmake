@@ -1,5 +1,8 @@
 set(include_list ${include_list}
 ${PROJ_PATH}/Application/Inc
+${PROJ_PATH}/Application/Inc/boost
+${PROJ_PATH}/Application/Inc/boost/sml
+${PROJ_PATH}/Application/Inc/boost/sml/utility
 ${PROJ_PATH}/Application/Inc/lwshell
 ${PROJ_PATH}/Core/Inc
 ${PROJ_PATH}/Drivers/CMSIS/Device/ST/STM32G4xx/Include
