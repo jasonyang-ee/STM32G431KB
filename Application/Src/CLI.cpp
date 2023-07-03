@@ -135,9 +135,9 @@ int32_t CLI::cmd_motor(int32_t argc, char** argv) {
         } else if (!strcmp(argv[1], "breath")) {
             motor_dac.breath();
         } else if (!strcmp(argv[1], "stream_on")) {
-			xTaskResumeFromISR(thread.utilities_handle);
+            xTaskResumeFromISR(thread.utilities_handle);
         } else if (!strcmp(argv[1], "stream_off")) {
-			vTaskSuspend(thread.utilities_handle);
+            vTaskSuspend(thread.utilities_handle);
         } else {
             serialCOM.sendString("Unknown Command\n");
         }
@@ -155,15 +155,25 @@ int32_t CLI::cmd_motor(int32_t argc, char** argv) {
 }
 
 int32_t CLI::cmd_show(int32_t argc, char** argv) {
-    serialCOM.sendString("LED level: ");
-    serialCOM.sendNumber(led_user.getLevel());
-    serialCOM.sendString("\nLED scale: ");
-    serialCOM.sendNumber(led_user.getScale());
-    serialCOM.sendString("\nDAC Target Value: ");
-    serialCOM.sendNumber(motor_dac.getLevel());
-    serialCOM.sendString("\nADC Sensing Value: ");
-    serialCOM.sendNumber(sensor_adc.getVolt());
-    serialCOM.sendLn();
+    // Detailed Menu
+    const char* help_text =
+        "\nShow Telemetry:\n"
+        "  one \tShow Telemetry Once\n"
+        "  all \tStream All Telemetry\n"
+        "  blower \tStream Blower Telemetry\n"
+        "  off \tStop Stream\n\n";
+
+    if (!strcmp(argv[1], "help")) {
+        serialCOM.sendString(help_text);
+    } else if (!strcmp(argv[1], "all")) {
+        stream_sm.process_event(start{});
+    } else if (!strcmp(argv[1], "off")) {
+        stream_sm.process_event(stop{});
+    } else if (!strcmp(argv[1], "one")) {
+        stream_sm.process_event(oneshot{});
+    } else {
+        serialCOM.sendString("Unknown Command\n");
+    }
     return 0;
 }
 

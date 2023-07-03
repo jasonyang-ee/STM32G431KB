@@ -13,6 +13,9 @@ class Thread {
     TaskHandle_t parse_handle;
     void parse();
 
+	TaskHandle_t telemetry_human_handle;
+	void telemetry_human();
+
     TaskHandle_t init_handle;
     void init();
 
@@ -27,6 +30,10 @@ class Thread {
 
     TaskHandle_t serial_send_handle;
     void serial_send();
+
+
+	// Settings
+	uint16_t m_stream_freq{500};
 };
 
 #endif    /* APPLICATION_INC_THREAD */

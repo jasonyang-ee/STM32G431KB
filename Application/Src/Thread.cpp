@@ -9,43 +9,38 @@ Thread::Thread() {
     // auto _task = [](void *arg) { static_cast<Thread *>(arg)->(); };
     // xTaskCreate(_task, "", 512, this, 2, &_Handle);
 
-    auto t1 = [](void *arg) { static_cast<Thread *>(arg)->parse(); };
-    xTaskCreate(t1, "cli parsing", 512, this, 2, &parse_handle);
-
-    auto t2 = [](void *arg) { static_cast<Thread *>(arg)->init(); };
-    xTaskCreate(t2, "system init", 256, this, 6, &init_handle);
+	auto t1 = [](void *arg) { static_cast<Thread *>(arg)->telemetry_human(); };
+	xTaskCreate(t1, "telemetry_human", 128, this, 1, &telemetry_human_handle);
+	vTaskSuspend(telemetry_human_handle);
 
     auto t3 = [](void *arg) { static_cast<Thread *>(arg)->utilities(); };
     xTaskCreate(t3, "utilities", 128, this, 1, &utilities_handle);
 
     auto a2 = [](void *arg) { static_cast<Thread *>(arg)->app_dac(); };
-    xTaskCreate(a2, "dac + adc", 128, this, 0, &app_dac_handle);
+    xTaskCreate(a2, "dac + adc", 64, this, 0, &app_dac_handle);
+
+    auto s0 = [](void *arg) { static_cast<Thread *>(arg)->init(); };
+    xTaskCreate(s0, "system init", 256, this, 6, &init_handle);
 
     auto s1 = [](void *arg) { static_cast<Thread *>(arg)->schedule_20Hz(); };
     xTaskCreate(s1, "schedule 20Hz", 64, this, 5, &schedule_20Hz_handle);
 
-    auto s2 = [](void *arg) { static_cast<Thread *>(arg)->serial_send(); };
-    xTaskCreate(s2, "serial send out", 128, this, 0, &serial_send_handle);
+    auto s11 = [](void *arg) { static_cast<Thread *>(arg)->serial_send(); };
+    xTaskCreate(s11, "serial send out", 64, this, 0, &serial_send_handle);
+
+    auto s12 = [](void *arg) { static_cast<Thread *>(arg)->parse(); };
+    xTaskCreate(s12, "cli parsing", 512, this, 2, &parse_handle);
 }
 
 Thread::~Thread() {}
 
-void Thread::parse() {
-    while (1) {
-        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-        cli.parse();
-    }
-}
 
-void Thread::init() {
-    while (1) {
-        cli.init();
-        motor_dac.init();
-        flash.Load();
-		vTaskSuspend(utilities_handle);
-        vTaskSuspend(NULL);
-    }
-}
+/*---------------------------------------------------------------------------
+
+        Applications
+
+---------------------------------------------------------------------------*/
+
 
 void Thread::utilities() {
     while (1) {
@@ -67,6 +62,23 @@ void Thread::app_dac() {
     }
 }
 
+
+/*---------------------------------------------------------------------------
+
+        System initialization and periodic update
+
+---------------------------------------------------------------------------*/
+
+void Thread::init() {
+    while (1) {
+        cli.init();
+        motor_dac.init();
+        flash.Load();
+		vTaskSuspend(utilities_handle);
+        vTaskSuspend(NULL);
+    }
+}
+
 void Thread::schedule_20Hz() {
     while (1) {
         led_user.scheduler();
@@ -77,5 +89,12 @@ void Thread::serial_send() {
     while (1) {
         ulTaskNotifyTake(pdTRUE, 300);
         serialCOM.sendOut();
+    }
+}
+
+void Thread::parse() {
+    while (1) {
+        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+        cli.parse();
     }
 }

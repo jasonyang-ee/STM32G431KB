@@ -18,7 +18,8 @@ Flash flash{};
 CustomDAC motor_dac{};
 CustomADC sensor_adc{};
 
-sml::sm<MotorState> motor_sm{&motor_dac, &thread};
+sml::sm<StreamState> stream_sm{&thread};
+sml::sm<MainState> main_sm{&thread};
 
 /**
  * @brief  The application entry point.
@@ -64,12 +65,12 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart) {
 
 void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size) {
     if (huart->Instance == USART2) {
+        // Start the DMA again before jumping thread
+        HAL_UARTEx_ReceiveToIdle_IT(&huart2, serialCOM.m_rx_data, UART_BUFFER);
+
         // Parse Command
         cli.setSize(Size);
         vTaskNotifyGiveFromISR(thread.parse_handle, NULL);
-
-        // Start the DMA again
-        HAL_UARTEx_ReceiveToIdle_IT(&huart2, serialCOM.m_rx_data, UART_BUFFER);
     }
 }
 

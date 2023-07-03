@@ -20,6 +20,7 @@ extern Flash flash;
 extern CustomDAC motor_dac;
 extern CustomADC sensor_adc;
 
-extern sml::sm<MotorState> motor_sm;
+extern sml::sm<StreamState> stream_sm;
+extern sml::sm<MainState> main_sm;
 
 #endif    /* APPLICATION_INC_INSTANCES */
