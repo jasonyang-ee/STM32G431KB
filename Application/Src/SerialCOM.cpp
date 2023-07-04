@@ -25,21 +25,14 @@ void SerialCOM::sendLn() { m_buffer_msg.append("\n"); };
 void SerialCOM::sendString(std::string msg) { m_buffer_msg.append(msg); }
 
 /**
- * @brief Append single number to buffer.
- *
- * @param value all kinds of numbers.
+ * @brief Append bool to buffer as text.
+ * 
+ * @param value bool value.
  */
-void SerialCOM::sendNumber(int value) { m_buffer_msg.append(std::to_string(value)); }
-void SerialCOM::sendNumber(float value) { m_buffer_msg.append(std::to_string(value)); }
-void SerialCOM::sendNumber(double value) { m_buffer_msg.append(std::to_string(value)); }
-void SerialCOM::sendNumber(uint8_t value) { m_buffer_msg.append(std::to_string(value)); }
-void SerialCOM::sendNumber(uint16_t value) { m_buffer_msg.append(std::to_string(value)); }
-void SerialCOM::sendNumber(uint32_t value) { m_buffer_msg.append(std::to_string(value)); }
-void SerialCOM::sendNumber(uint64_t value) { m_buffer_msg.append(std::to_string(value)); }
-void SerialCOM::sendNumber(int8_t value) { m_buffer_msg.append(std::to_string(value)); }
-void SerialCOM::sendNumber(int16_t value) { m_buffer_msg.append(std::to_string(value)); }
-void SerialCOM::sendNumber(int32_t value) { m_buffer_msg.append(std::to_string(value)); }
-void SerialCOM::sendNumber(int64_t value) { m_buffer_msg.append(std::to_string(value)); }
+void SerialCOM::sendNumber(bool value) {
+    value ? m_buffer_msg.append("ON") : m_buffer_msg.append("OFF");
+}
+
 
 /**
  * @brief Periodically send uart in DMA mode if buffer !empty.

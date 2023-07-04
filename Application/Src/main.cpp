@@ -19,7 +19,7 @@ CustomDAC dac{};
 CustomADC adc{};
 
 sml::sm<StreamState> stream_sm{&thread};
-sml::sm<MainState, sml::process_queue<std::queue>, sml::defer_queue<std::deque>> main_sm{&thread, &serialCOM};
+sml::sm<MainState, sml::process_queue<std::queue>> main_sm{&thread, &serialCOM};
 
 /**
  * @brief  The application entry point.

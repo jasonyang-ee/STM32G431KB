@@ -2,6 +2,7 @@
 #define CORE_INC_SERIALCOM
 
 #include "algorithm"
+#include "array"
 #include "main.h"
 #include "string"
 
@@ -23,26 +24,38 @@ class SerialCOM {
 
     void sendLn();
     void sendString(std::string);
-    void sendNumber(int);
-    void sendNumber(float);
-    void sendNumber(double);
-    void sendNumber(uint8_t);
-    void sendNumber(uint16_t);
-    void sendNumber(uint32_t);
-    void sendNumber(uint64_t);
-    void sendNumber(int8_t);
-    void sendNumber(int16_t);
-    void sendNumber(int32_t);
-    void sendNumber(int64_t);
+    void sendNumber(bool);
 
-	
+
+    /**
+     * @brief Append single number to buffer.
+     *
+     * @param value all kinds of numbers.
+     */
+    template <class T>
+    void sendNumber(T value) {
+        m_buffer_msg.append(std::to_string(value));
+    }
+
+    /**
+     * @brief Append array of numbers to buffer.
+     *
+     * @param items std::array of numbers.
+     */
+    template <class T, size_t N>
+    void sendNumber(std::array<T, N> items) {
+        for (auto &i : items) {
+            m_buffer_msg.append(std::to_string(i));
+            if (&i != &items.back()) m_buffer_msg.append(", ");
+        }
+    }
+
     bool sendOut();
 
     // Tx Rx Memory for DMA to fetch and push
     uint8_t m_tx_data[UART_BUFFER];  // UART_BUFFER may be re-defined in main.h
     uint8_t m_rx_data[UART_BUFFER];
 
-   private:
     // Port
     UART_HandleTypeDef *m_port;
 
