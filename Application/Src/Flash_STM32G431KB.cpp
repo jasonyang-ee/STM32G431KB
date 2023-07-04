@@ -18,7 +18,7 @@ void Flash::Save() {
     config.list.led_level = led_user.getLevel();
     config.list.led_scale = led_user.getScale();
     config.list.led_state = led_user.getState();
-	config.list.dac_level = motor_dac.getLevel();
+	config.list.dac_level = dac.getLevel();
 
 	// Save config object aligned into uint64_t array into flash
     Write(config.config_arr, config_arr_size);
@@ -39,7 +39,7 @@ void Flash::Load() {
 	led_user.setLevel(config.list.led_level);
     led_user.setScale(config.list.led_scale);
     led_user.setState(config.list.led_state);
-	motor_dac.setLevel(config.list.dac_level);
+	dac.setLevel(config.list.dac_level);
 }
 
 

@@ -17,7 +17,8 @@ class CLI {
     static int32_t cmd_help(int32_t, char**);
     static int32_t cmd_led(int32_t, char**);
     static int32_t cmd_flash(int32_t, char**);
-    static int32_t cmd_motor(int32_t, char**);
+	static int32_t cmd_idle(int32_t, char**);
+    static int32_t cmd_dac(int32_t, char**);
     static int32_t cmd_show(int32_t, char**);
 
 	private:

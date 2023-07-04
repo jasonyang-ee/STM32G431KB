@@ -13,7 +13,8 @@ void CLI::init() {
     lwshell_register_cmd("help", &CLI::cmd_help, NULL);
     lwshell_register_cmd("led", &CLI::cmd_led, NULL);
     lwshell_register_cmd("flash", &CLI::cmd_flash, NULL);
-    lwshell_register_cmd("dac", &CLI::cmd_motor, NULL);
+	lwshell_register_cmd("idle", &CLI::cmd_idle, NULL);
+    lwshell_register_cmd("dac", &CLI::cmd_dac, NULL);
     lwshell_register_cmd("show", &CLI::cmd_show, NULL);
 }
 
@@ -116,7 +117,17 @@ int32_t CLI::cmd_flash(int32_t argc, char** argv) {
     return 0;
 }
 
-int32_t CLI::cmd_motor(int32_t argc, char** argv) {
+int32_t CLI::cmd_idle(int32_t argc, char** argv) { 
+	
+	if (argc == 1) {
+		main_sm.process_event(shutdown{});
+		main_sm.process_event(start{});
+	} else {
+		serialCOM.sendString("Unknown Command\n");
+	}
+	return 0; }
+
+int32_t CLI::cmd_dac(int32_t argc, char** argv) {
     // Detailed Menu
     const char* help_text =
         "\nDAC Functions:\n"
@@ -125,28 +136,27 @@ int32_t CLI::cmd_motor(int32_t argc, char** argv) {
         "  add #value\tIncrease or Decrease DAC level\n\n";
 
     // Sub Command
-    if (argc == 2) {
+    if (argc ==1) {
+		main_sm.process_event(shutdown{});
+		main_sm.process_event(dac_update{});
+	} else if (argc == 2) {
         if (!strcmp(argv[1], "help")) {
             serialCOM.sendString(help_text);
         } else if (!strcmp(argv[1], "on")) {
-            motor_dac.on();
+            dac.on();
         } else if (!strcmp(argv[1], "off")) {
-            motor_dac.off();
+            dac.off();
         } else if (!strcmp(argv[1], "breath")) {
-            motor_dac.breath();
-        } else if (!strcmp(argv[1], "stream_on")) {
-            xTaskResumeFromISR(thread.utilities_handle);
-        } else if (!strcmp(argv[1], "stream_off")) {
-            vTaskSuspend(thread.utilities_handle);
+            dac.breath();
         } else {
             serialCOM.sendString("Unknown Command\n");
         }
     }
     if (argc == 3) {
         if (!strcmp(argv[1], "level")) {
-            motor_dac.setLevel(atof(argv[2]));
+            dac.setLevel(atof(argv[2]));
         } else if (!strcmp(argv[1], "add")) {
-            motor_dac.addLevel(atof(argv[2]));
+            dac.addLevel(atof(argv[2]));
         } else
             serialCOM.sendString("Unknown Command\n");
     }
@@ -158,19 +168,19 @@ int32_t CLI::cmd_show(int32_t argc, char** argv) {
     // Detailed Menu
     const char* help_text =
         "\nShow Telemetry:\n"
-        "  one \tShow Telemetry Once\n"
-        "  all \tStream All Telemetry\n"
-        "  blower \tStream Blower Telemetry\n"
-        "  off \tStop Stream\n\n";
+        "  Stream Telemetry\n"
+        "  one \tShow Telemetry Once\n\n";
 
-    if (!strcmp(argv[1], "help")) {
-        serialCOM.sendString(help_text);
-    } else if (!strcmp(argv[1], "all")) {
-        stream_sm.process_event(start{});
-    } else if (!strcmp(argv[1], "off")) {
-        stream_sm.process_event(stop{});
-    } else if (!strcmp(argv[1], "one")) {
-        stream_sm.process_event(oneshot{});
+    if (argc == 1) {
+        stream_sm.process_event(toggle{});
+    } else if (argc == 2) {
+        if (!strcmp(argv[1], "help")) {
+            serialCOM.sendString(help_text);
+        } else if (!strcmp(argv[1], "one")) {
+            stream_sm.process_event(oneshot{});
+        } else {
+            serialCOM.sendString("Unknown Command\n");
+        }
     } else {
         serialCOM.sendString("Unknown Command\n");
     }
@@ -190,7 +200,7 @@ int32_t CLI::cmd_help(int32_t argc, char** argv) {
         "\n"
         "\tdac\t[help] [level *] [add *]\n"
         "\n"
-        "\tshow\n";
+        "\tshow\t[help] [one]\n";
     serialCOM.sendString(help_menu);
     return 0;
 }

@@ -18,7 +18,7 @@ class Flash {
    private:
     // Update config_arr_size according to the sizeof(config)/sizeof(uint64_t)
     // ------------------- MUST EDIT -------------------
-#define config_arr_size 50
+#define config_arr_size 10
     union Config_Arr {
         struct Config {
             uint32_t led_level;

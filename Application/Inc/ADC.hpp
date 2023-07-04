@@ -1,23 +1,25 @@
 #ifndef APPLICATION_INC_ADC
 #define APPLICATION_INC_ADC
 
+#include "array"
+#include "cmath"
 #include "main.h"
+
+#ifndef ADC_BUFFER
+#define ADC_BUFFER 10
+#endif
 
 class CustomADC {
    public:
-	CustomADC();
-	virtual ~CustomADC();
-	void setPort(ADC_HandleTypeDef *);
+    CustomADC();
+    virtual ~CustomADC();
 
-	uint32_t sample();
-	uint32_t getValue();
-	double getVolt();
+    void saveSample(uint8_t);
 
-	uint32_t m_buffer;
+    std::array <uint32_t, 1> m_buffer;
 
-   private:
-	uint32_t m_value{};
-	ADC_HandleTypeDef *m_port;
+    // Public Data
+    uint32_t volt_from_dac{};
 };
 
-#endif    /* APPLICATION_INC_ADC */
+#endif /* APPLICATION_INC_ADC */

@@ -5,13 +5,17 @@ CustomADC::CustomADC() {}
 
 CustomADC::~CustomADC() {}
 
-void CustomADC::setPort(ADC_HandleTypeDef *port) { m_port = port; }
-
-uint32_t CustomADC::sample() {
-    m_value = m_buffer;
-    return m_value;
+void CustomADC::saveSample(uint8_t port) {
+	switch (port) {
+		// hadc1
+		case 1:
+			break;
+		// hadc2
+		case 2:
+			volt_from_dac = m_buffer.at(0);
+			break;
+		default:
+			break;
+	}
 }
 
-uint32_t CustomADC::getValue() { return m_value; }
-
-double CustomADC::getVolt() { return static_cast<double>(m_value) / 4096 * 3.3; }

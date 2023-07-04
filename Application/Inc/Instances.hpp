@@ -17,10 +17,10 @@ extern SerialCOM serialCOM;
 extern CLI cli;
 extern Thread thread;
 extern Flash flash;
-extern CustomDAC motor_dac;
-extern CustomADC sensor_adc;
+extern CustomDAC dac;
+extern CustomADC adc;
 
 extern sml::sm<StreamState> stream_sm;
-extern sml::sm<MainState> main_sm;
+extern sml::sm<MainState, sml::process_queue<std::queue>> main_sm;
 
 #endif    /* APPLICATION_INC_INSTANCES */

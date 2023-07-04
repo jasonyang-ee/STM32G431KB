@@ -15,11 +15,11 @@ Thread thread{};
 LED led_user{1000};
 SerialCOM serialCOM{};
 Flash flash{};
-CustomDAC motor_dac{};
-CustomADC sensor_adc{};
+CustomDAC dac{};
+CustomADC adc{};
 
 sml::sm<StreamState> stream_sm{&thread};
-sml::sm<MainState> main_sm{&thread};
+sml::sm<MainState, sml::process_queue<std::queue>> main_sm{&thread, &serialCOM};
 
 /**
  * @brief  The application entry point.
@@ -40,15 +40,25 @@ int main(void) {
     MX_TIM2_Init();
     MX_TIM4_Init();
 
-    HAL_TIM_PWM_Start_IT(&htim8, TIM_CHANNEL_2);
-    HAL_UARTEx_ReceiveToIdle_IT(&huart2, serialCOM.m_rx_data, UART_BUFFER);
-    HAL_ADC_Start_DMA(&hadc2, &sensor_adc.m_buffer, 1);
-
     // Instances Dependency Injection
     serialCOM.setPort(&huart2);
     led_user.setPort(&htim8.Instance->CCR2);
-    motor_dac.setPort(&hdac1, DAC_CHANNEL_2);
-    sensor_adc.setPort(&hadc2);
+    dac.setPort(&hdac1, DAC_CHANNEL_2);
+
+	serialCOM.sendString("Instance dependency injection complete\n");
+
+    // PWM Output Start
+    HAL_TIM_PWM_Start_IT(&htim8, TIM_CHANNEL_2);
+	serialCOM.sendString("PWM output Start\n");
+
+    // Serial Communication Start
+    HAL_UARTEx_ReceiveToIdle_IT(&huart2, serialCOM.m_rx_data, UART_BUFFER);
+	serialCOM.sendString("Serial communication Start\n");
+
+    // ADC Calibration and Start
+    HAL_ADCEx_Calibration_Start(&hadc2, ADC_SINGLE_ENDED);
+    HAL_ADC_Start_DMA(&hadc2, adc.m_buffer.data(), 1);
+	serialCOM.sendString("ADC calibration and start\n");
 
     // FreeRTOS Start
     vTaskStartScheduler();
@@ -74,7 +84,9 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size) {
     }
 }
 
-void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc) { sensor_adc.sample(); }
+void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc) {
+    if (hadc->Instance == ADC2) adc.saveSample(2);
+}
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
     if (htim->Instance == TIM17) {

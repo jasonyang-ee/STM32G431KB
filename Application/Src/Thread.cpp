@@ -9,31 +9,45 @@ Thread::Thread() {
     // auto _task = [](void *arg) { static_cast<Thread *>(arg)->(); };
     // xTaskCreate(_task, "", 512, this, 2, &_Handle);
 
-	auto t1 = [](void *arg) { static_cast<Thread *>(arg)->telemetry_human(); };
-	xTaskCreate(t1, "telemetry_human", 128, this, 1, &telemetry_human_handle);
-	vTaskSuspend(telemetry_human_handle);
+    auto t1 = [](void *arg) { static_cast<Thread *>(arg)->telemetry_human(); };
+    xTaskCreate(t1, "telemetry_human", 150, this, 2, &telemetry_human_handle);
+    vTaskSuspend(telemetry_human_handle);
 
-    auto t3 = [](void *arg) { static_cast<Thread *>(arg)->utilities(); };
-    xTaskCreate(t3, "utilities", 128, this, 1, &utilities_handle);
+    auto a1 = [](void *arg) { static_cast<Thread *>(arg)->idle(); };
+    xTaskCreate(a1, "idle", 300, this, 2, &idle_handle);
+    vTaskSuspend(idle_handle);
 
-    auto a2 = [](void *arg) { static_cast<Thread *>(arg)->app_dac(); };
-    xTaskCreate(a2, "dac + adc", 64, this, 0, &app_dac_handle);
+    auto a2 = [](void *arg) { static_cast<Thread *>(arg)->dacUpdate(); };
+    xTaskCreate(a2, "dacUpdate", 300, this, 2, &dac_handle);
+    vTaskSuspend(dac_handle);
 
     auto s0 = [](void *arg) { static_cast<Thread *>(arg)->init(); };
-    xTaskCreate(s0, "system init", 256, this, 6, &init_handle);
+    xTaskCreate(s0, "system init", 500, this, 6, &init_handle);
 
     auto s1 = [](void *arg) { static_cast<Thread *>(arg)->schedule_20Hz(); };
-    xTaskCreate(s1, "schedule 20Hz", 64, this, 5, &schedule_20Hz_handle);
+    xTaskCreate(s1, "schedule 20Hz", 128, this, 5, &schedule_20Hz_handle);
 
     auto s11 = [](void *arg) { static_cast<Thread *>(arg)->serial_send(); };
     xTaskCreate(s11, "serial send out", 64, this, 0, &serial_send_handle);
 
     auto s12 = [](void *arg) { static_cast<Thread *>(arg)->parse(); };
-    xTaskCreate(s12, "cli parsing", 512, this, 2, &parse_handle);
+    xTaskCreate(s12, "cli parsing", 400, this, 3, &parse_handle);
 }
 
 Thread::~Thread() {}
 
+void Thread::telemetry_human() {
+    while (1) {
+        serialCOM.sendString("\n\n\n\n\n\n\n\n");
+        serialCOM.sendString("\nDAC Target Value:\t");
+        serialCOM.sendNumber(dac.getLevel());
+        serialCOM.sendString("\nADC Sensing Value:\t");
+        serialCOM.sendNumber(adc.volt_from_dac);
+        serialCOM.sendLn();
+
+        stream_sm.process_event(finish{});
+    }
+}
 
 /*---------------------------------------------------------------------------
 
@@ -41,27 +55,22 @@ Thread::~Thread() {}
 
 ---------------------------------------------------------------------------*/
 
-
-void Thread::utilities() {
+void Thread::idle() {
     while (1) {
-		serialCOM.sendString("\nDAC Target Value: ");
-		serialCOM.sendNumber(motor_dac.getLevel());
-		serialCOM.sendString("\nADC Sensing Value: ");
-		serialCOM.sendNumber(sensor_adc.getVolt());
-		serialCOM.sendLn();
-        // vTaskSuspend(NULL);
-        vTaskDelay(1000);
+        serialCOM.sendString("idling\n");
+        dac.setLevel(0);
+        dac.off();
+        main_sm.process_event(finish{});
     }
 }
 
-void Thread::app_dac() {
+void Thread::dacUpdate() {
     while (1) {
-        motor_dac.schedule();
-        // vTaskSuspend(NULL);
-        vTaskDelay(1000);
+        serialCOM.sendString("dac updating\n");
+        dac.schedule();
+        main_sm.process_event(finish{});
     }
 }
-
 
 /*---------------------------------------------------------------------------
 
@@ -71,10 +80,14 @@ void Thread::app_dac() {
 
 void Thread::init() {
     while (1) {
+        serialCOM.sendString("RTOS Init\n");
         cli.init();
-        motor_dac.init();
+        dac.init();
         flash.Load();
-		vTaskSuspend(utilities_handle);
+
+        main_sm.process_event(start{});
+		main_sm.process_event(start{});
+
         vTaskSuspend(NULL);
     }
 }
@@ -97,4 +110,15 @@ void Thread::parse() {
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
         cli.parse();
     }
+}
+
+void Thread::idling_start() { serialCOM.sendString("ideling start function called\n"); }
+
+void Thread::dac_start() {
+    serialCOM.sendString("dac start function called\n");
+    dac.breath();
+}
+void Thread::dac_shutdown() {
+    serialCOM.sendString("dac shutdown function called\n");
+    dac.off();
 }
