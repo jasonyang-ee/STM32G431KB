@@ -26,7 +26,10 @@ struct function_ended {};
 struct sub_transit {};
 
 // Application Events
+struct goIdle {};
 struct dac_update {};
+struct dac_direct {};
+struct dac_direct_t {};
 
 struct Idle {
     auto operator()() {
@@ -47,7 +50,7 @@ struct Idle {
         // State Machine Logics
         // clang-format off
 		return make_transition_table(
-			*state<begin> / act_start = state<on>,
+			*state<begin> + event<start> / act_start = state<on>,
 			state<on> + event<finish> / act_delay = state<on>,
 			state<on> + event<shutdown> / act_shutdown = state<shutting_down>,
 			state<shutting_down> / process(function_ended{}) = X
@@ -90,24 +93,12 @@ struct MainState {
     auto operator()() {
         using namespace sml;
 
-		auto act_idle = [](Thread *thread, SerialCOM *serial) {
-			// thread->idling_start();
-			// vTaskResume(thread->idle_handle);
-			serial->sendString("MainState act_idle completed\n");
-		};
-		auto act_dac = [](Thread *thread, SerialCOM *serial) {
-			// thread->dac_start();
-			// xTaskResumeFromISR(thread->dac_handle);
-			serial->sendString("MainState act_dac completed\n");
-		};
-
         // State Machine Logics
         // clang-format off
 		return make_transition_table(
-			*state<begin> + event<start> / act_idle = state<Idle>,
-			state<Idle> + event<dac_update> / act_dac = state<DACState>,
+			*state<begin> + event<start> = state<Idle>,
+			state<Idle> + event<dac_update> = state<DACState>,
 			state<DACState> + event<function_ended> = state<Idle>
-			
 		);
         // clang-format on
     }

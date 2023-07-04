@@ -13,7 +13,7 @@ void CLI::init() {
     lwshell_register_cmd("help", &CLI::cmd_help, NULL);
     lwshell_register_cmd("led", &CLI::cmd_led, NULL);
     lwshell_register_cmd("flash", &CLI::cmd_flash, NULL);
-	lwshell_register_cmd("idle", &CLI::cmd_idle, NULL);
+    lwshell_register_cmd("idle", &CLI::cmd_idle, NULL);
     lwshell_register_cmd("dac", &CLI::cmd_dac, NULL);
     lwshell_register_cmd("show", &CLI::cmd_show, NULL);
 }
@@ -117,16 +117,15 @@ int32_t CLI::cmd_flash(int32_t argc, char** argv) {
     return 0;
 }
 
-int32_t CLI::cmd_idle(int32_t argc, char** argv) { 
-	
-	if (argc == 1) {
-		main_sm.process_event(shutdown{});
-		main_sm.process_event(start{});
-		main_sm.process_event(start{});
-	} else {
-		serialCOM.sendString("Unknown Command\n");
-	}
-	return 0; }
+int32_t CLI::cmd_idle(int32_t argc, char** argv) {
+    if (argc == 1) {
+        main_sm.process_event(shutdown{});
+        main_sm.process_event(start{});
+    } else {
+        serialCOM.sendString("Unknown Command\n");
+    }
+    return 0;
+}
 
 int32_t CLI::cmd_dac(int32_t argc, char** argv) {
     // Detailed Menu
@@ -137,11 +136,11 @@ int32_t CLI::cmd_dac(int32_t argc, char** argv) {
         "  add #value\tIncrease or Decrease DAC level\n\n";
 
     // Sub Command
-    if (argc ==1) {
-		main_sm.process_event(shutdown{});
-		main_sm.process_event(dac_update{});
-		main_sm.process_event(start{});
-	} else if (argc == 2) {
+    if (argc == 1) {
+        main_sm.process_event(shutdown{});
+        main_sm.process_event(dac_update{});
+        main_sm.process_event(start{});
+    } else if (argc == 2) {
         if (!strcmp(argv[1], "help")) {
             serialCOM.sendString(help_text);
         } else if (!strcmp(argv[1], "on")) {

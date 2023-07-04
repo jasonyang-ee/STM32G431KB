@@ -21,6 +21,6 @@ extern CustomDAC dac;
 extern CustomADC adc;
 
 extern sml::sm<StreamState> stream_sm;
-extern sml::sm<MainState, sml::process_queue<std::queue>> main_sm;
+extern sml::sm<MainState, sml::process_queue<std::queue>, sml::defer_queue<std::deque>> main_sm;
 
 #endif    /* APPLICATION_INC_INSTANCES */
