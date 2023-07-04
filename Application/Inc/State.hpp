@@ -105,8 +105,8 @@ struct MainState {
         // clang-format off
 		return make_transition_table(
 			*state<begin> + event<start> / act_idle = state<Idle>,
-			state<Idle> + event<dac_update> / (act_dac, process(start{})) = state<DACState>,
-			state<DACState> + event<function_ended> / state<Idle>
+			state<Idle> + event<dac_update> / act_dac = state<DACState>,
+			state<DACState> + event<function_ended> = state<Idle>
 			
 		);
         // clang-format on

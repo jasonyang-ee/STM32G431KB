@@ -122,6 +122,7 @@ int32_t CLI::cmd_idle(int32_t argc, char** argv) {
 	if (argc == 1) {
 		main_sm.process_event(shutdown{});
 		main_sm.process_event(start{});
+		main_sm.process_event(start{});
 	} else {
 		serialCOM.sendString("Unknown Command\n");
 	}
@@ -139,6 +140,7 @@ int32_t CLI::cmd_dac(int32_t argc, char** argv) {
     if (argc ==1) {
 		main_sm.process_event(shutdown{});
 		main_sm.process_event(dac_update{});
+		main_sm.process_event(start{});
 	} else if (argc == 2) {
         if (!strcmp(argv[1], "help")) {
             serialCOM.sendString(help_text);

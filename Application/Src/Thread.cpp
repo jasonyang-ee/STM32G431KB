@@ -10,15 +10,15 @@ Thread::Thread() {
     // xTaskCreate(_task, "", 512, this, 2, &_Handle);
 
     auto t1 = [](void *arg) { static_cast<Thread *>(arg)->telemetry_human(); };
-    xTaskCreate(t1, "telemetry_human", 150, this, 2, &telemetry_human_handle);
+    xTaskCreate(t1, "telemetry_human", 300, this, 2, &telemetry_human_handle);
     vTaskSuspend(telemetry_human_handle);
 
     auto a1 = [](void *arg) { static_cast<Thread *>(arg)->idle(); };
-    xTaskCreate(a1, "idle", 300, this, 2, &idle_handle);
+    xTaskCreate(a1, "idle", 400, this, 2, &idle_handle);
     vTaskSuspend(idle_handle);
 
     auto a2 = [](void *arg) { static_cast<Thread *>(arg)->dacUpdate(); };
-    xTaskCreate(a2, "dacUpdate", 300, this, 2, &dac_handle);
+    xTaskCreate(a2, "dacUpdate", 400, this, 2, &dac_handle);
     vTaskSuspend(dac_handle);
 
     auto s0 = [](void *arg) { static_cast<Thread *>(arg)->init(); };
@@ -31,7 +31,7 @@ Thread::Thread() {
     xTaskCreate(s11, "serial send out", 64, this, 0, &serial_send_handle);
 
     auto s12 = [](void *arg) { static_cast<Thread *>(arg)->parse(); };
-    xTaskCreate(s12, "cli parsing", 400, this, 3, &parse_handle);
+    xTaskCreate(s12, "cli parsing", 800, this, 3, &parse_handle);
 }
 
 Thread::~Thread() {}
@@ -43,6 +43,10 @@ void Thread::telemetry_human() {
         serialCOM.sendNumber(dac.getLevel());
         serialCOM.sendString("\nADC Sensing Value:\t");
         serialCOM.sendNumber(adc.volt_from_dac);
+
+        // State machine debug
+        serialCOM.sendString("\n\nCurrent State:\t");
+        main_sm.visit_current_states([](auto s) { serialCOM.sendString(s.c_str()); });
         serialCOM.sendLn();
 
         stream_sm.process_event(finish{});
