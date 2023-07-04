@@ -23,13 +23,9 @@ struct next {};
 struct finish {};
 struct shutdown {};
 struct function_ended {};
-struct sub_transit {};
 
 // Application Events
-struct goIdle {};
 struct dac_update {};
-struct dac_direct {};
-struct dac_direct_t {};
 
 struct Idle {
     auto operator()() {

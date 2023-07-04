@@ -45,9 +45,9 @@ void Thread::telemetry_human() {
         serialCOM.sendNumber(adc.volt_from_dac);
 
         // State machine debug
-        serialCOM.sendString("\n\nCurrent State:\t");
-        main_sm.visit_current_states([](auto s) { serialCOM.sendString(s.c_str()); });
-        serialCOM.sendLn();
+        // serialCOM.sendString("\n\nCurrent State:\t");
+        // main_sm.visit_current_states([](auto s) { serialCOM.sendString(s.c_str()); });
+        // serialCOM.sendLn();
 
         stream_sm.process_event(finish{});
     }
