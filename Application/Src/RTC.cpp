@@ -3,7 +3,7 @@
 
 #include "RTC.hpp"
 
-#include "instances.hpp"
+#include "Instances.hpp"
 
 CustomRTC::CustomRTC() {}
 

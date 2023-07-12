@@ -15,7 +15,7 @@ void SerialCOM::setPort(UART_HandleTypeDef *port) { m_port = port; }
  * @brief Append new line to buffer
  *
  */
-void SerialCOM::sendLn() { m_buffer_msg.append("\n"); };
+void SerialCOM::sendLn() { m_buffer_msg.append("\n"); }
 
 /**
  * @brief Append string to buffer.
@@ -26,13 +26,12 @@ void SerialCOM::sendString(std::string msg) { m_buffer_msg.append(msg); }
 
 /**
  * @brief Append bool to buffer as text.
- * 
+ *
  * @param value bool value.
  */
 void SerialCOM::sendNumber(bool value) {
     value ? m_buffer_msg.append("ON") : m_buffer_msg.append("OFF");
 }
-
 
 /**
  * @brief Periodically send uart in DMA mode if buffer !empty.
