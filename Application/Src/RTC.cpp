@@ -30,15 +30,13 @@ void CustomRTC::setDate(uint8_t day, uint8_t month, uint8_t year) {
 }
 
 std::array<uint8_t, 3> CustomRTC::getDate() {
-    if (HAL_RTC_GetDate(&m_port, &m_date, RTC_FORMAT_BIN) != HAL_OK) {
-        serialCOM.sendString("RTC Get Date Error\n");
-    }
-    return {m_date.Date, m_date.Month, m_date.Year};
+    HAL_RTC_GetTime(&m_port, &m_time, RTC_FORMAT_BIN);
+    HAL_RTC_GetDate(&m_port, &m_date, RTC_FORMAT_BIN);
+    return {m_date.Month, m_date.Date, m_date.Year};
 }
 
 std::array<uint8_t, 3> CustomRTC::getTime() {
-    if (HAL_RTC_GetTime(&m_port, &m_time, RTC_FORMAT_BIN) != HAL_OK) {
-        serialCOM.sendString("RTC Get Time Error\n");
-    }
+    HAL_RTC_GetTime(&m_port, &m_time, RTC_FORMAT_BIN);
+    HAL_RTC_GetDate(&m_port, &m_date, RTC_FORMAT_BIN);
     return {m_time.Hours, m_time.Minutes, m_time.Seconds};
 }
