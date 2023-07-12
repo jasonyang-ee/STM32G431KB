@@ -27,7 +27,15 @@
 extern "C" {
 #endif
 
+#include "adc.h"
+#include "dac.h"
+#include "dma.h"
+#include "gpio.h"
+#include "rtc.h"
 #include "stm32g4xx_hal.h"
+#include "tim.h"
+#include "usart.h"
+
 
 // System Functions
 void Error_Handler(void);

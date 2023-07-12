@@ -20,6 +20,7 @@ class CLI {
 	static int32_t cmd_idle(int32_t, char**);
     static int32_t cmd_dac(int32_t, char**);
     static int32_t cmd_show(int32_t, char**);
+	static int32_t cmd_date(int32_t, char**);
 
 	private:
 	uint16_t m_cmd_size;

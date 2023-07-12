@@ -2,12 +2,6 @@
 #include "main.h"
 
 #include "Instances.hpp"
-#include "adc.h"
-#include "dac.h"
-#include "dma.h"
-#include "gpio.h"
-#include "tim.h"
-#include "usart.h"
 
 // Instances Objects
 CLI cli{};
@@ -17,6 +11,7 @@ SerialCOM serialCOM{};
 Flash flash{};
 CustomDAC dac{};
 CustomADC adc{};
+CustomRTC rtc{};
 
 sml::sm<StreamState> stream_sm{&thread};
 sml::sm<MainState, sml::process_queue<std::queue>> main_sm{&thread, &serialCOM};
@@ -39,26 +34,28 @@ int main(void) {
     MX_DAC1_Init();
     MX_TIM2_Init();
     MX_TIM4_Init();
+    MX_RTC_Init();
 
     // Instances Dependency Injection
     serialCOM.setPort(&huart2);
     led_user.setPort(&htim8.Instance->CCR2);
     dac.setPort(&hdac1, DAC_CHANNEL_2);
+	rtc.setPort(&hrtc);
 
-	serialCOM.sendString("Instance dependency injection complete\n");
+    serialCOM.sendString("Instance dependency injection complete\n");
 
     // PWM Output Start
     HAL_TIM_PWM_Start_IT(&htim8, TIM_CHANNEL_2);
-	serialCOM.sendString("PWM output Start\n");
+    serialCOM.sendString("PWM output Start\n");
 
     // Serial Communication Start
     HAL_UARTEx_ReceiveToIdle_IT(&huart2, serialCOM.m_rx_data, UART_BUFFER);
-	serialCOM.sendString("Serial communication Start\n");
+    serialCOM.sendString("Serial communication Start\n");
 
     // ADC Calibration and Start
     HAL_ADCEx_Calibration_Start(&hadc2, ADC_SINGLE_ENDED);
     HAL_ADC_Start_DMA(&hadc2, adc.m_buffer.data(), 1);
-	serialCOM.sendString("ADC calibration and start\n");
+    serialCOM.sendString("ADC calibration and start\n");
 
     // FreeRTOS Start
     vTaskStartScheduler();

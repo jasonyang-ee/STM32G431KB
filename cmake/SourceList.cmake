@@ -7,12 +7,14 @@ ${PROJ_PATH}/Application/Src/Flash_STM32G431KB.cpp
 ${PROJ_PATH}/Application/Src/GPIO.cpp
 ${PROJ_PATH}/Application/Src/LED.cpp
 ${PROJ_PATH}/Application/Src/main.cpp
+${PROJ_PATH}/Application/Src/RTC.cpp
 ${PROJ_PATH}/Application/Src/SerialCOM.cpp
 ${PROJ_PATH}/Application/Src/Thread.cpp
 ${PROJ_PATH}/Core/Src/adc.c
 ${PROJ_PATH}/Core/Src/dac.c
 ${PROJ_PATH}/Core/Src/dma.c
 ${PROJ_PATH}/Core/Src/gpio.c
+${PROJ_PATH}/Core/Src/rtc.c
 ${PROJ_PATH}/Core/Src/stm32g4xx_hal_msp.c
 ${PROJ_PATH}/Core/Src/stm32g4xx_hal_timebase_tim.c
 ${PROJ_PATH}/Core/Src/stm32g4xx_it.c
@@ -38,6 +40,8 @@ ${PROJ_PATH}/Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_pwr.c
 ${PROJ_PATH}/Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_pwr_ex.c
 ${PROJ_PATH}/Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_rcc.c
 ${PROJ_PATH}/Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_rcc_ex.c
+${PROJ_PATH}/Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_rtc.c
+${PROJ_PATH}/Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_rtc_ex.c
 ${PROJ_PATH}/Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_tim.c
 ${PROJ_PATH}/Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_tim_ex.c
 ${PROJ_PATH}/Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_uart.c

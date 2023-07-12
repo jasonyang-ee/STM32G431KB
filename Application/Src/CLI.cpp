@@ -16,6 +16,7 @@ void CLI::init() {
     lwshell_register_cmd("idle", &CLI::cmd_idle, NULL);
     lwshell_register_cmd("dac", &CLI::cmd_dac, NULL);
     lwshell_register_cmd("show", &CLI::cmd_show, NULL);
+	lwshell_register_cmd("rtc", &CLI::cmd_date, NULL);
 }
 
 /**
@@ -185,6 +186,30 @@ int32_t CLI::cmd_show(int32_t argc, char** argv) {
     } else {
         serialCOM.sendString("Unknown Command\n");
     }
+    return 0;
+}
+
+int32_t CLI::cmd_date(int32_t argc, char** argv) {
+    // Detailed Menu
+    const char* help_text =
+        "\nDate Functions:\n"
+        "  set\t\tSet Date\n"
+        "  get\t\tGet Date\n\n";
+
+    if (argc == 1) {
+        serialCOM.sendString(help_text);
+    } else if (argc == 5) {
+        if (!strcmp(argv[1], "setdate")) {
+            rtc.setDate(atoi(argv[2]), atoi(argv[3]), atoi(argv[4]));
+        } else if (!strcmp(argv[1], "settime")) {
+            rtc.setTime(atoi(argv[2]), atoi(argv[3]), atoi(argv[4]));
+        } else {
+            serialCOM.sendString("Unknown Command\n");
+        }
+    } else {
+        serialCOM.sendString("Unknown Command\n");
+    }
+
     return 0;
 }
 

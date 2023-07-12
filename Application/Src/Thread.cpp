@@ -43,6 +43,11 @@ void Thread::telemetry_human() {
         serialCOM.sendNumber(dac.getLevel());
         serialCOM.sendString("\nADC Sensing Value:\t");
         serialCOM.sendNumber(adc.volt_from_dac);
+		serialCOM.sendString("\nDate:\t");
+		serialCOM.sendNumber(rtc.getDate());
+		serialCOM.sendString("\nTime:\t");
+		serialCOM.sendNumber(rtc.getTime());
+		serialCOM.sendLn();
 
         // State machine debug
         // serialCOM.sendString("\n\nCurrent State:\t");

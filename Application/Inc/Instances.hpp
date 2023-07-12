@@ -9,6 +9,7 @@
 #include "ADC.hpp"
 #include "Flash_STM32G431KB.hpp"
 #include "State.hpp"
+#include "RTC.hpp"
 
 #define UART_BUFFER 64
 
@@ -19,6 +20,7 @@ extern Thread thread;
 extern Flash flash;
 extern CustomDAC dac;
 extern CustomADC adc;
+extern CustomRTC rtc;
 
 extern sml::sm<StreamState> stream_sm;
 extern sml::sm<MainState, sml::process_queue<std::queue>> main_sm;
