@@ -46,7 +46,6 @@ ${PROJ_PATH}/Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_tim.c
 ${PROJ_PATH}/Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_tim_ex.c
 ${PROJ_PATH}/Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_uart.c
 ${PROJ_PATH}/Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_uart_ex.c
-${PROJ_PATH}/Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_ll_adc.c
 ${PROJ_PATH}/Middlewares/Third_Party/FreeRTOS/Source/croutine.c
 ${PROJ_PATH}/Middlewares/Third_Party/FreeRTOS/Source/event_groups.c
 ${PROJ_PATH}/Middlewares/Third_Party/FreeRTOS/Source/list.c
