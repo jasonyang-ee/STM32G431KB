@@ -46,7 +46,7 @@ target_compile_options(${EXECUTABLE} PRIVATE
 	-Wall
 	-Wpedantic
 	-Wno-unused-parameter
-	-Os								# Optimize for size (that uses O2)
+	-Os								# Optimize for size (that uses O2 )
 )
 
 # Linker options
