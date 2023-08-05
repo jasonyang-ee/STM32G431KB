@@ -2,6 +2,11 @@
 
 # STM32G431 Playground
 
+## Experimental Documentation Using mdBook
+
+[Documentation Book Site](https://jasonyang-ee.github.io/STM32G431KB/)
+
+
 ## Hardware Basics
 
 Project Using STM32G431KB as Example. Test hardware is NUCLEO-G431KB.
