@@ -4,7 +4,7 @@
 
 ## Experimental Documentation Using mdBook
 
-[Documentation Book Site](https://jasonyang-ee.github.io/STM32G431KB/)
+[Documentation Book Site](https://doc.jasony.org/STM32G431KB)
 
 
 ## Hardware Basics
