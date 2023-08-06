@@ -2,20 +2,9 @@
 
 # STM32G431 Playground
 
-## Experimental Documentation Using mdBook
+## Documentation
 
-[Documentation Book Site](https://doc.jasony.org/STM32G431KB)
-
-Book Generation:
-* [Install Rust](https://www.rust-lang.org/tools/install)
-* Install mdBook
-	```bash
-	cargo install mdbook
-	```
-* Build Book
-	```bash
-	mdbook build
-	```
+Visit [Documentation](http://doc.jasony.org/STM32G431KB) for more information.
 
 ## Hardware Basics
 
@@ -38,7 +27,7 @@ More Docker Details: https://github.com/jasonyang-ee/STM32-Dockerfile
 docker run -rm -v {Your_Local_Full_Path}:/home jasonyangee/stm32-builder:ubuntu-latest https://github.com/jasonyang-ee/STM32G431KB
 ```
 > Visit Here for More Details: https://github.com/jasonyang-ee/STM32-Dockerfile
-![Run](doc/img/run.gif)
+![Run](docs_src/page/img/run.gif)
 
 - Manual Build
 ```
@@ -52,8 +41,8 @@ cmake --build build
 
 Use /CubeMX/CubeMX.ioc for complete info
 
-![diagram](doc/img/HardwareMap.png)
-![map](doc/img/PinMap.png)
+![diagram](docs_src/page/img/HardwareMap.png)
+![map](docs_src/page/img/PinMap.png)
 
 
 
@@ -172,7 +161,7 @@ const uint32_t m_address_end{0x08040000 - 0x8};
 const uint8_t m_page_total{127};
 ```
 
-![flash](doc/img/FlashTable.png)
+![flash](docs_src/page/img/FlashTable.png)
 
 
 The configuration data are packaged into a struct and union aligned to `uint64_t array` for double word HAL flash writing function. The pack and unpack is done manually by user.
@@ -216,7 +205,7 @@ void Flash::Load() {
 
 The memory save example:
 
-![FlashMem](doc/img/FlashMem.png)
+![FlashMem](docs_src/page/img/FlashMem.png)
 
 
 

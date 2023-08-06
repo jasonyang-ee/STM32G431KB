@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Introduction - STM32G431KB Documentation</title>
+        <title>FreeRTOS - STM32G431KB Documentation</title>
 
 
         <!-- Custom HTML head -->
@@ -85,7 +85,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="Introduction.html" class="active">Introduction</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><li class="part-title">User Guide</li><li class="chapter-item expanded "><a href="SerialUART.html"><strong aria-hidden="true">1.</strong> Serial UART</a></li><li class="chapter-item expanded "><a href="LED.html"><strong aria-hidden="true">2.</strong> LED</a></li><li class="chapter-item expanded "><a href="CLI.html"><strong aria-hidden="true">3.</strong> CLI</a></li><li class="chapter-item expanded "><a href="FreeRTOS.html"><strong aria-hidden="true">4.</strong> FreeRTOS</a></li><li class="chapter-item expanded "><a href="StateMachine.html"><strong aria-hidden="true">5.</strong> State Machine</a></li><li class="chapter-item expanded "><a href="Flash.html"><strong aria-hidden="true">6.</strong> Flash</a></li><li class="chapter-item expanded "><a href="DAC.html"><strong aria-hidden="true">7.</strong> DAC</a></li><li class="chapter-item expanded "><a href="ADC.html"><strong aria-hidden="true">8.</strong> ADC</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><a href="Author.html">Author</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="Introduction.html">Introduction</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><li class="part-title">User Guide</li><li class="chapter-item expanded "><a href="SerialUART.html"><strong aria-hidden="true">1.</strong> Serial UART</a></li><li class="chapter-item expanded "><a href="LED.html"><strong aria-hidden="true">2.</strong> LED</a></li><li class="chapter-item expanded "><a href="CLI.html"><strong aria-hidden="true">3.</strong> CLI</a></li><li class="chapter-item expanded "><a href="FreeRTOS.html" class="active"><strong aria-hidden="true">4.</strong> FreeRTOS</a></li><li class="chapter-item expanded "><a href="StateMachine.html"><strong aria-hidden="true">5.</strong> State Machine</a></li><li class="chapter-item expanded "><a href="Flash.html"><strong aria-hidden="true">6.</strong> Flash</a></li><li class="chapter-item expanded "><a href="DAC.html"><strong aria-hidden="true">7.</strong> DAC</a></li><li class="chapter-item expanded "><a href="ADC.html"><strong aria-hidden="true">8.</strong> ADC</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><a href="Author.html">Author</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -171,44 +171,83 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
-<h2 id="hardware-basics"><a class="header" href="#hardware-basics">Hardware Basics</a></h2>
-<p>Project Using STM32G431KB as Example. Test hardware is NUCLEO-G431KB.</p>
-<p>STM32CubeMX File Included.</p>
-<p>Hardware using jumper pin only to test out all functionalities.</p>
-<h2 id="build-this-project"><a class="header" href="#build-this-project">Build This Project</a></h2>
-<p>More Docker Details Visit <a href="https://github.com/jasonyang-ee/STM32-Dockerfile">https://github.com/jasonyang-ee/STM32-Dockerfile</a></p>
-<ul>
-<li>
-<p>Auto Docker Build Command</p>
-<pre><code>docker run -rm -v {Your_Local_Full_Path}:/home jasonyangee/stm32-builder:ubuntu-latest https://github.com/jasonyang-ee/STM32G431KB
+                        <h1 id="freertos"><a class="header" href="#freertos">FreeRTOS</a></h1>
+<h2 id="c-wrapper"><a class="header" href="#c-wrapper">C++ Wrapper</a></h2>
+<p>I made a c++ wrapper class to use FreeRTOS. That's the main idea here.</p>
+<p>To expend your task:</p>
+<ol>
+<li>Define the task handler and function
+<pre><code class="language-c++">TaskHandle_t parse_Handle;
+void parse();
 </code></pre>
-<blockquote>
-<p><img src="img/run.gif" alt="Run" /></p>
-</blockquote>
 </li>
-<li>
-<p>Manual CMake Build Command</p>
-<pre><code>cmake -B build -G Ninja
-cmake --build build
+<li>Use lamda to create the task
+<pre><code class="language-c++">auto t1 = [](void *arg) { static_cast&lt;Thread *&gt;(arg)-&gt;parse(); };
+xTaskCreate(t1, &quot;cli parsing&quot;, 256, this, -2, &amp;parse_Handle);
+</code></pre>
+</li>
+<li>Trap the task into its own tiny while() like the one in your main()
+<pre><code class="language-c++">void Thread::parse() {
+	while (1) {
+		vTaskSuspend(NULL);
+		cli.parse();
+	}
+}
+</code></pre>
+</li>
+<li>Use task control (i.e. queue, notify, suspend, resume) to run your app and feature.
+<pre><code class="language-c++">xTaskResumeFromISR(thread.parse_Handle);
+</code></pre>
+</li>
+</ol>
+<h2 id="use-of-freertos-wrapper-class"><a class="header" href="#use-of-freertos-wrapper-class">Use of FreeRTOS Wrapper Class</a></h2>
+<p>The task are created in the object initialization using Lamda due to C++ wrapping.</p>
+<ul>
+<li>In object initializer:
+<pre><code class="language-c++">auto t1 = [](void *arg) { static_cast&lt;Thread *&gt;(arg)-&gt;parse(); };
+xTaskCreate(t1, &quot;cli parsing&quot;, 256, this, -2, &amp;parse_Handle);
 </code></pre>
 </li>
 </ul>
-<h2 id="pin-map"><a class="header" href="#pin-map">Pin Map</a></h2>
-<p>Use /CubeMX/CubeMX.ioc for complete info</p>
-<p><img src="img/HardwareMap.png" alt="diagram" />
-<img src="img/PinMap.png" alt="map" /></p>
-<h2 id="folder-structure"><a class="header" href="#folder-structure">Folder Structure</a></h2>
-<p>This project uses HAL. Code generation using CubeMX, and the generated code structure is untouched for <code>/Core</code> <code>/Driver</code> <code>/Middlewares</code>.</p>
-<p>The only modification is that <code>main.c</code> and <code>main.h</code> are moved into <code>/Application</code> for better workflow.</p>
-<p>The c++ layer is done in <code>/Application</code>. All c++ class object are to represent each device or feature. Then, all objects are decleared globally in <code>Instances.hpp</code>. This will allow controlling class (State Machine or FreeRTOS) to easily access those instances and mutate data.</p>
+<p>Each of the corresponding task are decleared with its handle typle.</p>
+<ul>
+<li>In header:
+<pre><code class="language-c++">TaskHandle_t parse_Handle;
+void parse();
+</code></pre>
+</li>
+</ul>
+<h2 id="freertos-debugging"><a class="header" href="#freertos-debugging">FreeRTOS Debugging</a></h2>
+<ul>
+<li>Install VS Code Extension: RTOS Views (<code>mcu-debug.rtos-views</code>)</li>
+<li>Use a hardware timer with 20KHz setting. In this projcet timer 7 is used.</li>
+<li>Include the follwing code to enable full debugging feature.</li>
+</ul>
+<p>In <code>FreeRTOSConfig.h</code>:</p>
+<pre><code class="language-c++">#include &quot;tim.h&quot;					// Using 20kHz hardware timer
+#define configUSE_TRACE_FACILITY 1			// Show RTOS task ID stats
+#define configUSE_STATS_FORMATTING_FUNCTIONS 1		// Enable using vTaskList()
+#define configRECORD_STACK_HIGH_ADDRESS 1		// Show RTOS stack stats
+#define configGENERATE_RUN_TIME_STATS 1
+#define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS() MX_TIM7_Init()
+#define portGET_RUN_TIME_COUNTER_VALUE() htim7.Instance-&gt;CNT
+</code></pre>
+<p>In <code>MX_TIM7_Init()</code>:</p>
+<pre><code class="language-c++">/* USER CODE BEGIN TIM7_Init 2 */
+__TIM7_CLK_ENABLE();
+HAL_TIM_Base_Init(&amp;htim7);
+HAL_TIM_Base_Start(&amp;htim7);
+</code></pre>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="CLI.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
 
-                            <a rel="next" href="SerialUART.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next" href="StateMachine.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
 
@@ -218,8 +257,11 @@ cmake --build build
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="CLI.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
 
-                    <a rel="next" href="SerialUART.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next" href="StateMachine.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>

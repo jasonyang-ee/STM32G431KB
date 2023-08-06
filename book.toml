@@ -3,7 +3,7 @@ title = "STM32G431KB Documentation"
 authors = ["Jason Teng"]
 language = "en"
 multilingual = false
-src = "docs_src/src"
+src = "docs_src/page"
 
 [build]
 build-dir = "docs"

@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Introduction - STM32G431KB Documentation</title>
+        <title>CLI - STM32G431KB Documentation</title>
 
 
         <!-- Custom HTML head -->
@@ -85,7 +85,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="Introduction.html" class="active">Introduction</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><li class="part-title">User Guide</li><li class="chapter-item expanded "><a href="SerialUART.html"><strong aria-hidden="true">1.</strong> Serial UART</a></li><li class="chapter-item expanded "><a href="LED.html"><strong aria-hidden="true">2.</strong> LED</a></li><li class="chapter-item expanded "><a href="CLI.html"><strong aria-hidden="true">3.</strong> CLI</a></li><li class="chapter-item expanded "><a href="FreeRTOS.html"><strong aria-hidden="true">4.</strong> FreeRTOS</a></li><li class="chapter-item expanded "><a href="StateMachine.html"><strong aria-hidden="true">5.</strong> State Machine</a></li><li class="chapter-item expanded "><a href="Flash.html"><strong aria-hidden="true">6.</strong> Flash</a></li><li class="chapter-item expanded "><a href="DAC.html"><strong aria-hidden="true">7.</strong> DAC</a></li><li class="chapter-item expanded "><a href="ADC.html"><strong aria-hidden="true">8.</strong> ADC</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><a href="Author.html">Author</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="Introduction.html">Introduction</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><li class="part-title">User Guide</li><li class="chapter-item expanded "><a href="SerialUART.html"><strong aria-hidden="true">1.</strong> Serial UART</a></li><li class="chapter-item expanded "><a href="LED.html"><strong aria-hidden="true">2.</strong> LED</a></li><li class="chapter-item expanded "><a href="CLI.html" class="active"><strong aria-hidden="true">3.</strong> CLI</a></li><li class="chapter-item expanded "><a href="FreeRTOS.html"><strong aria-hidden="true">4.</strong> FreeRTOS</a></li><li class="chapter-item expanded "><a href="StateMachine.html"><strong aria-hidden="true">5.</strong> State Machine</a></li><li class="chapter-item expanded "><a href="Flash.html"><strong aria-hidden="true">6.</strong> Flash</a></li><li class="chapter-item expanded "><a href="DAC.html"><strong aria-hidden="true">7.</strong> DAC</a></li><li class="chapter-item expanded "><a href="ADC.html"><strong aria-hidden="true">8.</strong> ADC</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><a href="Author.html">Author</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -171,44 +171,99 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
-<h2 id="hardware-basics"><a class="header" href="#hardware-basics">Hardware Basics</a></h2>
-<p>Project Using STM32G431KB as Example. Test hardware is NUCLEO-G431KB.</p>
-<p>STM32CubeMX File Included.</p>
-<p>Hardware using jumper pin only to test out all functionalities.</p>
-<h2 id="build-this-project"><a class="header" href="#build-this-project">Build This Project</a></h2>
-<p>More Docker Details Visit <a href="https://github.com/jasonyang-ee/STM32-Dockerfile">https://github.com/jasonyang-ee/STM32-Dockerfile</a></p>
+                        <h1 id="cli"><a class="header" href="#cli">CLI</a></h1>
+<p>I am using lwshell. Credit to <a href="https://github.com/MaJerle/lwshell">https://github.com/MaJerle/lwshell</a></p>
+<h2 id="machnism"><a class="header" href="#machnism">Machnism</a></h2>
 <ul>
 <li>
-<p>Auto Docker Build Command</p>
-<pre><code>docker run -rm -v {Your_Local_Full_Path}:/home jasonyangee/stm32-builder:ubuntu-latest https://github.com/jasonyang-ee/STM32G431KB
-</code></pre>
-<blockquote>
-<p><img src="img/run.gif" alt="Run" /></p>
-</blockquote>
-</li>
-<li>
-<p>Manual CMake Build Command</p>
-<pre><code>cmake -B build -G Ninja
-cmake --build build
+<p>Direct usage without FreeRTOS:</p>
+<ul>
+<li>Inside <code>HAL_UARTEx_RxEventCallback()</code>:
+<pre><code class="language-c++">cli.setSize(Size);
+cli.parse();
 </code></pre>
 </li>
 </ul>
-<h2 id="pin-map"><a class="header" href="#pin-map">Pin Map</a></h2>
-<p>Use /CubeMX/CubeMX.ioc for complete info</p>
-<p><img src="img/HardwareMap.png" alt="diagram" />
-<img src="img/PinMap.png" alt="map" /></p>
-<h2 id="folder-structure"><a class="header" href="#folder-structure">Folder Structure</a></h2>
-<p>This project uses HAL. Code generation using CubeMX, and the generated code structure is untouched for <code>/Core</code> <code>/Driver</code> <code>/Middlewares</code>.</p>
-<p>The only modification is that <code>main.c</code> and <code>main.h</code> are moved into <code>/Application</code> for better workflow.</p>
-<p>The c++ layer is done in <code>/Application</code>. All c++ class object are to represent each device or feature. Then, all objects are decleared globally in <code>Instances.hpp</code>. This will allow controlling class (State Machine or FreeRTOS) to easily access those instances and mutate data.</p>
+</li>
+<li>
+<p>Start of the Instance:</p>
+<ul>
+<li>
+<p>Before <code>main()</code>:</p>
+<pre><code class="language-c++">CLI cli{};
+</code></pre>
+</li>
+<li>
+<p>Inside <code>main()</code>:</p>
+<pre><code class="language-c++">cli.init();
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="c-wrapper"><a class="header" href="#c-wrapper">C++ Wrapper</a></h2>
+<p>Additionally, I made a c++ wrapper class to use lwshell.</p>
+<p>This is how you do all the functions and use this hardware as playground. All playground feature should be accessed via this Command Line Interface.</p>
+<p>CLI input and output using UART (SerialCOM) as described above.</p>
+<p>To expend commands:</p>
+<ol>
+<li>
+<p>Add a static function that returns its run result</p>
+<pre><code class="language-c++">static int32_t led(int32_t, char**);
+</code></pre>
+</li>
+<li>
+<p>Register this function to be called when command is parsed in the RX.</p>
+<pre><code class="language-c++">lwshell_register_cmd(&quot;led&quot;, &amp;CLI::led, NULL);
+</code></pre>
+</li>
+<li>
+<p>Complete your command function.</p>
+<p><strong>REMEMBER TO <code>return int32_t;</code> ELSE SYSTEM WILL GET STUCK.</strong></p>
+</li>
+</ol>
+<h2 id="customization"><a class="header" href="#customization">Customization</a></h2>
+<p>Finally, we can populate our <code>static</code> custom command functions.</p>
+<p>You will need to define the command and register it in <code>init()</code>.</p>
+<p><strong>Example Command with Sub Commands:</strong></p>
+<ul>
+<li>
+<p>Inside init():</p>
+<pre><code class="language-c++">lwshell_register_cmd(&quot;led&quot;, &amp;CLI::led, NULL);
+</code></pre>
+</li>
+<li>
+<p>Function Define:</p>
+<pre><code class="language-c++">static int32_t CLI::led(int32_t argc, char** argv) {
+	const char* led_help =
+		&quot;\nLED Functions:\n&quot;
+		&quot;  on\tTurns ON LED\n&quot;
+		&quot;  off\tTurns OFF LED\n&quot;
+		&quot;  breath\tLED in breath effect mode\n&quot;
+		&quot;  blink\tLED in slow blink mode\n&quot;
+		&quot;  rapid\tLED in fast blink mode\n\n&quot;;
+
+	if (!strcmp(argv[1], &quot;help&quot;)) serialCOM.sendString(led_help);
+	if (!strcmp(argv[1], &quot;on&quot;)) led_user.on();
+	if (!strcmp(argv[1], &quot;off&quot;)) led_user.off();
+	if (!strcmp(argv[1], &quot;breath&quot;)) led_user.breath();
+	if (!strcmp(argv[1], &quot;blink&quot;)) led_user.blink();
+	if (!strcmp(argv[1], &quot;rapid&quot;)) led_user.rapid();
+	return 0;
+}
+</code></pre>
+</li>
+</ul>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="LED.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
 
-                            <a rel="next" href="SerialUART.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next" href="FreeRTOS.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
 
@@ -218,8 +273,11 @@ cmake --build build
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="LED.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
 
-                    <a rel="next" href="SerialUART.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next" href="FreeRTOS.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>

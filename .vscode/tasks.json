@@ -3,42 +3,6 @@
 	"tasks": [
 		{
 			"type": "shell",
-			"label": "Build Project",
-			"command": "cmake",
-			"args": [
-				"--build",
-				"${command:cmake.buildDirectory}",
-				"-j",
-				"20"
-			],
-			"options": {
-				"cwd": "${workspaceFolder}"
-			},
-			"problemMatcher": [
-				"$gcc"
-			],
-			"group": {
-				"kind": "build",
-				"isDefault": true
-			}
-		},
-		{
-			"type": "shell",
-			"label": "Clean Project",
-			"command": "cmake",
-			"args": [
-				"--build",
-				"${command:cmake.buildDirectory}",
-				"--target",
-				"clean"
-			],
-			"options": {
-				"cwd": "${workspaceFolder}"
-			},
-			"problemMatcher": []
-		},
-		{
-			"type": "shell",
 			"label": "Windows: Flash Firmware",
 			"command": "STM32_Programmer_CLI",
 			"args": [
@@ -95,9 +59,57 @@
 				"cwd": "${workspaceFolder}"
 			},
 			"problemMatcher": []
+		},
+		{
+			"type": "cmake",
+			"label": "CMake: build",
+			"command": "build",
+			"targets": [
+				"all"
+			],
+			"preset": "${command:cmake.activeBuildPresetName}",
+			"group": "build",
+			"problemMatcher": [],
+			"detail": "CMake template build task"
+		},
+		{
+			"type": "cmake",
+			"label": "CMake: clean rebuild",
+			"command": "cleanRebuild",
+			"targets": [
+				"all"
+			],
+			"preset": "${command:cmake.activeBuildPresetName}",
+			"group": "build",
+			"problemMatcher": [],
+			"detail": "CMake template clean rebuild task"
+		},
+		{
+			"type": "shell",
+			"label": "Build Book",
+			"command": "mdbook",
+			"args": [
+				"build",
+			],
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"problemMatcher": [],
+		},
+		{
+			"type": "shell",
+			"label": "Serve Book",
+			"command": "mdbook",
+			"args": [
+				"serve",
+				"--open",
+				"--port",
+				"8000"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"problemMatcher": [],
 		}
-
-
-		
 	]
 }
