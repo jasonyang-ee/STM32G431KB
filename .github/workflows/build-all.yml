@@ -13,8 +13,18 @@ on:
       - '**.md'
 
 jobs:
-  github-build:
+  Skip_Checking:
     runs-on: ubuntu-latest
+    outputs:
+      should_skip: ${{ steps.skip_check.outputs.should_skip }}
+    steps:
+      - id: skip_check
+        uses: fkirc/skip-duplicate-actions@v5
+
+  Github-Build:
+    runs-on: ubuntu-latest
+    needs: Skip_Checking
+    if: needs.Skip_Checking.outputs.should_skip != 'true'
     steps:
       - name: Install Dependencies
         run: |
@@ -36,8 +46,10 @@ jobs:
       - name: Build
         run: cmake --build $GITHUB_WORKSPACE/build -j 10
 
-  alpine-build:
+  Alpine-Build:
     runs-on: ubuntu-latest
+    needs: Skip_Checking
+    if: needs.Skip_Checking.outputs.should_skip != 'true'
     container:
       image: "ghcr.io/jasonyang-ee/stm32-builder:alpine-latest"
     steps:
@@ -45,8 +57,10 @@ jobs:
       - name: BUILD
         run: build.sh
 
-  arch-build:
+  Arch-Build:
     runs-on: ubuntu-latest
+    needs: Skip_Checking
+    if: needs.Skip_Checking.outputs.should_skip != 'true'
     container:
       image: "ghcr.io/jasonyang-ee/stm32-builder:arch-latest"
     steps:
@@ -54,8 +68,10 @@ jobs:
       - name: BUILD
         run: build.sh
 
-  ubuntu-build-upload:
+  Ubuntu-Build-Upload:
     runs-on: ubuntu-latest
+    needs: Skip_Checking
+    if: needs.Skip_Checking.outputs.should_skip != 'true'
     container:
       image: "ghcr.io/jasonyang-ee/stm32-builder:ubuntu-latest"
     steps:
@@ -76,16 +92,18 @@ jobs:
           path: ${{ github.workspace }}/build/*.bin
 
   Result:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     needs:
       - github-build
       - arch-build
       - alpine-build
       - ubuntu-build-upload
+      - Skip_Checking
+    if: always() && needs.Skip_Checking.outputs.should_skip != 'true'
     steps:
-      - name: All tests ok
+      - name: All Tests Ok
         if: ${{ !(contains(needs.*.result, 'failure')) }}
         run: exit 0
-      - name: Some tests failed
+      - name: Some Tests Failed
         if: ${{ contains(needs.*.result, 'failure') }}
         run: exit 1
