@@ -27,6 +27,7 @@ set(EXECUTABLE                      ${CMAKE_PROJECT_NAME})
 
 # USE .\getIncludeList.sh and .\getSourceList.sh to generate file list
 # Include List, Source List, and MCU Sepecific Setting
+# Must Update these files in cmake/ when adding new source files
 include(STM32G431xx_HAL_PARA)
 include(SourceList)
 include(IncludeList)
@@ -46,7 +47,6 @@ target_compile_options(${EXECUTABLE} PRIVATE
 	-Wall
 	-Wpedantic
 	-Wno-unused-parameter
-	-Os								# Optimize for size (that uses O2 )
 )
 
 # Linker options
