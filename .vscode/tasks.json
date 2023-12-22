@@ -104,7 +104,7 @@
 				"serve",
 				"--open",
 				"--port",
-				"8000"
+				"8500"
 			],
 			"options": {
 				"cwd": "${workspaceFolder}"
