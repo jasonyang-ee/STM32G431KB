@@ -1,0 +1,529 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>STM32G431KB Documentation</title>
+        <meta name="robots" content="noindex" />
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="docs_src/ferris.css">
+        <link rel="stylesheet" href="docs_src/theme/2018-edition.css">
+
+    </head>
+    <body>
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var html = document.querySelector('html');
+            var sidebar = null;
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="Introduction.html">Introduction</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><li class="part-title">User Guide</li><li class="chapter-item expanded "><a href="SerialUART.html"><strong aria-hidden="true">1.</strong> Serial UART</a></li><li class="chapter-item expanded "><a href="LED.html"><strong aria-hidden="true">2.</strong> LED</a></li><li class="chapter-item expanded "><a href="CLI.html"><strong aria-hidden="true">3.</strong> CLI</a></li><li class="chapter-item expanded "><a href="FreeRTOS.html"><strong aria-hidden="true">4.</strong> FreeRTOS</a></li><li class="chapter-item expanded "><a href="StateMachine.html"><strong aria-hidden="true">5.</strong> State Machine</a></li><li class="chapter-item expanded "><a href="Flash.html"><strong aria-hidden="true">6.</strong> Flash</a></li><li class="chapter-item expanded "><a href="DAC.html"><strong aria-hidden="true">7.</strong> DAC</a></li><li class="chapter-item expanded "><a href="ADC.html"><strong aria-hidden="true">8.</strong> ADC</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><a href="Author.html">Author</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">STM32G431KB Documentation</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/jasonyang-ee/STM32G431KB" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
+<h2 id="hardware-basics"><a class="header" href="#hardware-basics">Hardware Basics</a></h2>
+<p>Project Using STM32G431KB as Example. Test hardware is NUCLEO-G431KB.</p>
+<p>STM32CubeMX File Included.</p>
+<p>Hardware using jumper pin only to test out all functionalities.</p>
+<h2 id="build-this-project"><a class="header" href="#build-this-project">Build This Project</a></h2>
+<p>More Docker Details Visit <a href="https://github.com/jasonyang-ee/STM32-Dockerfile">https://github.com/jasonyang-ee/STM32-Dockerfile</a></p>
+<ul>
+<li>
+<p>Auto Docker Build Command</p>
+<pre><code>docker run -rm -v {Your_Local_Full_Path}:/home jasonyangee/stm32-builder:ubuntu-latest https://github.com/jasonyang-ee/STM32G431KB
+</code></pre>
+<blockquote>
+<p><img src="img/run.gif" alt="Run" /></p>
+</blockquote>
+</li>
+<li>
+<p>Manual CMake Build Command</p>
+<pre><code>cmake -B build -G Ninja
+cmake --build build
+</code></pre>
+</li>
+</ul>
+<h2 id="pin-map"><a class="header" href="#pin-map">Pin Map</a></h2>
+<p>Use /CubeMX/CubeMX.ioc for complete info</p>
+<p><img src="img/HardwareMap.png" alt="diagram" />
+<img src="img/PinMap.png" alt="map" /></p>
+<h2 id="folder-structure"><a class="header" href="#folder-structure">Folder Structure</a></h2>
+<p>This project uses HAL. Code generation using CubeMX, and the generated code structure is untouched for <code>/Core</code> <code>/Driver</code> <code>/Middlewares</code>.</p>
+<p>The only modification is that <code>main.c</code> and <code>main.h</code> are moved into <code>/Application</code> for better workflow.</p>
+<p>The c++ layer is done in <code>/Application</code>. All c++ class object are to represent each device or feature. Then, all objects are decleared globally in <code>Instances.hpp</code>. This will allow controlling class (State Machine or FreeRTOS) to easily access those instances and mutate data.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="serial-uart"><a class="header" href="#serial-uart">Serial UART</a></h1>
+<p>Serial COM is the base of all debugging and user interface for this project. It is used in interrupt mode only. DMA is not necessary because of my string buffer.</p>
+<h2 id="machnism"><a class="header" href="#machnism">Machnism</a></h2>
+<p>A STL string buffer is used to cache all pending to send data. This is gambling on that all data will be send on a fast scheduler to minimize the risk of stack overflow.</p>
+<p>This is really convineant that one do not have to worry about data size to exceed TX buffer size.</p>
+<p>The receiving buffer size is the only thing must be pre-determined which is easy. That is just your command max length.</p>
+<p>In short, both RX and TX buffer size are share defined as below.</p>
+<p>SerialCOM.hpp</p>
+<pre><code class="language-c++">#ifndef UART_BUFFER
+#define UART_BUFFER 64
+#endif
+</code></pre>
+<p>A better practice maybe using <a href="https://www.etlcpp.com/">ETL library</a> where string max size can be defined. But, whatever.</p>
+<h2 id="use-of-uart-object"><a class="header" href="#use-of-uart-object">Use of UART Object</a></h2>
+<ul>
+<li><code>sendString(std::string)</code> and <code>sendNumber(any_number)</code>to add data to buffer.</li>
+<li><code>sendLn()</code> for fast formatting.</li>
+<li><code>sendOut()</code> to initiate transmission. <strong>Recall this funtion in <code>HAL_UART_TxCpltCallback</code> to send all buffer.</strong></li>
+<li>Start of the Instance:</li>
+</ul>
+<p>Before <code>main()</code>:</p>
+<pre><code class="language-c++">SerialCOM serialCOM{};
+</code></pre>
+<p>Inside <code>main()</code>:</p>
+<pre><code class="language-c++">MX_USART2_UART_Init();
+serialCOM.setPort(&amp;huart2);
+HAL_UARTEx_ReceiveToIdle_IT(&amp;huart2, serialCOM.m_rx_data, UART_BUFFER);
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="led"><a class="header" href="#led">LED</a></h1>
+<p>LED is the 2nd debugging interface. Running it in breathing / blink / rapid mode will help you to determine if system is at fault.</p>
+<p>And it is fun to stare at LED anyway.</p>
+<h2 id="machnism-1"><a class="header" href="#machnism-1">Machnism</a></h2>
+<p>LED is controlled by PWM. PWM is controlled by <code>period</code> and <code>duty cycle</code>. <code>period</code> is the time it takes to complete one cycle. <code>duty cycle</code> is the time it takes to complete one cycle in high state.</p>
+<h2 id="pwm"><a class="header" href="#pwm">PWM</a></h2>
+<ul>
+<li>
+<p><code>Prescaler</code> x <code>Overflow</code> = <code>Clock Source</code> = <code>System Clock</code> / <code>Desired PWM Frequency</code></p>
+</li>
+<li>
+<p>If wanting period be 100 for ease of duty cycle setting:</p>
+</li>
+<li>
+<p>32Mhz / 1KHz / 100 = 320</p>
+</li>
+<li>
+<p>=&gt; <code>prescaler</code>: 320-1, <code>period</code>: 100-1, <code>PWM Frequency</code>: 1KHz</p>
+</li>
+<li>
+<p>If wanting max precision with using max period:</p>
+</li>
+<li>
+<p>32Mhz / 1KHz / (if &gt; 65535) then divide 65535 (16bit period)</p>
+</li>
+<li>
+<p>=&gt; <code>prescaler</code>: 1-1, <code>period</code>: 32000-1, <code>PWM Frequency</code>: 1KHz</p>
+</li>
+<li>
+<p>Use <code>clock source</code>: <code>internal clock (APBx)</code></p>
+</li>
+</ul>
+<h2 id="interrupt-via-pwm-oc-output-compare-signal"><a class="header" href="#interrupt-via-pwm-oc-output-compare-signal">Interrupt Via PWM OC (output compare) signal</a></h2>
+<ul>
+<li>Enable <code>PWM global interrupt</code></li>
+<li>Run <code>HAL_TIM_PWM_Start_IT(&amp;htimX, TIM_CHANNEL_X)</code> in <code>main()</code></li>
+<li>Define <code>void PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim)</code></li>
+<li>Run <code>led_user.scheduler()</code> in the <code>PWM_PulseFinishedCallback</code></li>
+</ul>
+<h2 id="led-class"><a class="header" href="#led-class">LED Class</a></h2>
+<ul>
+<li>Init object <code>LED led_user{period, dimmer, Interrupt Frequency}</code></li>
+<li>Passthogh channel CCR with <code>led_user.setCCR(&amp;htimX.Instance-&gt;CCRX);</code></li>
+<li>Ready to use <code>on()</code>, <code>off()</code>, <code>toggle()</code>, <code>set()</code>, <code>breath()</code>, <code>blink()</code>, <code>rapid()</code>.</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="cli"><a class="header" href="#cli">CLI</a></h1>
+<p>I am using lwshell. Credit to <a href="https://github.com/MaJerle/lwshell">https://github.com/MaJerle/lwshell</a></p>
+<h2 id="machnism-2"><a class="header" href="#machnism-2">Machnism</a></h2>
+<ul>
+<li>
+<p>Direct usage without FreeRTOS:</p>
+<ul>
+<li>Inside <code>HAL_UARTEx_RxEventCallback()</code>:
+<pre><code class="language-c++">cli.setSize(Size);
+cli.parse();
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p>Start of the Instance:</p>
+<ul>
+<li>
+<p>Before <code>main()</code>:</p>
+<pre><code class="language-c++">CLI cli{};
+</code></pre>
+</li>
+<li>
+<p>Inside <code>main()</code>:</p>
+<pre><code class="language-c++">cli.init();
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="c-wrapper"><a class="header" href="#c-wrapper">C++ Wrapper</a></h2>
+<p>Additionally, I made a c++ wrapper class to use lwshell.</p>
+<p>This is how you do all the functions and use this hardware as playground. All playground feature should be accessed via this Command Line Interface.</p>
+<p>CLI input and output using UART (SerialCOM) as described above.</p>
+<p>To expend commands:</p>
+<ol>
+<li>
+<p>Add a static function that returns its run result</p>
+<pre><code class="language-c++">static int32_t led(int32_t, char**);
+</code></pre>
+</li>
+<li>
+<p>Register this function to be called when command is parsed in the RX.</p>
+<pre><code class="language-c++">lwshell_register_cmd(&quot;led&quot;, &amp;CLI::led, NULL);
+</code></pre>
+</li>
+<li>
+<p>Complete your command function.</p>
+<p><strong>REMEMBER TO <code>return int32_t;</code> ELSE SYSTEM WILL GET STUCK.</strong></p>
+</li>
+</ol>
+<h2 id="customization"><a class="header" href="#customization">Customization</a></h2>
+<p>Finally, we can populate our <code>static</code> custom command functions.</p>
+<p>You will need to define the command and register it in <code>init()</code>.</p>
+<p><strong>Example Command with Sub Commands:</strong></p>
+<ul>
+<li>
+<p>Inside init():</p>
+<pre><code class="language-c++">lwshell_register_cmd(&quot;led&quot;, &amp;CLI::led, NULL);
+</code></pre>
+</li>
+<li>
+<p>Function Define:</p>
+<pre><code class="language-c++">static int32_t CLI::led(int32_t argc, char** argv) {
+	const char* led_help =
+		&quot;\nLED Functions:\n&quot;
+		&quot;  on\tTurns ON LED\n&quot;
+		&quot;  off\tTurns OFF LED\n&quot;
+		&quot;  breath\tLED in breath effect mode\n&quot;
+		&quot;  blink\tLED in slow blink mode\n&quot;
+		&quot;  rapid\tLED in fast blink mode\n\n&quot;;
+
+	if (!strcmp(argv[1], &quot;help&quot;)) serialCOM.sendString(led_help);
+	if (!strcmp(argv[1], &quot;on&quot;)) led_user.on();
+	if (!strcmp(argv[1], &quot;off&quot;)) led_user.off();
+	if (!strcmp(argv[1], &quot;breath&quot;)) led_user.breath();
+	if (!strcmp(argv[1], &quot;blink&quot;)) led_user.blink();
+	if (!strcmp(argv[1], &quot;rapid&quot;)) led_user.rapid();
+	return 0;
+}
+</code></pre>
+</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="freertos"><a class="header" href="#freertos">FreeRTOS</a></h1>
+<h2 id="c-wrapper-1"><a class="header" href="#c-wrapper-1">C++ Wrapper</a></h2>
+<p>I made a c++ wrapper class to use FreeRTOS. That's the main idea here.</p>
+<p>To expend your task:</p>
+<ol>
+<li>Define the task handler and function
+<pre><code class="language-c++">TaskHandle_t parse_Handle;
+void parse();
+</code></pre>
+</li>
+<li>Use lamda to create the task
+<pre><code class="language-c++">auto t1 = [](void *arg) { static_cast&lt;Thread *&gt;(arg)-&gt;parse(); };
+xTaskCreate(t1, &quot;cli parsing&quot;, 256, this, -2, &amp;parse_Handle);
+</code></pre>
+</li>
+<li>Trap the task into its own tiny while() like the one in your main()
+<pre><code class="language-c++">void Thread::parse() {
+	while (1) {
+		vTaskSuspend(NULL);
+		cli.parse();
+	}
+}
+</code></pre>
+</li>
+<li>Use task control (i.e. queue, notify, suspend, resume) to run your app and feature.
+<pre><code class="language-c++">xTaskResumeFromISR(thread.parse_Handle);
+</code></pre>
+</li>
+</ol>
+<h2 id="use-of-freertos-wrapper-class"><a class="header" href="#use-of-freertos-wrapper-class">Use of FreeRTOS Wrapper Class</a></h2>
+<p>The task are created in the object initialization using Lamda due to C++ wrapping.</p>
+<ul>
+<li>In object initializer:
+<pre><code class="language-c++">auto t1 = [](void *arg) { static_cast&lt;Thread *&gt;(arg)-&gt;parse(); };
+xTaskCreate(t1, &quot;cli parsing&quot;, 256, this, -2, &amp;parse_Handle);
+</code></pre>
+</li>
+</ul>
+<p>Each of the corresponding task are decleared with its handle typle.</p>
+<ul>
+<li>In header:
+<pre><code class="language-c++">TaskHandle_t parse_Handle;
+void parse();
+</code></pre>
+</li>
+</ul>
+<h2 id="freertos-debugging"><a class="header" href="#freertos-debugging">FreeRTOS Debugging</a></h2>
+<ul>
+<li>Install VS Code Extension: RTOS Views (<code>mcu-debug.rtos-views</code>)</li>
+<li>Use a hardware timer with 20KHz setting. In this projcet timer 7 is used.</li>
+<li>Include the follwing code to enable full debugging feature.</li>
+</ul>
+<p>In <code>FreeRTOSConfig.h</code>:</p>
+<pre><code class="language-c++">#include &quot;tim.h&quot;					// Using 20kHz hardware timer
+#define configUSE_TRACE_FACILITY 1			// Show RTOS task ID stats
+#define configUSE_STATS_FORMATTING_FUNCTIONS 1		// Enable using vTaskList()
+#define configRECORD_STACK_HIGH_ADDRESS 1		// Show RTOS stack stats
+#define configGENERATE_RUN_TIME_STATS 1
+#define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS() MX_TIM7_Init()
+#define portGET_RUN_TIME_COUNTER_VALUE() htim7.Instance-&gt;CNT
+</code></pre>
+<p>In <code>MX_TIM7_Init()</code>:</p>
+<pre><code class="language-c++">/* USER CODE BEGIN TIM7_Init 2 */
+__TIM7_CLK_ENABLE();
+HAL_TIM_Base_Init(&amp;htim7);
+HAL_TIM_Base_Start(&amp;htim7);
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="state-machine"><a class="header" href="#state-machine">State Machine</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="flash"><a class="header" href="#flash">Flash</a></h1>
+<p>The goal is to save and load user configurations for application. Writting from the back of the flash memory.</p>
+<p>Porting to different hardware requires user to edit <code>Flash.hpp</code> and <code>Flash.cpp</code></p>
+<p>Refer to the Reference Manual and find out the end of flash address. Then, update those two variable.</p>
+<pre><code class="language-c++">// G432KB has 128Kb of flash
+// Same as (0x0803FFFF + 1 - 0x8); if using datasheet provided value
+const uint32_t m_address_end{0x08040000 - 0x8};
+const uint8_t m_page_total{127};
+</code></pre>
+<p><img src="img/FlashTable.png" alt="" /></p>
+<p>The configuration data are packaged into a struct and union aligned to <code>uint64_t array</code> for double word HAL flash writing function. The pack and unpack is done manually by user.</p>
+<p>You will need to edit this section to fit your application needs.</p>
+<pre><code class="language-c++">// Edit config_arr_size and Config content.
+#define config_arr_size 2
+union Config_Arr {
+	struct Config {
+		uint32_t led_level;
+		uint32_t led_scale;
+	} config;
+
+	uint64_t config_arr[config_arr_size];
+};
+</code></pre>
+<p>In the public function <code>Save()</code> and <code>Load()</code>, you will need to manually pack and unpack your configuration to/from each of your instances.</p>
+<p>Then, you will call the private function <code>Write()</code> and <code>Read()</code> to do flash access.</p>
+<p>Below example saves and loads two configuration from LED usage.</p>
+<pre><code class="language-c++">void Flash::Save() {
+    Flash::Config_Arr current_config{};
+    current_config.config.led_level = led_user.getLevel();
+    current_config.config.led_scale = led_user.getScale();
+    Write(current_config.config_arr, config_arr_size);
+}
+
+void Flash::Load() {
+    Flash::Config_Arr loaded_config{};
+    Read(&amp;loaded_config, config_arr_size);
+	led_user.setLevel(loaded_config.config.led_level);
+    led_user.setScale(loaded_config.config.led_scale);
+}
+</code></pre>
+<p>The memory save example:</p>
+<p><img src="img/FlashMem.png" alt="" /></p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="dac"><a class="header" href="#dac">DAC</a></h1>
+<p>DAC using interrupt mode as of now.</p>
+<p>Two function is required to run with HAL:</p>
+<ul>
+<li>HAL_DAC_Start(m_port, m_channel);</li>
+<li>HAL_DAC_SetValue(m_port, m_channel, m_alignment, count_value);</li>
+</ul>
+<p><code>HAL_DAC_Start()</code> will call <code>HAL_Delay()</code>, and if used before <code>vTaskStartScheduler()</code>, then it will mess up with FreeRTOS causing thread to stuck in loop.</p>
+<p>Solutin is to move <code>HAL_DAC_Start()</code> into <code>setState()</code>. But, this likey will cause minor delay in runtime since every change of DAC value will call <code>HAL_DAC_Start()</code> again.</p>
+<p>Later we should implement a DMA or RTOS init() thread to be run once on system boot.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="adc"><a class="header" href="#adc">ADC</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="author"><a class="header" href="#author">Author</a></h1>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="docs_src/ferris.js"></script>
+
+        <script>
+        window.addEventListener('load', function() {
+            window.setTimeout(window.print, 100);
+        });
+        </script>
+
+    </div>
+    </body>
+</html>

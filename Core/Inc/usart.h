@@ -7,7 +7,7 @@
   ******************************************************************************
   * @attention
   *
-  * Copyright (c) 2023 STMicroelectronics.
+  * Copyright (c) 2025 STMicroelectronics.
   * All rights reserved.
   *
   * This software is licensed under terms that can be found in the LICENSE file
@@ -18,9 +18,6 @@
   */
 /* USER CODE END Header */
 /* Define to prevent recursive inclusion -------------------------------------*/
-
-#ifndef CORE_INC_USART
-#define CORE_INC_USART
 #ifndef __USART_H__
 #define __USART_H__
 
@@ -53,6 +50,3 @@ void MX_USART2_UART_Init(void);
 
 #endif /* __USART_H__ */
 
-
-
-#endif    /* CORE_INC_USART */

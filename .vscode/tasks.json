@@ -3,34 +3,15 @@
 	"tasks": [
 		{
 			"type": "shell",
-			"label": "Build Project",
-			"command": "cmake",
+			"label": "Windows: Flash Firmware",
+			"command": "STM32_Programmer_CLI",
 			"args": [
-				"--build",
-				"${command:cmake.buildDirectory}",
-				"-j",
-				"20"
-			],
-			"options": {
-				"cwd": "${workspaceFolder}"
-			},
-			"problemMatcher": [
-				"$gcc"
-			],
-			"group": {
-				"kind": "build",
-				"isDefault": true
-			}
-		},
-		{
-			"type": "shell",
-			"label": "Clean Project",
-			"command": "cmake",
-			"args": [
-				"--build",
-				"${command:cmake.buildDirectory}",
-				"--target",
-				"clean"
+				"--connect",
+				"port=swd",
+				"--download",
+				"'${command:cmake.launchTargetPath}'",
+				"-rst",
+				"-run"
 			],
 			"options": {
 				"cwd": "${workspaceFolder}"
@@ -39,13 +20,11 @@
 		},
 		{
 			"type": "shell",
-			"label": "Windows: Flash Firmware",
+			"label": "Windows: Reset Device",
 			"command": "STM32_Programmer_CLI",
 			"args": [
 				"--connect",
 				"port=swd",
-				"--download",
-				"${command:cmake.launchTargetPath}",
 				"-rst",
 				"-run"
 			],
@@ -59,10 +38,10 @@
 			"label": "Linux: Flash Firmware",
 			"command": "st-flash",
 			"args": [
+				"--reset",
 				"write",
 				"${command:cmake.launchTargetDirectory}/${command:cmake.buildTargetName}.bin",
-				"0x8000000",
-				"--reset"
+				"0x08000000"
 			],
 			"options": {
 				"cwd": "${workspaceFolder}"
@@ -80,9 +59,57 @@
 				"cwd": "${workspaceFolder}"
 			},
 			"problemMatcher": []
+		},
+		{
+			"type": "cmake",
+			"label": "CMake: build",
+			"command": "build",
+			"targets": [
+				"all"
+			],
+			"preset": "${command:cmake.activeBuildPresetName}",
+			"group": "build",
+			"problemMatcher": [],
+			"detail": "CMake template build task"
+		},
+		{
+			"type": "cmake",
+			"label": "CMake: clean rebuild",
+			"command": "cleanRebuild",
+			"targets": [
+				"all"
+			],
+			"preset": "${command:cmake.activeBuildPresetName}",
+			"group": "build",
+			"problemMatcher": [],
+			"detail": "CMake template clean rebuild task"
+		},
+		{
+			"type": "shell",
+			"label": "Build Book",
+			"command": "mdbook",
+			"args": [
+				"build",
+			],
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"problemMatcher": [],
+		},
+		{
+			"type": "shell",
+			"label": "Serve Book",
+			"command": "mdbook",
+			"args": [
+				"serve",
+				"--open",
+				"--port",
+				"8500"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"problemMatcher": [],
 		}
-
-
-		
 	]
 }

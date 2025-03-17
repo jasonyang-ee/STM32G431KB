@@ -1,0 +1,45 @@
+{
+	"recommendations": [
+		// Required
+		"twxs.cmake",
+		"ms-vscode.cmake-tools",
+		
+		// Debug
+		"marus25.cortex-debug",
+		"mcu-debug.debug-tracker-vscode",
+		"mcu-debug.memory-view",
+		"mcu-debug.rtos-views",
+		
+		// Essential
+		"ms-vscode.cpptools",
+		"xaver.clang-format",
+		"akiramiyakoda.cppincludeguard",
+		"cschlosser.doxdocgen",
+		"eamodio.gitlens",
+		"mhutchie.git-graph",
+		"donjayamanne.githistory",
+		"github.vscode-pull-request-github",
+		"yzhang.markdown-all-in-one",
+		"bierner.markdown-preview-github-styles",
+		"ms-vscode-remote.remote-wsl",
+		"ms-vscode-remote.remote-ssh",
+		"ms-vscode.remote-explorer",
+		
+		// Visuial
+		"dan-c-underwood.arm",
+		"zixuanwang.linkerscript",
+		"jeff-hykin.better-cpp-syntax",
+		"jeff-hykin.better-dockerfile-syntax",
+		"redhat.vscode-yaml",
+		
+		// Containers
+		"ms-azuretools.vscode-docker",
+		"ms-vscode-remote.remote-containers",
+		
+		// Optional Utilities
+		"albert.tabout",
+		"adpyke.codesnap",
+		"gerrnperl.outline-map",
+		"jannisx11.batch-rename-extension",
+	]
+}

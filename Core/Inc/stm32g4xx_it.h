@@ -6,20 +6,20 @@
   ******************************************************************************
   * @attention
   *
-  * Copyright (c) 2023 STMicroelectronics.
+  * Copyright (c) 2025 STMicroelectronics.
   * All rights reserved.
   *
   * This software is licensed under terms that can be found in the LICENSE file
   * in the root directory of this software component.
   * If no LICENSE file comes with this software, it is provided AS-IS.
   *
- ******************************************************************************
+  ******************************************************************************
   */
 /* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef CORE_INC_STM32G4XX_IT
-#define CORE_INC_STM32G4XX_IT
+#ifndef __STM32G4xx_IT_H
+#define __STM32G4xx_IT_H
 
 #ifdef __cplusplus
  extern "C" {
@@ -52,6 +52,15 @@ void MemManage_Handler(void);
 void BusFault_Handler(void);
 void UsageFault_Handler(void);
 void DebugMon_Handler(void);
+void PVD_PVM_IRQHandler(void);
+void DMA1_Channel1_IRQHandler(void);
+void DMA1_Channel2_IRQHandler(void);
+void DMA1_Channel3_IRQHandler(void);
+void DMA1_Channel4_IRQHandler(void);
+void DMA1_Channel5_IRQHandler(void);
+void DMA1_Channel6_IRQHandler(void);
+void ADC1_2_IRQHandler(void);
+void TIM1_TRG_COM_TIM17_IRQHandler(void);
 void USART2_IRQHandler(void);
 void TIM6_DAC_IRQHandler(void);
 /* USER CODE BEGIN EFP */
@@ -62,4 +71,4 @@ void TIM6_DAC_IRQHandler(void);
 }
 #endif
 
-#endif    /* CORE_INC_STM32G4XX_IT */
+#endif /* __STM32G4xx_IT_H */
