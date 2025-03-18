@@ -18,6 +18,7 @@ class CLI {
     void func_info(int32_t argc, char** argv);
     void func_rot(int32_t argc, char** argv);
     void func_crc(int32_t argc, char** argv);
+    void func_dac(int32_t argc, char** argv); // Add function declaration
 
    private:
     void setCommands();
