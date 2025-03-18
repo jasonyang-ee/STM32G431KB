@@ -20,7 +20,7 @@ class SM {
 
     template <typename... ExternalInjection>
     static void triggerEvent(Parent::Event event, Parent::StateMachine &sm, ExternalInjection... args) {
-        auto it = std::find_if(sm.transitions.begin(), sm.transitions.end(), [&](const auto &t) {
+        auto it = std::ranges::find_if(sm.transitions.begin(), sm.transitions.end(), [&](const auto &t) {
             return std::get<0>(t) == sm.currentState && std::get<1>(t) == event;
         });
 
@@ -33,7 +33,7 @@ class SM {
 
     template <typename... ExternalInjection>
     static void setState(Parent::State state, Parent::StateMachine &sm, ExternalInjection... args) {
-        auto it = std::find_if(sm.entries.begin(), sm.entries.end(),
+        auto it = std::ranges::find_if(sm.entries.begin(), sm.entries.end(),
                                [&](const auto &entry) { return std::get<0>(entry) == state; });
 
         if (it != sm.entries.end()) {
