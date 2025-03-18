@@ -12,6 +12,8 @@ void CustomCRC::setPort(CRC_HandleTypeDef *Port) {
 
 void CustomCRC::setPolynomial(uint32_t Pol, uint32_t PolyLength) { HAL_CRCEx_Polynomial_Set(&hcrc, Pol, PolyLength); }
 
+void CustomCRC::setInitValue(uint32_t Value) { port->Init.InitValue = Value; }
+
 uint32_t CustomCRC::accumulate(uint8_t *data, uint32_t size) { HAL_CRC_Accumulate(&hcrc, (uint32_t*)data, size); }
 
 uint32_t CustomCRC::calculate(uint8_t *data, uint32_t size) { HAL_CRC_Calculate(&hcrc, (uint32_t*)data, size); }

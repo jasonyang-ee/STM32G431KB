@@ -144,11 +144,11 @@ void CLI::func_rot(int32_t argc, char** argv) {
 		if (arg == "help" || arg == "?" || arg == "-h") {
 			serial.sendString(help_text);
 		} else if (arg == "on") {
-			SM<Thread>::triggerEvent(Thread::Event::START, thread.rotation_sm);
+			SM<Thread>::triggerEvent(Thread::Event::START, thread.runner_sm);
 		} else if (arg == "off") {
-			SM<Thread>::setState(Thread::State::OFF, thread.rotation_sm);
+			SM<Thread>::setState(Thread::State::OFF, thread.runner_sm);
 		} else if (arg == "set" && argc == 3) {
-			SM<Thread>::setState(Thread::State::INIT, thread.rotation_sm, int{std::stoi(argv[2])});
+			SM<Thread>::setState(Thread::State::INIT, thread.runner_sm, int{std::stoi(argv[2])});
 		} else {
 			serial.sendString("Command not found\n");
 		}
@@ -167,17 +167,10 @@ void CLI::func_crc(int32_t argc, char** argv) {
 		std::string arg = argv[1];
 		if (arg == "help" || arg == "?" || arg == "-h") {
 			serial.sendString(help_text);
-		} else if (arg == "acc") {
-			if (argc == 3) {
-				serial.sendNumber(std::stoi(argv[2]));
-				uint8_t data = std::stoi(argv[2]);
-				serial.sendNumber(crc.accumulate(&data, 1));
-			}
 		} else if (arg == "cal") {
 			if (argc == 3) {
-				serial.sendNumber(std::stoi(argv[2]));
-				uint8_t data = std::stoi(argv[2]);
-				serial.sendNumber(crc.calculate(&data, 1));
+				uint8_t input = std::stoi(argv[2]);
+				SM<Thread>::setState(Thread::State::CRC_CAL, thread.runner_sm, std::vector<uint8_t>{input});
 			}
 		} else {
 			serial.sendString("Command not found\n");

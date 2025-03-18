@@ -14,7 +14,7 @@ class Serial {
     virtual ~Serial(){};
 
     // Must be greater than protobuf payload size
-    static constexpr size_t UART_BUFFER_SIZE{128};
+    static constexpr size_t UART_BUFFER_SIZE{512};
 
     // Tx Rx Memory for DMA
     std::array<uint8_t, UART_BUFFER_SIZE> tx;
@@ -51,7 +51,7 @@ class Serial {
     void sendNumber(std::array<T, N> elements) {
         for (auto &i : elements) {
             tx_cache.append(std::to_string(i));
-            if (&i != &elements.back()) tx_cache.append("\t");
+            if (&i != &elements.back()) tx_cache.append("  ");
         }
     }
 
@@ -65,7 +65,7 @@ class Serial {
         for (auto &column : elements) {
             for (auto &element : column) {
                 tx_cache.append(std::to_string(element));
-                if (&element != &column.back()) tx_cache.append("\t");
+                if (&element != &column.back()) tx_cache.append("  ");
             }
             if (&column != &elements.back()) tx_cache.append("\n");
         }

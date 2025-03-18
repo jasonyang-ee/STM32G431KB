@@ -38,11 +38,12 @@ Thread::Thread() {
     // clang-format on
 
     // clang-format off
-	rotation_sm = {
+	runner_sm = {
 		State::OFF,
 		{ // Entry definition: (TargetState, GuardFunction, ActionFunction, Injection)
 			{ State::OFF,		{},	actionRotationStop(),	{} },
             { State::INIT,		{},	actionRotationStart(),	{} },
+			{ State::CRC_CAL,	{},	actionCRCStart(),		{} },
 		},
 		{ // Transition definition: (CurrentState, Event, NextState, GuardFunction, ActionFunction, Injection)
 			{ State::OFF,		Event::START,		State::R1,		{},	actionRotationStart(),	{} },
@@ -53,11 +54,12 @@ Thread::Thread() {
 			{ State::R3,		Event::TASK_DONE,	State::R4,		{},	actionRotate(),			{3} },
 			{ State::R4,		Event::TASK_DONE,	State::R1,		{},	actionRotate(),			{4} },
 			{ State::R1,		Event::STOP,		State::OFF,		{},	actionRotationStop(),	{} },
+			{ State::CRC_CAL,	Event::TASK_DONE,	State::OFF,		{},	actionCRCStop(),		{} },
 		}
 	};
     // clang-format on
 
-	// Set initial state
+    // Set initial state
     SM<Thread>::setState(State::INIT, thread_sm);
 }
 
@@ -66,30 +68,32 @@ Thread::~Thread() {}
 // Initialize System
 void Thread::init() {
     while (1) {
-        dac.init();
+		dac.init();
         flash.Load();
         SM<Thread>::triggerEvent(Event::INIT_DONE, thread_sm);
-        vTaskDelete(init_handle);
+        vTaskDelete(NULL);
     }
 }
 Action Thread::actionSystemInit() {
-    return [this]() { xTaskCreate(task<&Thread::init>, "system init", 800, this, 6, &init_handle); };
+	return [this]() {
+        xTaskCreate(task<&Thread::init>, "system init", 800, this, 6, &init_handle);
+    };
 }
 Action Thread::actionSystemRun() {
     return [this]() {
         xTaskCreate(task<&Thread::serialTX>, "serial send tx", 100, this, 1, &serial_handle);
-        xTaskCreate(task<&Thread::parse>, "cli parsing", 200, this, 2, &parse_handle);
-        xTaskCreate(task<&Thread::schedule_20Hz>, "schedule 20Hz", 64, this, 5, &schedule_20Hz_handle);
-        xTaskCreate(task<&Thread::telemetry>, "telemetry", 400, this, 3, &telemetry_handle);
+		xTaskCreate(task<&Thread::parse>, "cli parsing", 200, this, 2, &parse_handle);
+		xTaskCreate(task<&Thread::schedule_20Hz>, "schedule 20Hz", 64, this, 5, &schedule_20Hz_handle);
+		xTaskCreate(task<&Thread::telemetry>, "telemetry", 400, this, 3, &telemetry_handle);
         vTaskSuspend(telemetry_handle);
-        xTaskCreate(task<&Thread::rotate>, "task simulation", 200, this, 3, &rotate_handle);
-        vTaskSuspend(rotate_handle);
-        xTaskCreate(task<&Thread::calculator>, "calculator", 64, this, 3, &calculator_handle);
+		xTaskCreate(task<&Thread::runner>, "task simulation", 200, this, 3, &runner_handle);
+        vTaskSuspend(runner_handle);
+		xTaskCreate(task<&Thread::calculator>, "calculator", 1000, this, 5, &calculator_handle);
         vTaskSuspend(calculator_handle);
-        xTaskCreate(task<&Thread::dacUpdate>, "dacUpdate", 64, this, 4, &dacUpdate_handle);
+		xTaskCreate(task<&Thread::dacUpdate>, "dacUpdate", 64, this, 4, &dacUpdate_handle);
         vTaskSuspend(dacUpdate_handle);
-
-        SM<Thread>::triggerEvent(Event::CREATE_DONE, thread_sm);
+		serial.sendString("\n\nSystem Boot OK\n");
+		SM<Thread>::triggerEvent(Event::CREATE_DONE, thread_sm);
     };
 }
 
@@ -101,10 +105,14 @@ void Thread::telemetry() {
         serial.sendNumber(dac.getLevel());
         serial.sendString("\nADC Sensing Value:\t");
         serial.sendNumber(adc.volt_from_dac);
-        serial.sendString("\nDate:\t");
+        serial.sendString("\nDate - Time:\t");
         serial.sendNumber(rtc.getDate());
-        serial.sendString("\nTime:\t");
+        serial.sendString("  -  ");
         serial.sendNumber(rtc.getTime());
+        serial.sendString("\nCurrent Free Heap: ");
+        serial.sendNumber(xPortGetFreeHeapSize());
+        serial.sendString("\nMinimum Free Heap: ");
+        serial.sendNumber(xPortGetMinimumEverFreeHeapSize());
         serial.sendLn();
 
         SM<Thread>::triggerEvent(Event::TASK_DONE, telemetry_sm);
@@ -156,29 +164,30 @@ void Thread::parse() {
     }
 }
 
-void Thread::rotate() {
+void Thread::runner() {
     while (1) {
-        SM<Thread>::triggerEvent(Event::TASK_DONE, rotation_sm);
+        serial.sendString("Running\n");
+        SM<Thread>::triggerEvent(Event::TASK_DONE, runner_sm);
     }
 }
 Action Thread::actionRotationStart() {
     return [this]() {
         BaseType_t xYieldRequired = pdTRUE;
-        xTaskResumeFromISR(rotate_handle);
+        xTaskResumeFromISR(runner_handle);
         portYIELD_FROM_ISR(xYieldRequired);
     };
 }
 Action Thread::actionRotationStop() {
     return [this]() {
         led_user.off();
-        vTaskSuspend(rotate_handle);
+        vTaskSuspend(runner_handle);
     };
 }
 Action Thread::actionRotate() {
     return [this]() {
         int order{0};
-        if (rotation_sm.injections.size() > 0) {
-            order = std::any_cast<int>(rotation_sm.injections[0]);
+        if (runner_sm.injections.size() > 0) {
+            order = std::any_cast<int>(runner_sm.injections[0]);
         }
         switch (order) {
             case 1:
@@ -197,13 +206,30 @@ Action Thread::actionRotate() {
                 led_user.off();
                 break;
         }
-        serial.sendString("Rotating\n");
         vTaskDelay(1000);
     };
 }
 
 void Thread::calculator() {
     while (1) {
-        vTaskDelay(1000);
+        // get std::vector<uint8> input from injection
+        std::vector<uint8_t> input = std::any_cast<std::vector<uint8_t>>(runner_sm.injections[0]);
+        crc.setPolynomial(0x9B, 8);
+        crc.setInitValue(0x00);
+        auto result = crc.calculate(input.data(), 2);
+        serial.sendString("CRC Result: ");
+        serial.sendNumber(result);
+        serial.sendLn();
+        SM<Thread>::triggerEvent(Event::TASK_DONE, runner_sm);
     }
+}
+Action Thread::actionCRCStart() {
+    return [this]() {
+        BaseType_t xYieldRequired = pdTRUE;
+        xTaskResumeFromISR(calculator_handle);
+        portYIELD_FROM_ISR(xYieldRequired);
+    };
+}
+Action Thread::actionCRCStop() {
+    return [this]() { vTaskSuspend(calculator_handle); };
 }

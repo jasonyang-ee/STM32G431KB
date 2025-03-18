@@ -29,7 +29,7 @@ void Flash::Load() {
     serial.sendNumber(payload.dac_level);
     serial.sendString("\nLED State: ");
     serial.sendNumber(payload.led_state);
-    serial.sendString("\nWrite Counts: ");
+    serial.sendString("\nFlash Write Counts: ");
     serial.sendNumber(payload.write_counts);
 
     // restore the state

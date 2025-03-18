@@ -11,32 +11,25 @@ class Thread {
     Thread();
     virtual ~Thread();
 
+    // Task Task Handle
     template <void (Thread::*TaskFunction)()>
     static void task(void *arg) {
         (static_cast<Thread *>(arg)->*TaskFunction)();
     }
-
     void init();
     TaskHandle_t init_handle;
-
     void serialTX();
     TaskHandle_t serial_handle;
-
     void parse();
     TaskHandle_t parse_handle;
-
     void telemetry();
     TaskHandle_t telemetry_handle;
-
-    void rotate();
-    TaskHandle_t rotate_handle;
-
+    void runner();
+    TaskHandle_t runner_handle;
     void calculator();
     TaskHandle_t calculator_handle;
-
     void dacUpdate();
     TaskHandle_t dacUpdate_handle;
-
     void schedule_20Hz();
     TaskHandle_t schedule_20Hz_handle;
 
@@ -47,7 +40,7 @@ class Thread {
     ---------------------------------------------------------------------------*/
 
     // State and Event List
-    enum class State { ON, OFF, SINGLE, INIT, CREATE_TASKS, IDLE, R1, R2, R3, R4 };
+    enum class State { ON, OFF, SINGLE, INIT, CREATE_TASKS, IDLE, R1, R2, R3, R4, CRC_CAL };
     enum class Event { START, STOP, TOGGLE, SINGLE, TASK_DONE, INIT_DONE, CREATE_DONE };
 
     using Entry = std::tuple<State, Guard, Action, Injection>;
@@ -62,7 +55,7 @@ class Thread {
     // State Machine Instances
     StateMachine thread_sm;
     StateMachine telemetry_sm;
-    StateMachine rotation_sm;
+    StateMachine runner_sm;
     StateMachine dac_sm;
 
     // State Machine Data
@@ -78,6 +71,8 @@ class Thread {
     Action actionRotationStart();
     Action actionRotationStop();
     Action actionRotate();
+    Action actionCRCStart();
+    Action actionCRCStop();
 
     template <typename Parent>
     friend class SM;  // Grant access to ThreadSM
