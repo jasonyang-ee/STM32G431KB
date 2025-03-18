@@ -47,22 +47,24 @@ target_compile_options(${EXECUTABLE} PRIVATE
 	-Wall
 	-Wpedantic
 	-Wno-unused-parameter
+    -ffunction-sections
+    -fdata-sections
 )
 
 # Linker options
 target_link_options(${EXECUTABLE} PRIVATE
 	-T${linker_script_SRC}
 	${CPU_PARAMETERS}
-	-Wl,-Map=${CMAKE_PROJECT_NAME}.map
-	--specs=nosys.specs
-	-u _printf_float                # STDIO float formatting support
-	-Wl,--start-group
+	--specs=nosys.specs	  # Will remove support for SWO.
+	-u _printf_float
 	-lc
 	-lm
 	-lstdc++
 	-lsupc++
+	-Wl,--start-group
 	-Wl,--end-group
 	-Wl,--print-memory-usage
+	-Wl,-Map=${CMAKE_PROJECT_NAME}.map
 )
 
 # Execute post-build to print size
