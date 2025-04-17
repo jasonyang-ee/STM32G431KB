@@ -71,34 +71,32 @@ Thread::~Thread() {}
 // Initialize System
 void Thread::init() {
     while (1) {
-		dac.init();
+        dac.init();
         flash.Load();
         SM<Thread>::triggerEvent(Event::INIT_DONE, thread_sm);
         vTaskDelete(NULL);
     }
 }
 Action Thread::actionSystemInit() {
-	return [this]() {
-        xTaskCreate(task<&Thread::init>, "system init", 800, this, 6, &init_handle);
-    };
+    return [this]() { xTaskCreate(task<&Thread::init>, "system init", 1100, this, 6, &init_handle); };
 }
 Action Thread::actionSystemRun() {
     return [this]() {
-        xTaskCreate(task<&Thread::serialTX>, "serial send tx", 64, this, 1, &serial_handle);
-		xTaskCreate(task<&Thread::parse>, "cli parsing", 200, this, 2, &parse_handle);
-		xTaskCreate(task<&Thread::schedule_20Hz>, "schedule 20Hz", 64, this, 5, &schedule_20Hz_handle);
-		xTaskCreate(task<&Thread::telemetry>, "telemetry", 400, this, 3, &telemetry_handle);
+        xTaskCreate(task<&Thread::serialTX>, "serial send tx", 100, this, 1, &serial_handle);
+        xTaskCreate(task<&Thread::parse>, "cli parsing", 420, this, 2, &parse_handle);
+        xTaskCreate(task<&Thread::schedule_20Hz>, "schedule 20Hz", 64, this, 5, &schedule_20Hz_handle);
+        xTaskCreate(task<&Thread::telemetry>, "telemetry", 400, this, 3, &telemetry_handle);
         vTaskSuspend(telemetry_handle);
-		xTaskCreate(task<&Thread::runner>, "task simulation", 400, this, 3, &runner_handle);
+        xTaskCreate(task<&Thread::runner>, "task simulation", 420, this, 3, &runner_handle);
         vTaskSuspend(runner_handle);
-		xTaskCreate(task<&Thread::calculator>, "calculator", 400, this, 5, &calculator_handle);
-        vTaskSuspend(calculator_handle);
-		xTaskCreate(task<&Thread::dacUpdate>, "dacUpdate", 64, this, 4, &dacUpdate_handle);
+        // xTaskCreate(task<&Thread::calculator>, "calculator", 200, this, 5, &calculator_handle);
+        // vTaskSuspend(calculator_handle);
+        xTaskCreate(task<&Thread::dacUpdate>, "dacUpdate", 64, this, 4, &dacUpdate_handle);
         vTaskSuspend(dacUpdate_handle);
-		serial.sendString("\nCurrent Free Heap: ");
+        serial.sendString("\nCurrent Free Heap: ");
         serial.sendNumber(xPortGetFreeHeapSize());
-		serial.sendString("\n\nSystem Boot OK\n");
-		SM<Thread>::triggerEvent(Event::CREATE_DONE, thread_sm);
+        serial.sendString("\n\nSystem Boot OK\n");
+        SM<Thread>::triggerEvent(Event::CREATE_DONE, thread_sm);
     };
 }
 
@@ -118,8 +116,8 @@ void Thread::telemetry() {
         serial.sendNumber(xPortGetFreeHeapSize());
         serial.sendString("\nMinimum Free Heap: ");
         serial.sendNumber(xPortGetMinimumEverFreeHeapSize());
-		serial.sendString("\nStack High Water Mark: ");
-		serial.sendNumber(static_cast<uint32_t>(uxTaskGetStackHighWaterMark(NULL)));
+        serial.sendString("\nStack High Water Mark: ");
+        serial.sendNumber(static_cast<uint32_t>(uxTaskGetStackHighWaterMark(NULL)));
         serial.sendLn();
 
         SM<Thread>::triggerEvent(Event::TASK_DONE, telemetry_sm);
@@ -215,6 +213,20 @@ Action Thread::actionRotate() {
         }
         vTaskDelay(1000);
     };
+}
+
+void Thread::flashSave() {
+	while (1) {
+		flash.Save();
+		vTaskDelete(NULL);
+	}
+}
+
+void Thread::flashLoad() {
+	while (1) {
+		flash.Load();
+		vTaskDelete(NULL);
+	}
 }
 
 void Thread::calculator() {

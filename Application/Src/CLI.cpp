@@ -14,9 +14,10 @@ void CLI::setCommands() {
     cmd_map["led"] = [this](int32_t argc, char** argv) { func_led(argc, argv); };
     cmd_map["flash"] = [this](int32_t argc, char** argv) { func_flash(argc, argv); };
     cmd_map["info"] = [this](int32_t argc, char** argv) { func_info(argc, argv); };
-	cmd_map["rot"] = [this](int32_t argc, char** argv) { func_rot(argc, argv); };
-	cmd_map["crc"] = [this](int32_t argc, char** argv) { func_crc(argc, argv); };
-    cmd_map["dac"] = [this](int32_t argc, char** argv) { func_dac(argc, argv); }; // Register func_dac
+    cmd_map["rot"] = [this](int32_t argc, char** argv) { func_rot(argc, argv); };
+    cmd_map["crc"] = [this](int32_t argc, char** argv) { func_crc(argc, argv); };
+    cmd_map["dac"] = [this](int32_t argc, char** argv) { func_dac(argc, argv); };
+    cmd_map["reset"] = [this](int32_t argc, char** argv) { func_reset(argc, argv); };
 }
 
 void CLI::func_help(int32_t argc, char** argv) {
@@ -87,19 +88,17 @@ void CLI::func_flash(int32_t argc, char** argv) {
         if (arg == "help" || arg == "?" || arg == "-h") {
             serial.sendString(help_text);
         } else if (arg == "save") {
-            if (flash.Save()) {
-				serial.sendString("Flash Saved\n");
-			}
+            xTaskCreate(Thread::task<&Thread::flashSave>, "Flash Save", 200, NULL, 1, &thread.flashSave_handle);
         } else if (arg == "load") {
-            flash.Load();
-		} else if (arg == "purge") {
-			if (flash.Purge()) {
-				serial.sendString("Flash Purged\n");
-			}
-		} else if (arg == "init") {
-			if(flash.Init()) {
-				serial.sendString("Flash Initialized\n");
-			}
+            xTaskCreate(Thread::task<&Thread::flashLoad>, "Flash Load", 200, NULL, 1, &thread.flashLoad_handle);
+        } else if (arg == "purge") {
+            if (flash.Purge()) {
+                serial.sendString("Flash Purged\n");
+            }
+        } else if (arg == "init") {
+            if (flash.Init()) {
+                serial.sendString("Flash Initialized\n");
+            }
         } else {
             serial.sendString("Command not found\n");
         }
@@ -133,50 +132,50 @@ void CLI::func_info(int32_t argc, char** argv) {
 }
 
 void CLI::func_rot(int32_t argc, char** argv) {
-	// Detailed Menu
-	const char* help_text =
-		"\nRotation Functions:\n"
-		"  start\t\tStart Rotation\n"
-		"  stop\t\tStop Rotation\n\n";
+    // Detailed Menu
+    const char* help_text =
+        "\nRotation Functions:\n"
+        "  start\t\tStart Rotation\n"
+        "  stop\t\tStop Rotation\n\n";
 
-	// Sub Command
-	if (argc > 1) {
-		std::string arg = argv[1];
-		if (arg == "help" || arg == "?" || arg == "-h") {
-			serial.sendString(help_text);
-		} else if (arg == "on") {
-			SM<Thread>::triggerEvent(Thread::Event::START, thread.runner_sm);
-		} else if (arg == "off") {
-			SM<Thread>::setState(Thread::State::OFF, thread.runner_sm);
-		} else if (arg == "set" && argc == 3) {
-			SM<Thread>::setState(Thread::State::INIT, thread.runner_sm, int{std::stoi(argv[2])});
-		} else {
-			serial.sendString("Command not found\n");
-		}
-	}
+    // Sub Command
+    if (argc > 1) {
+        std::string arg = argv[1];
+        if (arg == "help" || arg == "?" || arg == "-h") {
+            serial.sendString(help_text);
+        } else if (arg == "on") {
+            SM<Thread>::triggerEvent(Thread::Event::START, thread.runner_sm);
+        } else if (arg == "off") {
+            SM<Thread>::setState(Thread::State::OFF, thread.runner_sm);
+        } else if (arg == "set" && argc == 3) {
+            SM<Thread>::setState(Thread::State::INIT, thread.runner_sm, int{std::stoi(argv[2])});
+        } else {
+            serial.sendString("Command not found\n");
+        }
+    }
 }
 
 void CLI::func_crc(int32_t argc, char** argv) {
-	// Detailed Menu
-	const char* help_text =
-		"\nCRC Functions:\n"
-		"  acc [#]\tAccumulate CRC\n"
-		"  cal [#]\tCalculate CRC\n\n";
+    // Detailed Menu
+    const char* help_text =
+        "\nCRC Functions:\n"
+        "  acc [#]\tAccumulate CRC\n"
+        "  cal [#]\tCalculate CRC\n\n";
 
-	// Sub Command
-	if (argc > 1) {
-		std::string arg = argv[1];
-		if (arg == "help" || arg == "?" || arg == "-h") {
-			serial.sendString(help_text);
-		} else if (arg == "cal") {
-			if (argc == 3) {
-				uint8_t input = std::stoi(argv[2]);
-				SM<Thread>::setState(Thread::State::CRC_CAL, thread.runner_sm, std::vector<uint8_t>{input});
-			}
-		} else {
-			serial.sendString("Command not found\n");
-		}
-	}
+    // Sub Command
+    if (argc > 1) {
+        std::string arg = argv[1];
+        if (arg == "help" || arg == "?" || arg == "-h") {
+            serial.sendString(help_text);
+        } else if (arg == "cal") {
+            if (argc == 3) {
+                uint8_t input = std::stoi(argv[2]);
+                SM<Thread>::setState(Thread::State::CRC_CAL, thread.runner_sm, std::vector<uint8_t>{input});
+            }
+        } else {
+            serial.sendString("Command not found\n");
+        }
+    }
 }
 
 void CLI::func_dac(int32_t argc, char** argv) {
@@ -213,3 +212,5 @@ void CLI::func_dac(int32_t argc, char** argv) {
         }
     }
 }
+
+void CLI::func_reset(int32_t argc, char** argv) { NVIC_SystemReset(); }

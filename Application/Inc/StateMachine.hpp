@@ -29,7 +29,7 @@ class SM {
             updateInjection(sm, injection, std::forward<ExternalInjection>(args)...);
             handleStateChange(sm, nextState, guard, action);
         }
-        runAnonymous(sm, std::forward<ExternalInjection>(args)...);
+        while(runAnonymous(sm, std::forward<ExternalInjection>(args)...)) {}
     }
 
     template <typename... ExternalInjection>
@@ -42,11 +42,11 @@ class SM {
             updateInjection(sm, injection, std::forward<ExternalInjection>(args)...);
             handleStateChange(sm, state, guard, action);
         }
-        runAnonymous(sm, std::forward<ExternalInjection>(args)...);
+        while(runAnonymous(sm, std::forward<ExternalInjection>(args)...)) {}
     }
 
     template <typename... ExternalInjection>
-    static void runAnonymous(StateMachine &sm, ExternalInjection... args) {
+    static bool runAnonymous(StateMachine &sm, ExternalInjection... args) {
         auto it = std::ranges::find_if(sm.anonymous.begin(), sm.anonymous.end(),
                                        [&](const auto &entry) { return std::get<0>(entry) == sm.currentState; });
 
@@ -54,7 +54,9 @@ class SM {
             auto [fromState, nextState, guard, action, injection] = *it;
             updateInjection(sm, injection, std::forward<ExternalInjection>(args)...);
             handleStateChange(sm, nextState, guard, action);
+			return true;
         }
+		return false;
     }
 
     static Parent::State getState(Parent::StateMachine &sm) { return sm.currentState; }
