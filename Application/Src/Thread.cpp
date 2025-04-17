@@ -33,6 +33,8 @@ Thread::Thread() {
 			{ State::ON,		Event::STOP,		State::OFF,		{},	actionTelStop(),	{} },
 			{ State::ON,		Event::TASK_DONE,	State::ON,		{},	actionTelDelay(),	{} },
 			{ State::SINGLE,	Event::TASK_DONE,	State::OFF,		{},	actionTelStop(),	{} },
+		},
+		{ // Anonymous transition definition: (CurrentState, NextState, GuardFunction, ActionFunction, Injection)
 		}
 	};
     // clang-format on
