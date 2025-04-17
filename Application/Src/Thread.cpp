@@ -33,8 +33,6 @@ Thread::Thread() {
 			{ State::ON,		Event::STOP,		State::OFF,		{},	actionTelStop(),	{} },
 			{ State::ON,		Event::TASK_DONE,	State::ON,		{},	actionTelDelay(),	{} },
 			{ State::SINGLE,	Event::TASK_DONE,	State::OFF,		{},	actionTelStop(),	{} },
-		},
-		{ // Anonymous transition definition: (CurrentState, NextState, GuardFunction, ActionFunction, Injection)
 		}
 	};
     // clang-format on
@@ -48,7 +46,7 @@ Thread::Thread() {
 			{ State::CRC_CAL,	{},	actionCRCStart(),		{} },
 		},
 		{ // Transition definition: (CurrentState, Event, NextState, GuardFunction, ActionFunction, Injection)
-			{ State::OFF,		Event::START,		State::R1,		{},	actionRotationStart(),	{} },
+			{ State::OFF,		Event::START,		State::R0,		{},	actionRotationStart(),	{} },
 			{ State::INIT,		Event::TASK_DONE,	State::ON,		{},	actionRotate(),			{} },
 			{ State::ON,		Event::TASK_DONE,	State::OFF,		{},	actionRotationStop(),	{} },
 			{ State::R1,		Event::TASK_DONE,	State::R2,		{},	actionRotate(),			{1} },
@@ -57,6 +55,9 @@ Thread::Thread() {
 			{ State::R4,		Event::TASK_DONE,	State::R1,		{},	actionRotate(),			{4} },
 			{ State::R1,		Event::STOP,		State::OFF,		{},	actionRotationStop(),	{} },
 			{ State::CRC_CAL,	Event::TASK_DONE,	State::OFF,		{},	actionCRCStop(),		{} },
+		},
+		{ // Anonymous transition definition: (CurrentState, NextState, GuardFunction, ActionFunction, Injection)
+			{ State::R0,	State::R1,	{},	[](){serial.sendString("auto\n");},	{} },
 		}
 	};
     // clang-format on
@@ -83,17 +84,19 @@ Action Thread::actionSystemInit() {
 }
 Action Thread::actionSystemRun() {
     return [this]() {
-        xTaskCreate(task<&Thread::serialTX>, "serial send tx", 100, this, 1, &serial_handle);
+        xTaskCreate(task<&Thread::serialTX>, "serial send tx", 64, this, 1, &serial_handle);
 		xTaskCreate(task<&Thread::parse>, "cli parsing", 200, this, 2, &parse_handle);
 		xTaskCreate(task<&Thread::schedule_20Hz>, "schedule 20Hz", 64, this, 5, &schedule_20Hz_handle);
 		xTaskCreate(task<&Thread::telemetry>, "telemetry", 400, this, 3, &telemetry_handle);
         vTaskSuspend(telemetry_handle);
-		xTaskCreate(task<&Thread::runner>, "task simulation", 200, this, 3, &runner_handle);
+		xTaskCreate(task<&Thread::runner>, "task simulation", 400, this, 3, &runner_handle);
         vTaskSuspend(runner_handle);
-		xTaskCreate(task<&Thread::calculator>, "calculator", 1000, this, 5, &calculator_handle);
+		xTaskCreate(task<&Thread::calculator>, "calculator", 400, this, 5, &calculator_handle);
         vTaskSuspend(calculator_handle);
 		xTaskCreate(task<&Thread::dacUpdate>, "dacUpdate", 64, this, 4, &dacUpdate_handle);
         vTaskSuspend(dacUpdate_handle);
+		serial.sendString("\nCurrent Free Heap: ");
+        serial.sendNumber(xPortGetFreeHeapSize());
 		serial.sendString("\n\nSystem Boot OK\n");
 		SM<Thread>::triggerEvent(Event::CREATE_DONE, thread_sm);
     };
@@ -115,6 +118,8 @@ void Thread::telemetry() {
         serial.sendNumber(xPortGetFreeHeapSize());
         serial.sendString("\nMinimum Free Heap: ");
         serial.sendNumber(xPortGetMinimumEverFreeHeapSize());
+		serial.sendString("\nStack High Water Mark: ");
+		serial.sendNumber(static_cast<uint32_t>(uxTaskGetStackHighWaterMark(NULL)));
         serial.sendLn();
 
         SM<Thread>::triggerEvent(Event::TASK_DONE, telemetry_sm);
@@ -196,7 +201,7 @@ Action Thread::actionRotate() {
                 led_user.rapid();
                 break;
             case 2:
-                led_user.off();
+                led_user.on();
                 break;
             case 3:
                 led_user.three();

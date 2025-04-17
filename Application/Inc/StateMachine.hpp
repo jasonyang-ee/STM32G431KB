@@ -11,7 +11,6 @@ using Injection = std::vector<std::any>;
 using Action = std::optional<std::function<void()>>;
 using Guard = std::optional<std::function<bool()>>;
 
-
 template <typename Parent>
 class SM {
    public:
@@ -30,7 +29,7 @@ class SM {
             updateInjection(sm, injection, std::forward<ExternalInjection>(args)...);
             handleStateChange(sm, nextState, guard, action);
         }
-		runAnonymous(sm, std::forward<ExternalInjection>(args)...);
+        runAnonymous(sm, std::forward<ExternalInjection>(args)...);
     }
 
     template <typename... ExternalInjection>
@@ -43,14 +42,13 @@ class SM {
             updateInjection(sm, injection, std::forward<ExternalInjection>(args)...);
             handleStateChange(sm, state, guard, action);
         }
-		runAnonymous(sm, std::forward<ExternalInjection>(args)...);
+        runAnonymous(sm, std::forward<ExternalInjection>(args)...);
     }
 
     template <typename... ExternalInjection>
     static void runAnonymous(StateMachine &sm, ExternalInjection... args) {
-        auto it = std::find_if(sm.anonymous.begin(), sm.anonymous.end(), [&](const auto &t) {
-            return std::get<0>(t) == sm.currentState && (!std::get<2>(t) || (*std::get<2>(t))());  // guard passes
-        });
+        auto it = std::ranges::find_if(sm.anonymous.begin(), sm.anonymous.end(),
+                                       [&](const auto &entry) { return std::get<0>(entry) == sm.currentState; });
 
         if (it != sm.anonymous.end()) {
             auto [fromState, nextState, guard, action, injection] = *it;
