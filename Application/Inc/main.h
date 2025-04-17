@@ -33,7 +33,7 @@ extern "C" {
 
 #include "adc.h"
 #include "cordic.h"
-#include "crc.h"
+// #include "crc.h"
 #include "dac.h"
 #include "dma.h"
 #include "fmac.h"

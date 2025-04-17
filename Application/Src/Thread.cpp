@@ -43,7 +43,7 @@ Thread::Thread() {
 		{ // Entry definition: (TargetState, GuardFunction, ActionFunction, Injection)
 			{ State::OFF,		{},	actionRotationStop(),	{} },
             { State::INIT,		{},	actionRotationStart(),	{} },
-			{ State::CRC_CAL,	{},	actionCRCStart(),		{} },
+			// { State::CRC_CAL,	{},	actionCRCStart(),		{} },
 		},
 		{ // Transition definition: (CurrentState, Event, NextState, GuardFunction, ActionFunction, Injection)
 			{ State::OFF,		Event::START,		State::R0,		{},	actionRotationStart(),	{} },
@@ -54,7 +54,7 @@ Thread::Thread() {
 			{ State::R3,		Event::TASK_DONE,	State::R4,		{},	actionRotate(),			{3} },
 			{ State::R4,		Event::TASK_DONE,	State::R1,		{},	actionRotate(),			{4} },
 			{ State::R1,		Event::STOP,		State::OFF,		{},	actionRotationStop(),	{} },
-			{ State::CRC_CAL,	Event::TASK_DONE,	State::OFF,		{},	actionCRCStop(),		{} },
+			// { State::CRC_CAL,	Event::TASK_DONE,	State::OFF,		{},	actionCRCStop(),		{} },
 		},
 		{ // Anonymous transition definition: (CurrentState, NextState, GuardFunction, ActionFunction, Injection)
 			{ State::R0,	State::R1,	{},	[](){serial.sendString("auto\n");},	{} },
@@ -78,16 +78,16 @@ void Thread::init() {
     }
 }
 Action Thread::actionSystemInit() {
-    return [this]() { xTaskCreate(task<&Thread::init>, "system init", 1100, this, 6, &init_handle); };
+    return [this]() { xTaskCreate(task<&Thread::init>, "system init", 1000, this, 6, &init_handle); };
 }
 Action Thread::actionSystemRun() {
     return [this]() {
-        xTaskCreate(task<&Thread::serialTX>, "serial send tx", 100, this, 1, &serial_handle);
-        xTaskCreate(task<&Thread::parse>, "cli parsing", 420, this, 2, &parse_handle);
-        xTaskCreate(task<&Thread::schedule_20Hz>, "schedule 20Hz", 64, this, 5, &schedule_20Hz_handle);
-        xTaskCreate(task<&Thread::telemetry>, "telemetry", 400, this, 3, &telemetry_handle);
+        xTaskCreate(task<&Thread::serialTX>, "serial send tx", 100, this, 3, &serial_handle);
+        xTaskCreate(task<&Thread::parse>, "cli parsing", 1100, this, 6, &parse_handle);
+        xTaskCreate(task<&Thread::schedule_20Hz>, "schedule 20Hz", 64, this, 2, &schedule_20Hz_handle);
+        xTaskCreate(task<&Thread::telemetry>, "telemetry", 400, this, 2, &telemetry_handle);
         vTaskSuspend(telemetry_handle);
-        xTaskCreate(task<&Thread::runner>, "task simulation", 420, this, 3, &runner_handle);
+        xTaskCreate(task<&Thread::runner>, "task simulation", 200, this, 3, &runner_handle);
         vTaskSuspend(runner_handle);
         // xTaskCreate(task<&Thread::calculator>, "calculator", 200, this, 5, &calculator_handle);
         // vTaskSuspend(calculator_handle);
@@ -229,26 +229,26 @@ void Thread::flashLoad() {
 	}
 }
 
-void Thread::calculator() {
-    while (1) {
-        // get std::vector<uint8> input from injection
-        std::vector<uint8_t> input = std::any_cast<std::vector<uint8_t>>(runner_sm.injections[0]);
-        crc.setPolynomial(0x9B, 8);
-        crc.setInitValue(0x00);
-        auto result = crc.calculate(input.data(), 2);
-        serial.sendString("CRC Result: ");
-        serial.sendNumber(result);
-        serial.sendLn();
-        SM<Thread>::triggerEvent(Event::TASK_DONE, runner_sm);
-    }
-}
-Action Thread::actionCRCStart() {
-    return [this]() {
-        BaseType_t xYieldRequired = pdTRUE;
-        xTaskResumeFromISR(calculator_handle);
-        portYIELD_FROM_ISR(xYieldRequired);
-    };
-}
-Action Thread::actionCRCStop() {
-    return [this]() { vTaskSuspend(calculator_handle); };
-}
+// void Thread::calculator() {
+//     while (1) {
+//         // get std::vector<uint8> input from injection
+//         std::vector<uint8_t> input = std::any_cast<std::vector<uint8_t>>(runner_sm.injections[0]);
+//         crc.setPolynomial(0x9B, 8);
+//         crc.setInitValue(0x00);
+//         auto result = crc.calculate(input.data(), 2);
+//         serial.sendString("CRC Result: ");
+//         serial.sendNumber(result);
+//         serial.sendLn();
+//         SM<Thread>::triggerEvent(Event::TASK_DONE, runner_sm);
+//     }
+// }
+// Action Thread::actionCRCStart() {
+//     return [this]() {
+//         BaseType_t xYieldRequired = pdTRUE;
+//         xTaskResumeFromISR(calculator_handle);
+//         portYIELD_FROM_ISR(xYieldRequired);
+//     };
+// }
+// Action Thread::actionCRCStop() {
+//     return [this]() { vTaskSuspend(calculator_handle); };
+// }

@@ -12,7 +12,7 @@ Flash flash{};
 CustomDAC dac{};
 CustomADC adc{};
 CustomRTC rtc{};
-CustomCRC crc{};
+// CustomCRC crc{};
 
 /**
  * @brief  The application entry point.
@@ -33,7 +33,7 @@ int main(void) {
     MX_TIM2_Init();
     MX_TIM4_Init();
     MX_RTC_Init();
-    MX_CRC_Init();
+    // MX_CRC_Init();
     MX_FMAC_Init();
     MX_CORDIC_Init();
 	
@@ -42,7 +42,7 @@ int main(void) {
     led_user.setPort(&htim8.Instance->CCR2);
     dac.setPort(&hdac1, DAC_CHANNEL_2);
     rtc.setPort(&hrtc);
-	crc.setPort(&hcrc);
+	// crc.setPort(&hcrc);
 	
     // PWM Output Start
     HAL_TIM_PWM_Start_IT(&htim8, TIM_CHANNEL_2);
