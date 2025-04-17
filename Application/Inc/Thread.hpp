@@ -38,17 +38,22 @@ class Thread {
             State Machine for Thread Control
 
     ---------------------------------------------------------------------------*/
-
+   public:
     // State and Event List
-    enum class State { ON, OFF, SINGLE, INIT, CREATE_TASKS, IDLE, R1, R2, R3, R4, CRC_CAL };
+    enum class State { ON, OFF, SINGLE, INIT, CREATE_TASKS, IDLE, R0, R1, R2, R3, R4, CRC_CAL };
     enum class Event { START, STOP, TOGGLE, SINGLE, TASK_DONE, INIT_DONE, CREATE_DONE };
 
+    // State Machine Mechanism
+    template <typename Parent>
+    friend class SM;
     using Entry = std::tuple<State, Guard, Action, Injection>;
     using Transition = std::tuple<State, Event, State, Guard, Action, Injection>;
+    using Anonymous = std::tuple<State, State, Guard, Action, Injection>;
     struct StateMachine {
         State currentState;
         std::vector<Entry> entries;
         std::vector<Transition> transitions;
+        std::vector<Anonymous> anonymous;
         Injection injections;
     };
 
@@ -57,9 +62,6 @@ class Thread {
     StateMachine telemetry_sm;
     StateMachine runner_sm;
     StateMachine dac_sm;
-
-    // State Machine Data
-    uint16_t telemetry_delay{2000};
 
    private:
     // Action and Guard Functions
@@ -74,8 +76,8 @@ class Thread {
     Action actionCRCStart();
     Action actionCRCStop();
 
-    template <typename Parent>
-    friend class SM;  // Grant access to ThreadSM
+    // State Machine Data
+    uint16_t telemetry_delay{2000};
 };
 
 #endif /* APPLICATION_INC_THREAD */

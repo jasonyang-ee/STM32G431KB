@@ -45,19 +45,27 @@ class LED {
     uint16_t three_timer_off{0};
     uint16_t three_counter{0};
 
-    // State Machine Definition
+    /*---------------------------------------------------------------------------
+
+            State Machine for Thread Control
+
+    ---------------------------------------------------------------------------*/
    public:
     // State and Event List
     enum class State { ON, OFF, BREATH, BLINK, RAPID, THREE };
     enum class Event { ON, OFF, TOGGLE, BREATH, BLINK, RAPID, SCHEDULE };
 
+    // State Machine Mechanism
+    template <typename Parent>
+    friend class SM;
     using Entry = std::tuple<State, Guard, Action, Injection>;
     using Transition = std::tuple<State, Event, State, Guard, Action, Injection>;
-
+    using Anonymous = std::tuple<State, State, Guard, Action, Injection>;
     struct StateMachine {
         State currentState;
         std::vector<Entry> entries;
         std::vector<Transition> transitions;
+        std::vector<Anonymous> anonymous;
         Injection injections;
     };
 
@@ -75,10 +83,6 @@ class LED {
     Guard guardBlink();
     Guard guardRapid();
     Guard guardThree();
-
-    template <typename Parent>
-    friend class SM;  // Grant access to ThreadSM
-
-};  // class LED
+};
 
 #endif /* APPLICATION_INC_LED */

@@ -16,6 +16,7 @@ void CLI::setCommands() {
     cmd_map["info"] = [this](int32_t argc, char** argv) { func_info(argc, argv); };
 	cmd_map["rot"] = [this](int32_t argc, char** argv) { func_rot(argc, argv); };
 	cmd_map["crc"] = [this](int32_t argc, char** argv) { func_crc(argc, argv); };
+    cmd_map["dac"] = [this](int32_t argc, char** argv) { func_dac(argc, argv); }; // Register func_dac
 }
 
 void CLI::func_help(int32_t argc, char** argv) {
@@ -176,4 +177,39 @@ void CLI::func_crc(int32_t argc, char** argv) {
 			serial.sendString("Command not found\n");
 		}
 	}
+}
+
+void CLI::func_dac(int32_t argc, char** argv) {
+    // Detailed Menu
+    const char* help_text =
+        "\nDAC Functions:\n"
+        "  level [value]\tSet DAC level\n"
+        "  add [value]\tAdd to DAC level\n"
+        "  sine [amplitude] [frequency] [samplingRate]\tGenerate sine wave\n\n";
+
+    // No Sub Command
+    if (argc == 1) {
+        serial.sendString(help_text);
+    }
+
+    // Sub Command
+    if (argc > 1) {
+        std::string arg = argv[1];
+        if (arg == "help" || arg == "?" || arg == "-h") {
+            serial.sendString(help_text);
+        } else if (arg == "level" && argc == 3) {
+            double value = std::stod(argv[2]);
+            dac.setLevel(value);
+        } else if (arg == "add" && argc == 3) {
+            double value = std::stod(argv[2]);
+            dac.addLevel(value);
+        } else if (arg == "sine" && argc == 5) {
+            double amplitude = std::stod(argv[2]);
+            double frequency = std::stod(argv[3]);
+            double samplingRate = std::stod(argv[4]);
+            dac.generateSineWave(amplitude, frequency, samplingRate);
+        } else {
+            serial.sendString("Command not found\n");
+        }
+    }
 }

@@ -29,17 +29,31 @@ class SM {
             updateInjection(sm, injection, std::forward<ExternalInjection>(args)...);
             handleStateChange(sm, nextState, guard, action);
         }
+        runAnonymous(sm, std::forward<ExternalInjection>(args)...);
     }
 
     template <typename... ExternalInjection>
     static void setState(Parent::State state, Parent::StateMachine &sm, ExternalInjection... args) {
         auto it = std::ranges::find_if(sm.entries.begin(), sm.entries.end(),
-                               [&](const auto &entry) { return std::get<0>(entry) == state; });
+                                       [&](const auto &entry) { return std::get<0>(entry) == state; });
 
         if (it != sm.entries.end()) {
             auto [targetState, guard, action, injection] = *it;
             updateInjection(sm, injection, std::forward<ExternalInjection>(args)...);
             handleStateChange(sm, state, guard, action);
+        }
+        runAnonymous(sm, std::forward<ExternalInjection>(args)...);
+    }
+
+    template <typename... ExternalInjection>
+    static void runAnonymous(StateMachine &sm, ExternalInjection... args) {
+        auto it = std::ranges::find_if(sm.anonymous.begin(), sm.anonymous.end(),
+                                       [&](const auto &entry) { return std::get<0>(entry) == sm.currentState; });
+
+        if (it != sm.anonymous.end()) {
+            auto [fromState, nextState, guard, action, injection] = *it;
+            updateInjection(sm, injection, std::forward<ExternalInjection>(args)...);
+            handleStateChange(sm, nextState, guard, action);
         }
     }
 
