@@ -26,10 +26,10 @@ class Thread {
     TaskHandle_t telemetry_handle;
     void runner();
     TaskHandle_t runner_handle;
-	void flashSave();
-	TaskHandle_t flashSave_handle;
-	void flashLoad();
-	TaskHandle_t flashLoad_handle;
+    void flashSave();
+    TaskHandle_t flashSave_handle;
+    void flashLoad();
+    TaskHandle_t flashLoad_handle;
     void calculator();
     TaskHandle_t calculator_handle;
     void dacUpdate();

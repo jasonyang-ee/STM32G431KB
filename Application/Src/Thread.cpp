@@ -74,8 +74,11 @@ void Thread::init() {
         dac.init();
         flash.Load();
         SM<Thread>::triggerEvent(Event::INIT_DONE, thread_sm);
-		serial.sendString("High Water Mark: ");
-		serial.sendNumber(uxTaskGetStackHighWaterMark(NULL));
+        serial.sendString("High Water Mark: ");
+        serial.sendNumber(uxTaskGetStackHighWaterMark(NULL));
+        serial.sendString("\nCurrent Free Heap: ");
+        serial.sendNumber(xPortGetFreeHeapSize());
+        serial.sendString("\n\nSystem Boot OK\n");
         vTaskDelete(NULL);
     }
 }
@@ -84,7 +87,7 @@ Action Thread::actionSystemInit() {
 }
 Action Thread::actionSystemRun() {
     return [this]() {
-		xTaskCreate(task<&Thread::watchdog>, "watchdog", 64, this, 1, &watchdog_handle);
+        xTaskCreate(task<&Thread::watchdog>, "watchdog", 64, this, 1, &watchdog_handle);
         xTaskCreate(task<&Thread::serialTX>, "serial send tx", 64, this, 5, &serial_handle);
         xTaskCreate(task<&Thread::parse>, "cli parsing", 400, this, 5, &parse_handle);
         xTaskCreate(task<&Thread::schedule_20Hz>, "schedule 20Hz", 100, this, 2, &schedule_20Hz_handle);
@@ -96,9 +99,7 @@ Action Thread::actionSystemRun() {
         vTaskSuspend(calculator_handle);
         xTaskCreate(task<&Thread::dacUpdate>, "dacUpdate", 64, this, 4, &dacUpdate_handle);
         vTaskSuspend(dacUpdate_handle);
-        serial.sendString("\nCurrent Free Heap: ");
-        serial.sendNumber(xPortGetFreeHeapSize());
-        serial.sendString("\n\nSystem Boot OK\n");
+
         SM<Thread>::triggerEvent(Event::CREATE_DONE, thread_sm);
     };
 }

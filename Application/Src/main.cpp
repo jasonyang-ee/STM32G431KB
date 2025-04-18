@@ -34,28 +34,28 @@ int main(void) {
     MX_TIM4_Init();
     MX_RTC_Init();
     MX_CRC_Init();
-	
+
     // Instances Dependency Injection
     serial.setPort(std::vector<UART_HandleTypeDef *>{&huart2});
     led_user.setPort(&htim8.Instance->CCR2);
     dac.setPort(&hdac1, DAC_CHANNEL_2);
     rtc.setPort(&hrtc);
-	// crc.setPort(&hcrc);
-	
+    // crc.setPort(&hcrc);
+
     // PWM Output Start
     HAL_TIM_PWM_Start_IT(&htim8, TIM_CHANNEL_2);
     serial.sendString("PWM output Start\n");
-	
+
     // Serial Communication Start
     HAL_UARTEx_ReceiveToIdle_IT(&huart2, serial.rx.data(), serial.UART_BUFFER_SIZE);
     serial.sendString("Serial communication Start\n");
-	
+
     // ADC Calibration and Start
     HAL_ADCEx_Calibration_Start(&hadc2, ADC_SINGLE_ENDED);
     HAL_ADC_Start_DMA(&hadc2, adc.m_buffer.data(), 1);
     serial.sendString("ADC calibration and start\n");
-	
-	// Watchdog Start
+
+    // Watchdog Start
     MX_IWDG_Init();
 
     // FreeRTOS Start
