@@ -32,17 +32,14 @@ extern "C" {
 // clang-format on
 
 #include "adc.h"
-#include "cordic.h"
 #include "crc.h"
 #include "dac.h"
 #include "dma.h"
-#include "fmac.h"
-#include "gpio.h"
 #include "iwdg.h"
 #include "rtc.h"
 #include "tim.h"
 #include "usart.h"
-#include "wwdg.h"
+#include "gpio.h"
 
 // System Functions
 void Error_Handler(void);

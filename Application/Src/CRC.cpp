@@ -1,4 +1,3 @@
-
 #include "CRC.hpp"
 
 CustomCRC::CustomCRC() {}

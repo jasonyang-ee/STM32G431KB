@@ -1,4 +1,5 @@
-
+#ifndef APPLICATION_INC_CRC
+#define APPLICATION_INC_CRC
 
 #include "main.h"
 
@@ -9,7 +10,7 @@ class CustomCRC {
 
     void setPort(CRC_HandleTypeDef *port);
     void setPolynomial(uint32_t, uint32_t);
-	void setInitValue(uint32_t);
+    void setInitValue(uint32_t);
 
     uint32_t accumulate(uint8_t *data, uint32_t size);
     uint32_t calculate(uint8_t *data, uint32_t size);
@@ -19,3 +20,5 @@ class CustomCRC {
    private:
     CRC_HandleTypeDef *port;
 };
+
+#endif /* APPLICATION_INC_CRC */

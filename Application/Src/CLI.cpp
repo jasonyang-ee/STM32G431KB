@@ -15,7 +15,7 @@ void CLI::setCommands() {
     cmd_map["flash"] = [this](int32_t argc, char** argv) { func_flash(argc, argv); };
     cmd_map["info"] = [this](int32_t argc, char** argv) { func_info(argc, argv); };
     cmd_map["rot"] = [this](int32_t argc, char** argv) { func_rot(argc, argv); };
-    cmd_map["crc"] = [this](int32_t argc, char** argv) { func_crc(argc, argv); };
+    // cmd_map["crc"] = [this](int32_t argc, char** argv) { func_crc(argc, argv); };
     cmd_map["dac"] = [this](int32_t argc, char** argv) { func_dac(argc, argv); };
     cmd_map["reset"] = [this](int32_t argc, char** argv) { func_reset(argc, argv); };
 }
@@ -88,9 +88,11 @@ void CLI::func_flash(int32_t argc, char** argv) {
         if (arg == "help" || arg == "?" || arg == "-h") {
             serial.sendString(help_text);
         } else if (arg == "save") {
-            xTaskCreate(Thread::task<&Thread::flashSave>, "Flash Save", 200, NULL, 1, &thread.flashSave_handle);
+            if (flash.Save()) {
+                serial.sendString("Flash Saved\n");
+            }
         } else if (arg == "load") {
-            xTaskCreate(Thread::task<&Thread::flashLoad>, "Flash Load", 200, NULL, 1, &thread.flashLoad_handle);
+            flash.Load();
         } else if (arg == "purge") {
             if (flash.Purge()) {
                 serial.sendString("Flash Purged\n");
@@ -155,28 +157,28 @@ void CLI::func_rot(int32_t argc, char** argv) {
     }
 }
 
-void CLI::func_crc(int32_t argc, char** argv) {
-    // Detailed Menu
-    const char* help_text =
-        "\nCRC Functions:\n"
-        "  acc [#]\tAccumulate CRC\n"
-        "  cal [#]\tCalculate CRC\n\n";
+// void CLI::func_crc(int32_t argc, char** argv) {
+//     // Detailed Menu
+//     const char* help_text =
+//         "\nCRC Functions:\n"
+//         "  acc [#]\tAccumulate CRC\n"
+//         "  cal [#]\tCalculate CRC\n\n";
 
-    // Sub Command
-    if (argc > 1) {
-        std::string arg = argv[1];
-        if (arg == "help" || arg == "?" || arg == "-h") {
-            serial.sendString(help_text);
-        } else if (arg == "cal") {
-            if (argc == 3) {
-                uint8_t input = std::stoi(argv[2]);
-                SM<Thread>::setState(Thread::State::CRC_CAL, thread.runner_sm, std::vector<uint8_t>{input});
-            }
-        } else {
-            serial.sendString("Command not found\n");
-        }
-    }
-}
+//     // Sub Command
+//     if (argc > 1) {
+//         std::string arg = argv[1];
+//         if (arg == "help" || arg == "?" || arg == "-h") {
+//             serial.sendString(help_text);
+//         } else if (arg == "cal") {
+//             if (argc == 3) {
+//                 uint8_t input = std::stoi(argv[2]);
+//                 SM<Thread>::setState(Thread::State::CRC_CAL, thread.runner_sm, std::vector<uint8_t>{input});
+//             }
+//         } else {
+//             serial.sendString("Command not found\n");
+//         }
+//     }
+// }
 
 void CLI::func_dac(int32_t argc, char** argv) {
     // Detailed Menu

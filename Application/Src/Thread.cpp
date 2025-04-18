@@ -43,7 +43,7 @@ Thread::Thread() {
 		{ // Entry definition: (TargetState, GuardFunction, ActionFunction, Injection)
 			{ State::OFF,		{},	actionRotationStop(),	{} },
             { State::INIT,		{},	actionRotationStart(),	{} },
-			{ State::CRC_CAL,	{},	actionCRCStart(),		{} },
+			// { State::CRC_CAL,	{},	actionCRCStart(),		{} },
 		},
 		{ // Transition definition: (CurrentState, Event, NextState, GuardFunction, ActionFunction, Injection)
 			{ State::OFF,		Event::START,		State::R0,		{},	actionRotationStart(),	{} },
@@ -54,7 +54,7 @@ Thread::Thread() {
 			{ State::R3,		Event::TASK_DONE,	State::R4,		{},	actionRotate(),			{3} },
 			{ State::R4,		Event::TASK_DONE,	State::R1,		{},	actionRotate(),			{4} },
 			{ State::R1,		Event::STOP,		State::OFF,		{},	actionRotationStop(),	{} },
-			{ State::CRC_CAL,	Event::TASK_DONE,	State::OFF,		{},	actionCRCStop(),		{} },
+			// { State::CRC_CAL,	Event::TASK_DONE,	State::OFF,		{},	actionCRCStop(),		{} },
 		},
 		{ // Anonymous transition definition: (CurrentState, NextState, GuardFunction, ActionFunction, Injection)
 			{ State::R0,	State::R1,	{},	[](){serial.sendString("auto\n");},	{} },
@@ -74,23 +74,26 @@ void Thread::init() {
         dac.init();
         flash.Load();
         SM<Thread>::triggerEvent(Event::INIT_DONE, thread_sm);
+		serial.sendString("High Water Mark: ");
+		serial.sendNumber(uxTaskGetStackHighWaterMark(NULL));
         vTaskDelete(NULL);
     }
 }
 Action Thread::actionSystemInit() {
-    return [this]() { xTaskCreate(task<&Thread::init>, "system init", 1100, this, 6, &init_handle); };
+    return [this]() { xTaskCreate(task<&Thread::init>, "system init", 650, this, 6, &init_handle); };
 }
 Action Thread::actionSystemRun() {
     return [this]() {
-        xTaskCreate(task<&Thread::serialTX>, "serial send tx", 100, this, 1, &serial_handle);
-        xTaskCreate(task<&Thread::parse>, "cli parsing", 420, this, 2, &parse_handle);
-        xTaskCreate(task<&Thread::schedule_20Hz>, "schedule 20Hz", 64, this, 5, &schedule_20Hz_handle);
-        xTaskCreate(task<&Thread::telemetry>, "telemetry", 400, this, 3, &telemetry_handle);
+		xTaskCreate(task<&Thread::watchdog>, "watchdog", 64, this, 1, &watchdog_handle);
+        xTaskCreate(task<&Thread::serialTX>, "serial send tx", 64, this, 5, &serial_handle);
+        xTaskCreate(task<&Thread::parse>, "cli parsing", 400, this, 5, &parse_handle);
+        xTaskCreate(task<&Thread::schedule_20Hz>, "schedule 20Hz", 100, this, 2, &schedule_20Hz_handle);
+        xTaskCreate(task<&Thread::telemetry>, "telemetry", 400, this, 2, &telemetry_handle);
         vTaskSuspend(telemetry_handle);
-        xTaskCreate(task<&Thread::runner>, "task simulation", 420, this, 3, &runner_handle);
+        xTaskCreate(task<&Thread::runner>, "task simulation", 160, this, 3, &runner_handle);
         vTaskSuspend(runner_handle);
-        // xTaskCreate(task<&Thread::calculator>, "calculator", 200, this, 5, &calculator_handle);
-        // vTaskSuspend(calculator_handle);
+        xTaskCreate(task<&Thread::calculator>, "calculator", 400, this, 5, &calculator_handle);
+        vTaskSuspend(calculator_handle);
         xTaskCreate(task<&Thread::dacUpdate>, "dacUpdate", 64, this, 4, &dacUpdate_handle);
         vTaskSuspend(dacUpdate_handle);
         serial.sendString("\nCurrent Free Heap: ");
@@ -116,8 +119,6 @@ void Thread::telemetry() {
         serial.sendNumber(xPortGetFreeHeapSize());
         serial.sendString("\nMinimum Free Heap: ");
         serial.sendNumber(xPortGetMinimumEverFreeHeapSize());
-        serial.sendString("\nStack High Water Mark: ");
-        serial.sendNumber(static_cast<uint32_t>(uxTaskGetStackHighWaterMark(NULL)));
         serial.sendLn();
 
         SM<Thread>::triggerEvent(Event::TASK_DONE, telemetry_sm);
@@ -149,10 +150,17 @@ void Thread::dacUpdate() {
 void Thread::schedule_20Hz() {
     while (1) {
         led_user.scheduler();
-        HAL_IWDG_Refresh(&hiwdg);
         vTaskDelay(50);
     }
 }
+
+void Thread::watchdog() {
+    while (1) {
+        HAL_IWDG_Refresh(&hiwdg);
+        vTaskDelay(100);
+    }
+}
+
 void Thread::serialTX() {
     while (1) {
         ulTaskNotifyTake(pdTRUE, 300);
@@ -216,17 +224,17 @@ Action Thread::actionRotate() {
 }
 
 void Thread::flashSave() {
-	while (1) {
-		flash.Save();
-		vTaskDelete(NULL);
-	}
+    while (1) {
+        flash.Save();
+        vTaskDelete(NULL);
+    }
 }
 
 void Thread::flashLoad() {
-	while (1) {
-		flash.Load();
-		vTaskDelete(NULL);
-	}
+    while (1) {
+        flash.Load();
+        vTaskDelete(NULL);
+    }
 }
 
 void Thread::calculator() {

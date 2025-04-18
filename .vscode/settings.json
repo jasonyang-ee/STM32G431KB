@@ -72,6 +72,7 @@
 		"xmemory": "cpp",
 		"xstring": "cpp",
 		"xtr1common": "cpp",
-		"xutility": "cpp"
+		"xutility": "cpp",
+		"freertosconfig.h": "c"
 	}
 }

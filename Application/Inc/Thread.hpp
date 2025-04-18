@@ -36,6 +36,8 @@ class Thread {
     TaskHandle_t dacUpdate_handle;
     void schedule_20Hz();
     TaskHandle_t schedule_20Hz_handle;
+    void watchdog();
+    TaskHandle_t watchdog_handle;
 
     /*---------------------------------------------------------------------------
 

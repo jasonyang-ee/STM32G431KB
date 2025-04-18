@@ -34,15 +34,13 @@ int main(void) {
     MX_TIM4_Init();
     MX_RTC_Init();
     MX_CRC_Init();
-    MX_FMAC_Init();
-    MX_CORDIC_Init();
 	
     // Instances Dependency Injection
     serial.setPort(std::vector<UART_HandleTypeDef *>{&huart2});
     led_user.setPort(&htim8.Instance->CCR2);
     dac.setPort(&hdac1, DAC_CHANNEL_2);
     rtc.setPort(&hrtc);
-	crc.setPort(&hcrc);
+	// crc.setPort(&hcrc);
 	
     // PWM Output Start
     HAL_TIM_PWM_Start_IT(&htim8, TIM_CHANNEL_2);
@@ -58,7 +56,7 @@ int main(void) {
     serial.sendString("ADC calibration and start\n");
 	
 	// Watchdog Start
-    // MX_IWDG_Init();
+    MX_IWDG_Init();
 
     // FreeRTOS Start
     vTaskStartScheduler();
