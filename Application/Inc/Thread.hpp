@@ -18,10 +18,10 @@ class Thread {
     }
     void init();
     TaskHandle_t init_handle;
-    void serialTX();
-    TaskHandle_t serial_handle;
-    void parse();
-    TaskHandle_t parse_handle;
+    void sendTX();
+    TaskHandle_t sendTX_handle;
+    void parseRX();
+    TaskHandle_t parseRX_handle;
     void telemetry();
     TaskHandle_t telemetry_handle;
     void runner();

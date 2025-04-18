@@ -88,8 +88,8 @@ Action Thread::actionSystemInit() {
 Action Thread::actionSystemRun() {
     return [this]() {
         xTaskCreate(task<&Thread::watchdog>, "watchdog", 64, this, 1, &watchdog_handle);
-        xTaskCreate(task<&Thread::serialTX>, "serial send tx", 64, this, 5, &serial_handle);
-        xTaskCreate(task<&Thread::parse>, "cli parsing", 400, this, 5, &parse_handle);
+        xTaskCreate(task<&Thread::sendTX>, "serial send tx", 64, this, 5, &sendTX_handle);
+        xTaskCreate(task<&Thread::parseRX>, "cli parsing", 400, this, 5, &parseRX_handle);
         xTaskCreate(task<&Thread::schedule_20Hz>, "schedule 20Hz", 100, this, 2, &schedule_20Hz_handle);
         xTaskCreate(task<&Thread::telemetry>, "telemetry", 400, this, 2, &telemetry_handle);
         vTaskSuspend(telemetry_handle);
@@ -164,14 +164,14 @@ void Thread::watchdog() {
     }
 }
 
-void Thread::serialTX() {
+void Thread::sendTX() {
     while (1) {
         ulTaskNotifyTake(pdTRUE, 300);
         serial.commit();
     }
 }
 
-void Thread::parse() {
+void Thread::parseRX() {
     while (1) {
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
         if (!cli.parse()) {
