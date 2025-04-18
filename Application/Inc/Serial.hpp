@@ -3,18 +3,18 @@
 
 #include <algorithm>
 #include <array>
-#include <string>
-#include <vector>
+#include <cstdint>
 
 #include "main.h"
 
 class Serial {
    public:
+    static constexpr size_t MAX_PORTS{1};
     Serial(){};
     virtual ~Serial(){};
 
     // Must be greater than protobuf payload size
-    static constexpr size_t UART_BUFFER_SIZE{512};
+    static constexpr size_t UART_BUFFER_SIZE{256};
 
     // Tx Rx Memory for DMA
     std::array<uint8_t, UART_BUFFER_SIZE> tx;
@@ -22,24 +22,59 @@ class Serial {
 
     /// @brief Initialize Serial
     /// @param Ports Vector of UART_HandleTypeDef pointer
-    void setPort(std::vector<UART_HandleTypeDef *> Ports) { ports = Ports; }
+    void setPort(UART_HandleTypeDef* ports_arr[], size_t count) {
+        port_count = (count <= MAX_PORTS ? count : MAX_PORTS);
+        for (size_t i = 0; i < port_count; ++i) ports[i] = ports_arr[i];
+    }
 
     /// @brief Send a new line character
-    void sendLn() { tx_cache.append("\n"); };
+    void sendLn() { 
+        if (tx_cache_size + 1 < UART_BUFFER_SIZE) {
+            tx_cache[tx_cache_size++] = '\n';
+        }
+    }
 
     /// @brief Buffer a string to be sent
     /// @param msg string to be sent
-    void sendString(std::string msg) { tx_cache.append(msg); }
+    void sendString(const char* msg) {
+        while (*msg && tx_cache_size < UART_BUFFER_SIZE) {
+            tx_cache[tx_cache_size++] = *msg++;
+        }
+    }
 
     /// @brief Sending number and bool
     /// @tparam T Data type
     /// @param value number to be buffered
     template <class T>
     void sendNumber(T value) {
-        if (std::is_same<T, bool>::value) {
-            value ? tx_cache.append("ON") : tx_cache.append("OFF");
+        if constexpr (std::is_same_v<T, bool>) {
+            sendString(value ? "ON" : "OFF");
+        } else if constexpr (std::is_floating_point_v<T>) {
+            sendNumber(static_cast<long>(value));
         } else {
-            tx_cache.append(std::to_string(value));
+            char buf[32];
+            size_t idx = 0;
+            if (value == 0) {
+                buf[idx++] = '0';
+            } else {
+                if constexpr (std::is_signed_v<T>) {
+                    if (value < 0) {
+                        buf[idx++] = '-';
+                        value = -value;
+                    }
+                }
+                char rev[32]; size_t ridx = 0;
+                auto v = value;
+                while (v > 0) {
+                    rev[ridx++] = '0' + (v % 10);
+                    v /= 10;
+                }
+                while (ridx > 0) {
+                    buf[idx++] = rev[--ridx];
+                }
+            }
+            buf[idx] = '\0';
+            sendString(buf);
         }
     }
 
@@ -50,8 +85,8 @@ class Serial {
     template <class T, size_t N>
     void sendNumber(std::array<T, N> elements) {
         for (auto &i : elements) {
-            tx_cache.append(std::to_string(i));
-            if (&i != &elements.back()) tx_cache.append("  ");
+            sendNumber(i);
+            if (&i != &elements.back()) sendString("  ");
         }
     }
 
@@ -64,10 +99,10 @@ class Serial {
     void sendNumber(std::array<std::array<T, M>, N> elements) {
         for (auto &column : elements) {
             for (auto &element : column) {
-                tx_cache.append(std::to_string(element));
-                if (&element != &column.back()) tx_cache.append("  ");
+                sendNumber(element);
+                if (&element != &column.back()) sendString("  ");
             }
-            if (&column != &elements.back()) tx_cache.append("\n");
+            if (&column != &elements.back()) sendLn();
         }
     }
 
@@ -77,49 +112,47 @@ class Serial {
     void sendPB(uint8_t *msg, uint32_t size) {
         // copy msg into std::array of pb_cache
         std::copy(msg, msg + size, pb_cache.data());
-        pb_size = size;
+        pb_cache_size = size;
     }
 
     /// @brief Send out data with iterrupt mode
     /// @return True if data is sent
     bool commit() {
-        if (!tx_cache.empty()) {
-            if (tx_cache.size() < (UART_BUFFER_SIZE)) {
-                std::copy(tx_cache.begin(), tx_cache.end(), tx.data());
-                tx_size = tx_cache.size();
-                tx_cache.clear();
+        if (tx_cache_size > 0) {
+            if (tx_cache_size < UART_BUFFER_SIZE) {
+                std::copy(tx_cache.begin(), tx_cache.begin() + tx_cache_size, tx.data());
             } else {
                 std::copy(tx_cache.begin(), tx_cache.begin() + UART_BUFFER_SIZE, tx.data());
-                tx_size = UART_BUFFER_SIZE;
-                tx_cache.erase(0, UART_BUFFER_SIZE);
+                tx_cache_size = UART_BUFFER_SIZE;
             }
-            for (auto port : ports) {
-                HAL_UART_Transmit_IT(port, tx.data(), tx_size);
+            for (size_t i = 0; i < port_count; ++i) {
+                HAL_UART_Transmit_IT(ports[i], tx.data(), tx_cache_size);
             }
+            tx_cache_size = 0;
             return true;
         }
 
-        if (!pb_cache.empty()) {
-            std::copy(pb_cache.begin(), pb_cache.end(), tx.data());
-            for (auto port : ports) {
-                HAL_UART_Transmit_IT(port, tx.data(), pb_size);
+        if (pb_cache_size > 0) {
+            std::copy(pb_cache.begin(), pb_cache.begin() + pb_cache_size, tx.data());
+            for (size_t i = 0; i < port_count; ++i) {
+                HAL_UART_Transmit_IT(ports[i], tx.data(), pb_cache_size);
             }
-            pb_cache = {};
+            pb_cache_size = 0;
             return true;
         }
         return false;
     }
 
    private:
-    std::vector<UART_HandleTypeDef *> ports;
+    std::array<UART_HandleTypeDef*, MAX_PORTS> ports;
+    size_t port_count{};
 
-    // Sending buffer Data
-    std::string tx_cache{};
-    std::string pb_cache{};
+    std::array<char, UART_BUFFER_SIZE> tx_cache;
+    size_t tx_cache_size{};
+    std::array<uint8_t, UART_BUFFER_SIZE> pb_cache;
+    size_t pb_cache_size{};
 
-    // Sending buffer size
-    uint16_t tx_size{};
-    uint16_t pb_size{};
+    // no dynamic buffers remain
 };
 
 #endif /* CORE_INC_SERIAL */

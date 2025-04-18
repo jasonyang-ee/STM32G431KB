@@ -1,8 +1,20 @@
 #include "CLI.hpp"
 
 #include "Instances.hpp"
+#include <cstring> // for strcmp, strtok
 
-CLI::CLI() { setCommands(); }
+CLI::CLI() {
+    commands[0] = {"?", &CLI::func_help};
+    commands[1] = {"-h", &CLI::func_help};
+    commands[2] = {"help", &CLI::func_help};
+    commands[3] = {"led", &CLI::func_led};
+    commands[4] = {"flash", &CLI::func_flash};
+    commands[5] = {"info", &CLI::func_info};
+    commands[6] = {"rot", &CLI::func_rot};
+    commands[7] = {"crc", &CLI::func_crc};
+    commands[8] = {"dac", &CLI::func_dac};
+    commands[9] = {"reset", &CLI::func_reset};
+}
 
 CLI::~CLI() {}
 
@@ -21,7 +33,7 @@ void CLI::setCommands() {
 }
 
 void CLI::func_help(int32_t argc, char** argv) {
-    std::string help_text =
+    const char* help_text =
         "\nUsage:  led\t[help] [on] [off]\n"
         "\t\t[breath] [blink] [rapid]\n"
         "\t\t[scale #] [level #] [add #]\n"
@@ -35,7 +47,6 @@ void CLI::func_help(int32_t argc, char** argv) {
 }
 
 void CLI::func_led(int32_t argc, char** argv) {
-    // Detailed Menu
     const char* help_text =
         "\nLED Functions:\n"
         "  on\t\tTurns ON LED\n"
@@ -47,27 +58,24 @@ void CLI::func_led(int32_t argc, char** argv) {
         "  level #value\tSet LED light level\n"
         "  add #value\tIncrease or Decrease LED light level\n\n";
 
-    // No Sub Command
     if (argc == 1) {
         led_user.toggle();
     }
-
-    // Sub Command
     if (argc > 1) {
-        std::string arg = argv[1];
-        if (arg == "help" || arg == "?" || arg == "-h") {
+        const char* arg = argv[1];
+        if (strcmp(arg, "help") == 0 || strcmp(arg, "?") == 0 || strcmp(arg, "-h") == 0) {
             serial.sendString(help_text);
-        } else if (arg == "on") {
+        } else if (strcmp(arg, "on") == 0) {
             led_user.on();
-        } else if (arg == "off") {
+        } else if (strcmp(arg, "off") == 0) {
             led_user.off();
-        } else if (arg == "blink") {
+        } else if (strcmp(arg, "blink") == 0) {
             led_user.blink();
-        } else if (arg == "rapid") {
+        } else if (strcmp(arg, "rapid") == 0) {
             led_user.rapid();
-        } else if (arg == "breath") {
+        } else if (strcmp(arg, "breath") == 0) {
             led_user.breath();
-        } else if (arg == "three") {
+        } else if (strcmp(arg, "three") == 0) {
             led_user.three();
         } else {
             serial.sendString("Command not found\n");
@@ -76,28 +84,24 @@ void CLI::func_led(int32_t argc, char** argv) {
 }
 
 void CLI::func_flash(int32_t argc, char** argv) {
-    // Detailed Menu
     const char* help_text =
         "\nFlash Functions:\n"
         "  load\t\tse setting from flash\n"
         "  unload\t\tSave setting to flash\n\n";
 
-    // Sub Command
     if (argc > 1) {
-        std::string arg = argv[1];
-        if (arg == "help" || arg == "?" || arg == "-h") {
+        const char* arg = argv[1];
+        if (strcmp(arg, "help") == 0 || strcmp(arg, "?") == 0 || strcmp(arg, "-h") == 0) {
             serial.sendString(help_text);
-        } else if (arg == "save") {
-            if (flash.Save()) {
-                serial.sendString("Flash Saved\n");
-            }
-        } else if (arg == "load") {
-            flash.Load();
-        } else if (arg == "purge") {
+        } else if (strcmp(arg, "save") == 0) {
+            xTaskCreate(Thread::task<&Thread::flashSave>, "Flash Save", 200, NULL, 1, &thread.flashSave_handle);
+        } else if (strcmp(arg, "load") == 0) {
+            xTaskCreate(Thread::task<&Thread::flashLoad>, "Flash Load", 200, NULL, 1, &thread.flashLoad_handle);
+        } else if (strcmp(arg, "purge") == 0) {
             if (flash.Purge()) {
                 serial.sendString("Flash Purged\n");
             }
-        } else if (arg == "init") {
+        } else if (strcmp(arg, "init") == 0) {
             if (flash.Init()) {
                 serial.sendString("Flash Initialized\n");
             }
@@ -113,19 +117,16 @@ void CLI::func_info(int32_t argc, char** argv) {
         "  on\tStream Telemetry\n"
         "  off\tStop Telemetry\n\n";
 
-    // No Sub Command
     if (argc == 1) {
         SM<Thread>::triggerEvent(Thread::Event::SINGLE, thread.telemetry_sm);
     }
-
-    // Sub Command
     if (argc > 1) {
-        std::string arg = argv[1];
-        if (arg == "help" || arg == "?" || arg == "-h") {
+        const char* arg = argv[1];
+        if (strcmp(arg, "help") == 0 || strcmp(arg, "?") == 0 || strcmp(arg, "-h") == 0) {
             serial.sendString(help_text);
-        } else if (arg == "on") {
+        } else if (strcmp(arg, "on") == 0) {
             SM<Thread>::triggerEvent(Thread::Event::START, thread.telemetry_sm);
-        } else if (arg == "off") {
+        } else if (strcmp(arg, "off") == 0) {
             SM<Thread>::triggerEvent(Thread::Event::STOP, thread.telemetry_sm);
         } else {
             serial.sendString("Command not found\n");
@@ -134,22 +135,20 @@ void CLI::func_info(int32_t argc, char** argv) {
 }
 
 void CLI::func_rot(int32_t argc, char** argv) {
-    // Detailed Menu
     const char* help_text =
         "\nRotation Functions:\n"
         "  start\t\tStart Rotation\n"
         "  stop\t\tStop Rotation\n\n";
 
-    // Sub Command
     if (argc > 1) {
-        std::string arg = argv[1];
-        if (arg == "help" || arg == "?" || arg == "-h") {
+        const char* arg = argv[1];
+        if (strcmp(arg, "help") == 0 || strcmp(arg, "?") == 0 || strcmp(arg, "-h") == 0) {
             serial.sendString(help_text);
-        } else if (arg == "on") {
+        } else if (strcmp(arg, "on") == 0) {
             SM<Thread>::triggerEvent(Thread::Event::START, thread.runner_sm);
-        } else if (arg == "off") {
+        } else if (strcmp(arg, "off") == 0) {
             SM<Thread>::setState(Thread::State::OFF, thread.runner_sm);
-        } else if (arg == "set" && argc == 3) {
+        } else if (strcmp(arg, "set") == 0 && argc == 3) {
             SM<Thread>::setState(Thread::State::INIT, thread.runner_sm, int{std::stoi(argv[2])});
         } else {
             serial.sendString("Command not found\n");
@@ -157,54 +156,49 @@ void CLI::func_rot(int32_t argc, char** argv) {
     }
 }
 
-// void CLI::func_crc(int32_t argc, char** argv) {
-//     // Detailed Menu
-//     const char* help_text =
-//         "\nCRC Functions:\n"
-//         "  acc [#]\tAccumulate CRC\n"
-//         "  cal [#]\tCalculate CRC\n\n";
+void CLI::func_crc(int32_t argc, char** argv) {
+    const char* help_text =
+        "\nCRC Functions:\n"
+        "  acc [#]\tAccumulate CRC\n"
+        "  cal [#]\tCalculate CRC\n\n";
 
-//     // Sub Command
-//     if (argc > 1) {
-//         std::string arg = argv[1];
-//         if (arg == "help" || arg == "?" || arg == "-h") {
-//             serial.sendString(help_text);
-//         } else if (arg == "cal") {
-//             if (argc == 3) {
-//                 uint8_t input = std::stoi(argv[2]);
-//                 SM<Thread>::setState(Thread::State::CRC_CAL, thread.runner_sm, std::vector<uint8_t>{input});
-//             }
-//         } else {
-//             serial.sendString("Command not found\n");
-//         }
-//     }
-// }
+    if (argc > 1) {
+        const char* arg = argv[1];
+        if (strcmp(arg, "help") == 0 || strcmp(arg, "?") == 0 || strcmp(arg, "-h") == 0) {
+            serial.sendString(help_text);
+        } else if (strcmp(arg, "cal") == 0) {
+            if (argc == 3) {
+                uint8_t input = (uint8_t)atoi(argv[2]);
+                uint8_t data[1] = {input};
+                SM<Thread>::setState(Thread::State::CRC_CAL, thread.runner_sm, data, 1);
+            }
+        } else {
+            serial.sendString("Command not found\n");
+        }
+    }
+}
 
 void CLI::func_dac(int32_t argc, char** argv) {
-    // Detailed Menu
     const char* help_text =
         "\nDAC Functions:\n"
         "  level [value]\tSet DAC level\n"
         "  add [value]\tAdd to DAC level\n"
         "  sine [amplitude] [frequency] [samplingRate]\tGenerate sine wave\n\n";
 
-    // No Sub Command
     if (argc == 1) {
         serial.sendString(help_text);
     }
-
-    // Sub Command
     if (argc > 1) {
-        std::string arg = argv[1];
-        if (arg == "help" || arg == "?" || arg == "-h") {
+        const char* arg = argv[1];
+        if (strcmp(arg, "help") == 0 || strcmp(arg, "?") == 0 || strcmp(arg, "-h") == 0) {
             serial.sendString(help_text);
-        } else if (arg == "level" && argc == 3) {
+        } else if (strcmp(arg, "level") == 0 && argc == 3) {
             double value = std::stod(argv[2]);
             dac.setLevel(value);
-        } else if (arg == "add" && argc == 3) {
+        } else if (strcmp(arg, "add") == 0 && argc == 3) {
             double value = std::stod(argv[2]);
             dac.addLevel(value);
-        } else if (arg == "sine" && argc == 5) {
+        } else if (strcmp(arg, "sine") == 0 && argc == 5) {
             double amplitude = std::stod(argv[2]);
             double frequency = std::stod(argv[3]);
             double samplingRate = std::stod(argv[4]);

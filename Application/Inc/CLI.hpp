@@ -2,13 +2,9 @@
 #define APPLICATION_INC_ACLI
 
 #include <cstdint>
-#include <functional>
-#include <string>
-#include <unordered_map>
-#include <vector>
+#include <cstring>  // for strncpy, strlen
 
 #include "StateMachine.hpp"
-
 
 class CLI {
    private:
@@ -19,51 +15,44 @@ class CLI {
     void func_rot(int32_t argc, char** argv);
     void func_crc(int32_t argc, char** argv);
     void func_dac(int32_t argc, char** argv);
-	void func_reset(int32_t argc, char** argv);
+    void func_reset(int32_t argc, char** argv);
 
    private:
-    void setCommands();
+    static constexpr size_t MAX_CACHE_SIZE = 128;
+    static constexpr size_t MAX_ARGS = 10;
+    static constexpr size_t NUM_COMMANDS = 10;
+    struct CommandEntry { const char* name; void (CLI::*func)(int32_t, char**); };
+    CommandEntry commands[NUM_COMMANDS];
+    char rx_cache[MAX_CACHE_SIZE];
     size_t rx_size{};
-    std::string rx_cache{};
-    std::unordered_map<std::string, std::function<void(int32_t, char**)>> cmd_map{};
 
    public:
     CLI();
     virtual ~CLI();
 
-    void saveCache(std::string rx) { rx_cache = rx; }
+    void saveCache(const char* rx) { strncpy(rx_cache, rx, MAX_CACHE_SIZE); rx_cache[MAX_CACHE_SIZE-1] = '\0'; rx_size = strlen(rx_cache); }
 
     bool parse() {
         // tokenizing rx_cache by space
-        std::vector<std::string> tokens;
-        std::string token;
-        for (char c : rx_cache) {
-            if (c == ' ' || c == '\n' || c == '\r') {
-                if (!token.empty()) {
-                    tokens.push_back(token);
-                    token.clear();
-                }
-            } else {
-                token += c;
-            }
+        char* tokens[MAX_ARGS];
+        size_t token_count = 0;
+        char* token = strtok(rx_cache, " \n\r");
+        while (token != nullptr && token_count < MAX_ARGS) {
+            tokens[token_count++] = token;
+            token = strtok(nullptr, " \n\r");
         }
 
         // parse command and arguments
-        if (!tokens.empty()) {
-            std::string command = tokens[0];
-            // using first token as command
-            auto arguments = cmd_map.find(command);
-            if (arguments != cmd_map.end()) {
-                int32_t argc = tokens.size();
-                std::vector<char*> argv;
-                for (auto& t : tokens) {
-                    argv.push_back(&t[0]);
+        if (token_count > 0) {
+            const char* command = tokens[0];
+            for (size_t i = 0; i < NUM_COMMANDS; ++i) {
+                if (strcmp(commands[i].name, command) == 0) {
+                    // Invoke command functions by first token
+                    (this->*commands[i].func)(token_count, tokens);
+                    return true;
                 }
-                // Invoke command functions by first token
-                arguments->second(argc, argv.data());
-            } else {
-                return false;
             }
+            return false;
         }
         return true;
     }

@@ -1,4 +1,3 @@
-
 #include "main.h"
 
 #include "Instances.hpp"
@@ -36,7 +35,10 @@ int main(void) {
     MX_CRC_Init();
 	
     // Instances Dependency Injection
-    serial.setPort(std::vector<UART_HandleTypeDef *>{&huart2});
+    {
+        UART_HandleTypeDef* ports_arr[] = {&huart2};
+        serial.setPort(ports_arr, 1);
+    }
     led_user.setPort(&htim8.Instance->CCR2);
     dac.setPort(&hdac1, DAC_CHANNEL_2);
     rtc.setPort(&hrtc);
@@ -72,8 +74,12 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart) { vTaskNotifyGiveFromISR
 void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size) {
     if (huart->Instance == USART2) {
         // Save rx data to cli cache
-        cli.saveCache(std::string(reinterpret_cast<char *>(serial.rx.data()), Size));
-
+        {
+            char* rxPtr = reinterpret_cast<char*>(serial.rx.data());
+            if (Size < serial.UART_BUFFER_SIZE) rxPtr[Size] = '\0';
+            cli.saveCache(rxPtr);
+        }
+        
         // Restart DMA before exiting callback interrupt
         HAL_UARTEx_ReceiveToIdle_IT(&huart2, serial.rx.data(), serial.UART_BUFFER_SIZE);
 
