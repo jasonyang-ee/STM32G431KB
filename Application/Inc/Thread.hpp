@@ -30,8 +30,8 @@ class Thread {
 	TaskHandle_t flashSave_handle;
 	void flashLoad();
 	TaskHandle_t flashLoad_handle;
-    // void calculator();
-    // TaskHandle_t calculator_handle;
+    void calculator();
+    TaskHandle_t calculator_handle;
     void dacUpdate();
     TaskHandle_t dacUpdate_handle;
     void schedule_20Hz();

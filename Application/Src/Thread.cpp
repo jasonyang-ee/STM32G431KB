@@ -74,24 +74,26 @@ void Thread::init() {
         dac.init();
         flash.Load();
         SM<Thread>::triggerEvent(Event::INIT_DONE, thread_sm);
+		serial.sendString("High Water Mark: ");
+		serial.sendNumber(uxTaskGetStackHighWaterMark(NULL));
         vTaskDelete(NULL);
     }
 }
 Action Thread::actionSystemInit() {
-    return [this]() { xTaskCreate(task<&Thread::init>, "system init", 1200, this, 6, &init_handle); };
+    return [this]() { xTaskCreate(task<&Thread::init>, "system init", 650, this, 6, &init_handle); };
 }
 Action Thread::actionSystemRun() {
     return [this]() {
 		xTaskCreate(task<&Thread::watchdog>, "watchdog", 64, this, 1, &watchdog_handle);
-        xTaskCreate(task<&Thread::serialTX>, "serial send tx", 100, this, 5, &serial_handle);
-        xTaskCreate(task<&Thread::parse>, "cli parsing", 1200, this, 5, &parse_handle);
-        xTaskCreate(task<&Thread::schedule_20Hz>, "schedule 20Hz", 64, this, 2, &schedule_20Hz_handle);
+        xTaskCreate(task<&Thread::serialTX>, "serial send tx", 64, this, 5, &serial_handle);
+        xTaskCreate(task<&Thread::parse>, "cli parsing", 400, this, 5, &parse_handle);
+        xTaskCreate(task<&Thread::schedule_20Hz>, "schedule 20Hz", 100, this, 2, &schedule_20Hz_handle);
         xTaskCreate(task<&Thread::telemetry>, "telemetry", 400, this, 2, &telemetry_handle);
         vTaskSuspend(telemetry_handle);
-        xTaskCreate(task<&Thread::runner>, "task simulation", 200, this, 3, &runner_handle);
+        xTaskCreate(task<&Thread::runner>, "task simulation", 160, this, 3, &runner_handle);
         vTaskSuspend(runner_handle);
-        // xTaskCreate(task<&Thread::calculator>, "calculator", 200, this, 5, &calculator_handle);
-        // vTaskSuspend(calculator_handle);
+        xTaskCreate(task<&Thread::calculator>, "calculator", 400, this, 5, &calculator_handle);
+        vTaskSuspend(calculator_handle);
         xTaskCreate(task<&Thread::dacUpdate>, "dacUpdate", 64, this, 4, &dacUpdate_handle);
         vTaskSuspend(dacUpdate_handle);
         serial.sendString("\nCurrent Free Heap: ");
@@ -235,26 +237,26 @@ void Thread::flashLoad() {
     }
 }
 
-// void Thread::calculator() {
-//     while (1) {
-//         // get std::vector<uint8> input from injection
-//         std::vector<uint8_t> input = std::any_cast<std::vector<uint8_t>>(runner_sm.injections[0]);
-//         crc.setPolynomial(0x9B, 8);
-//         crc.setInitValue(0x00);
-//         auto result = crc.calculate(input.data(), 2);
-//         serial.sendString("CRC Result: ");
-//         serial.sendNumber(result);
-//         serial.sendLn();
-//         SM<Thread>::triggerEvent(Event::TASK_DONE, runner_sm);
-//     }
-// }
-// Action Thread::actionCRCStart() {
-//     return [this]() {
-//         BaseType_t xYieldRequired = pdTRUE;
-//         xTaskResumeFromISR(calculator_handle);
-//         portYIELD_FROM_ISR(xYieldRequired);
-//     };
-// }
-// Action Thread::actionCRCStop() {
-//     return [this]() { vTaskSuspend(calculator_handle); };
-// }
+void Thread::calculator() {
+    while (1) {
+        // get std::vector<uint8> input from injection
+        std::vector<uint8_t> input = std::any_cast<std::vector<uint8_t>>(runner_sm.injections[0]);
+        crc.setPolynomial(0x9B, 8);
+        crc.setInitValue(0x00);
+        auto result = crc.calculate(input.data(), 2);
+        serial.sendString("CRC Result: ");
+        serial.sendNumber(result);
+        serial.sendLn();
+        SM<Thread>::triggerEvent(Event::TASK_DONE, runner_sm);
+    }
+}
+Action Thread::actionCRCStart() {
+    return [this]() {
+        BaseType_t xYieldRequired = pdTRUE;
+        xTaskResumeFromISR(calculator_handle);
+        portYIELD_FROM_ISR(xYieldRequired);
+    };
+}
+Action Thread::actionCRCStop() {
+    return [this]() { vTaskSuspend(calculator_handle); };
+}
