@@ -69,7 +69,6 @@ class LED {
         Injection injections;
     };
 
-	
     // State Machine Instances
     StateMachine led_sm;
 

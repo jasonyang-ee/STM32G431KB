@@ -78,12 +78,13 @@ void Thread::init() {
     }
 }
 Action Thread::actionSystemInit() {
-    return [this]() { xTaskCreate(task<&Thread::init>, "system init", 1000, this, 6, &init_handle); };
+    return [this]() { xTaskCreate(task<&Thread::init>, "system init", 1200, this, 6, &init_handle); };
 }
 Action Thread::actionSystemRun() {
     return [this]() {
-        xTaskCreate(task<&Thread::serialTX>, "serial send tx", 100, this, 3, &serial_handle);
-        xTaskCreate(task<&Thread::parse>, "cli parsing", 1100, this, 6, &parse_handle);
+		xTaskCreate(task<&Thread::watchdog>, "watchdog", 64, this, 1, &watchdog_handle);
+        xTaskCreate(task<&Thread::serialTX>, "serial send tx", 100, this, 5, &serial_handle);
+        xTaskCreate(task<&Thread::parse>, "cli parsing", 1200, this, 5, &parse_handle);
         xTaskCreate(task<&Thread::schedule_20Hz>, "schedule 20Hz", 64, this, 2, &schedule_20Hz_handle);
         xTaskCreate(task<&Thread::telemetry>, "telemetry", 400, this, 2, &telemetry_handle);
         vTaskSuspend(telemetry_handle);
@@ -147,10 +148,17 @@ void Thread::dacUpdate() {
 void Thread::schedule_20Hz() {
     while (1) {
         led_user.scheduler();
-        HAL_IWDG_Refresh(&hiwdg);
         vTaskDelay(50);
     }
 }
+
+void Thread::watchdog() {
+    while (1) {
+        HAL_IWDG_Refresh(&hiwdg);
+        vTaskDelay(100);
+    }
+}
+
 void Thread::serialTX() {
     while (1) {
         ulTaskNotifyTake(pdTRUE, 300);

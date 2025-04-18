@@ -56,7 +56,7 @@ int main(void) {
     serial.sendString("ADC calibration and start\n");
 	
 	// Watchdog Start
-    // MX_IWDG_Init();
+    MX_IWDG_Init();
 
     // FreeRTOS Start
     vTaskStartScheduler();
