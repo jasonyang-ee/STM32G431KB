@@ -67,7 +67,7 @@ int main(void) {
 
 /* ------------------------- Call Back Functions * ---------------------------------*/
 
-void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart) { vTaskNotifyGiveFromISR(thread.serial_handle, NULL); }
+void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart) { vTaskNotifyGiveFromISR(thread.sendTX_handle, NULL); }
 
 void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size) {
     if (huart->Instance == USART2) {
@@ -78,7 +78,7 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size) {
         HAL_UARTEx_ReceiveToIdle_IT(&huart2, serial.rx.data(), serial.UART_BUFFER_SIZE);
 
         // Parse command with thread
-        vTaskNotifyGiveFromISR(thread.parse_handle, NULL);
+        vTaskNotifyGiveFromISR(thread.parseRX_handle, NULL);
     }
 }
 
