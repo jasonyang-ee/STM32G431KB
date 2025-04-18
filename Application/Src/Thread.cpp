@@ -74,10 +74,10 @@ void Thread::init() {
         dac.init();
         flash.Load();
         SM<Thread>::triggerEvent(Event::INIT_DONE, thread_sm);
-        serial.sendString("High Water Mark: ");
-        serial.sendNumber(uxTaskGetStackHighWaterMark(NULL));
         serial.sendString("\nCurrent Free Heap: ");
         serial.sendNumber(xPortGetFreeHeapSize());
+        serial.sendString("High Water Mark: ");
+        serial.sendNumber(uxTaskGetStackHighWaterMark(NULL));
         serial.sendString("\n\nSystem Boot OK\n");
         vTaskDelete(NULL);
     }
@@ -120,6 +120,8 @@ void Thread::telemetry() {
         serial.sendNumber(xPortGetFreeHeapSize());
         serial.sendString("\nMinimum Free Heap: ");
         serial.sendNumber(xPortGetMinimumEverFreeHeapSize());
+		serial.sendString("\nSerial High Water Mark: ");
+		serial.sendNumber(serial.getHighWaterMark());
         serial.sendLn();
 
         SM<Thread>::triggerEvent(Event::TASK_DONE, telemetry_sm);
