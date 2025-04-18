@@ -12,7 +12,7 @@ Flash flash{};
 CustomDAC dac{};
 CustomADC adc{};
 CustomRTC rtc{};
-// CustomCRC crc{};
+CustomCRC crc{};
 
 /**
  * @brief  The application entry point.
@@ -33,9 +33,7 @@ int main(void) {
     MX_TIM2_Init();
     MX_TIM4_Init();
     MX_RTC_Init();
-    // MX_CRC_Init();
-    MX_FMAC_Init();
-    MX_CORDIC_Init();
+    MX_CRC_Init();
 	
     // Instances Dependency Injection
     serial.setPort(std::vector<UART_HandleTypeDef *>{&huart2});

@@ -116,8 +116,6 @@ void Thread::telemetry() {
         serial.sendNumber(xPortGetFreeHeapSize());
         serial.sendString("\nMinimum Free Heap: ");
         serial.sendNumber(xPortGetMinimumEverFreeHeapSize());
-        serial.sendString("\nStack High Water Mark: ");
-        serial.sendNumber(static_cast<uint32_t>(uxTaskGetStackHighWaterMark(NULL)));
         serial.sendLn();
 
         SM<Thread>::triggerEvent(Event::TASK_DONE, telemetry_sm);
@@ -216,17 +214,17 @@ Action Thread::actionRotate() {
 }
 
 void Thread::flashSave() {
-	while (1) {
-		flash.Save();
-		vTaskDelete(NULL);
-	}
+    while (1) {
+        flash.Save();
+        vTaskDelete(NULL);
+    }
 }
 
 void Thread::flashLoad() {
-	while (1) {
-		flash.Load();
-		vTaskDelete(NULL);
-	}
+    while (1) {
+        flash.Load();
+        vTaskDelete(NULL);
+    }
 }
 
 // void Thread::calculator() {

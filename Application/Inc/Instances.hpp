@@ -3,7 +3,7 @@
 
 #include "ADC.hpp"
 #include "CLI.hpp"
-// #include "CRC.hpp"
+#include "CRC.hpp"
 #include "DAC.hpp"
 #include "Flash.hpp"
 #include "LED.hpp"
@@ -19,6 +19,6 @@ extern Flash flash;
 extern CustomDAC dac;
 extern CustomADC adc;
 extern CustomRTC rtc;
-// extern CustomCRC crc;
+extern CustomCRC crc;
 
 #endif /* APPLICATION_INC_INSTANCES */
