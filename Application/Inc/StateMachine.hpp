@@ -4,21 +4,22 @@
 #include <any>
 #include <functional>
 #include <optional>
+#include <ranges>
 #include <tuple>
 #include <unordered_map>
 #include <vector>
-#include <ranges>
+
 
 /// @brief Values injected into actions and guards.
 using Injection = std::vector<std::any>;
 
 /// @brief Optional transition action callback.
 /// @see std::function<void()>
-using Action    = std::optional<std::function<void()>>;
+using Action = std::optional<std::function<void()>>;
 
 /// @brief Optional guard predicate for transitions.
 /// @return true if transition is allowed.
-using Guard     = std::optional<std::function<bool()>>;
+using Guard = std::optional<std::function<bool()>>;
 
 /// @brief Forward declaration of the state machine engine.
 template <typename Parent>
@@ -26,36 +27,36 @@ class SM;
 
 /// @brief Container for states, transitions, and injections of the state machine.
 /// @tparam Parent Type defining State and Event.
-template<typename Parent>
+template <typename Parent>
 struct StateMachineContainer {
-    using State      = typename Parent::State;
-    using Event      = typename Parent::Event;
-    using Entry      = std::tuple< State, Guard, Action, Injection >;
-    using Transition = std::tuple< State, Event, State, Guard, Action, Injection >;
-    using Anonymous  = std::tuple< State, State, Guard, Action, Injection >;
+    using State = typename Parent::State;
+    using Event = typename Parent::Event;
+    using Entry = std::tuple<State, Guard, Action, Injection>;
+    using Transition = std::tuple<State, Event, State, Guard, Action, Injection>;
+    using Anonymous = std::tuple<State, State, Guard, Action, Injection>;
 
     /// @brief Current active state of the state machine.
-    State                  currentState;
+    State currentState;
 
     /// @brief Registered state entries with guards and entry actions.
-    std::vector<Entry>      entries;
+    std::vector<Entry> entries;
 
     /// @brief Event-driven transitions.
     std::vector<Transition> transitions;
 
     /// @brief Automatic transitions executed without an explicit event.
-    std::vector<Anonymous>  anonymous;
+    std::vector<Anonymous> anonymous;
 
     /// @brief Values injected into callbacks during state changes.
-    Injection               injections;
+    Injection injections;
 
     // Member convenience methods
     /// @brief Trigger a state machine event.
     /// @tparam ExternalInjection Types of additional data to inject.
     /// @param event Event to trigger.
     /// @param args Optional injection values.
-    template<typename... ExternalInjection>
-    void triggerEvent(typename Parent::Event event, ExternalInjection&&... args) {
+    template <typename... ExternalInjection>
+    void triggerEvent(typename Parent::Event event, ExternalInjection &&...args) {
         SM<Parent>::triggerEvent(event, *this, std::forward<ExternalInjection>(args)...);
     }
 
@@ -63,22 +64,13 @@ struct StateMachineContainer {
     /// @tparam ExternalInjection Types of additional data to inject.
     /// @param state Target state to set.
     /// @param args Optional injection values.
-    template<typename... ExternalInjection>
-    void setState(typename Parent::State state, ExternalInjection&&... args) {
+    template <typename... ExternalInjection>
+    void setState(typename Parent::State state, ExternalInjection &&...args) {
         SM<Parent>::setState(state, *this, std::forward<ExternalInjection>(args)...);
-    }
-
-    /// @brief Run anonymous transitions until none remain.
-    /// @tparam ExternalInjection Types of additional data to inject.
-    /// @param args Optional injection values.
-    /// @return true if any anonymous transition executed.
-    template<typename... ExternalInjection>
-    bool runAnonymous(ExternalInjection&&... args) {
-        return SM<Parent>::runAnonymous(*this, std::forward<ExternalInjection>(args)...);
     }
 };
 
-template<typename Parent>
+template <typename Parent>
 using StateMachine = StateMachineContainer<Parent>;
 
 /// @brief State machine engine implementing transitions and state changes.
@@ -106,7 +98,8 @@ class SM {
             updateInjection(sm, injection, std::forward<ExternalInjection>(args)...);
             handleStateChange(sm, nextState, guard, action);
         }
-        while(runAnonymous(sm, std::forward<ExternalInjection>(args)...)) {}
+        while (runAnonymous(sm, std::forward<ExternalInjection>(args)...)) {
+        }
     }
 
     /// @brief Force set the state with injection values.
@@ -124,9 +117,16 @@ class SM {
             updateInjection(sm, injection, std::forward<ExternalInjection>(args)...);
             handleStateChange(sm, state, guard, action);
         }
-        while(runAnonymous(sm, std::forward<ExternalInjection>(args)...)) {}
+        while (runAnonymous(sm, std::forward<ExternalInjection>(args)...)) {
+        }
     }
 
+    /// @brief Retrieve the current state from the state machine.
+    /// @param sm StateMachine instance.
+    /// @return Current active state.
+    static Parent::State getState(StateMachine &sm) { return sm.currentState; }
+
+   private:
     /// @brief Execute an anonymous transition if the current state matches.
     /// @tparam ExternalInjection Types of optional injection values.
     /// @param sm StateMachine instance to operate on.
@@ -146,12 +146,6 @@ class SM {
         return false;
     }
 
-    /// @brief Retrieve the current state from the state machine.
-    /// @param sm StateMachine instance.
-    /// @return Current active state.
-    static Parent::State getState(StateMachine &sm) { return sm.currentState; }
-
-   private:
     /// @brief Evaluate guard and perform state change and action.
     /// @param sm Instance to update.
     /// @param nextState State to transition to.
