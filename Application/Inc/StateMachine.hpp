@@ -6,20 +6,40 @@
 #include <optional>
 #include <tuple>
 #include <unordered_map>
+#include <vector>
+#include <ranges>
 
 using Injection = std::vector<std::any>;
-using Action = std::optional<std::function<void()>>;
-using Guard = std::optional<std::function<bool()>>;
+using Action    = std::optional<std::function<void()>>;
+using Guard     = std::optional<std::function<bool()>>;
+
+template<typename Parent>
+struct StateMachineContainer {
+    using State      = typename Parent::State;
+    using Event      = typename Parent::Event;
+    using Entry      = std::tuple< State, Guard, Action, Injection >;
+    using Transition = std::tuple< State, Event, State, Guard, Action, Injection >;
+    using Anonymous  = std::tuple< State, State, Guard, Action, Injection >;
+
+    State                  currentState;
+    std::vector<Entry>      entries;
+    std::vector<Transition> transitions;
+    std::vector<Anonymous>  anonymous;
+    Injection               injections;
+};
+
+template<typename Parent>
+using StateMachine = StateMachineContainer<Parent>;
 
 template <typename Parent>
 class SM {
    public:
     using State = typename Parent::State;
     using Event = typename Parent::Event;
-    using StateMachine = typename Parent::StateMachine;
+    using StateMachine = StateMachineContainer<Parent>;
 
     template <typename... ExternalInjection>
-    static void triggerEvent(Parent::Event event, Parent::StateMachine &sm, ExternalInjection... args) {
+    static void triggerEvent(Parent::Event event, StateMachine &sm, ExternalInjection... args) {
         auto it = std::ranges::find_if(sm.transitions.begin(), sm.transitions.end(), [&](const auto &t) {
             return std::get<0>(t) == sm.currentState && std::get<1>(t) == event;
         });
@@ -33,7 +53,7 @@ class SM {
     }
 
     template <typename... ExternalInjection>
-    static void setState(Parent::State state, Parent::StateMachine &sm, ExternalInjection... args) {
+    static void setState(Parent::State state, StateMachine &sm, ExternalInjection... args) {
         auto it = std::ranges::find_if(sm.entries.begin(), sm.entries.end(),
                                        [&](const auto &entry) { return std::get<0>(entry) == state; });
 
@@ -59,17 +79,17 @@ class SM {
 		return false;
     }
 
-    static Parent::State getState(Parent::StateMachine &sm) { return sm.currentState; }
+    static Parent::State getState(StateMachine &sm) { return sm.currentState; }
 
    private:
-    static void handleStateChange(Parent::StateMachine &sm, Parent::State nextState, Guard guard, Action action) {
+    static void handleStateChange(StateMachine &sm, Parent::State nextState, Guard guard, Action action) {
         if (guard && !(*guard)()) return;
         sm.currentState = nextState;
         if (action) (*action)();
     }
 
     template <typename... ExternalInjection>
-    static void updateInjection(Parent::StateMachine &sm, Injection injection, ExternalInjection &&...args) {
+    static void updateInjection(StateMachine &sm, Injection injection, ExternalInjection &&...args) {
         if (!injection.empty()) {
             sm.injections = injection;
         } else if (sizeof...(args) > 0) {
