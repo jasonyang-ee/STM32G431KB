@@ -22,7 +22,7 @@ class Serial {
 
     /// @brief Initialize Serial
     /// @param Ports Vector of UART_HandleTypeDef pointer
-    void setPort(std::vector<UART_HandleTypeDef *> Ports) { ports = Ports; }
+    void setPort(std::vector<UART_HandleTypeDef *> Ports) { ports = std::move(Ports); }
 
 	/// @brief Get high water mark
 	/// @return High water mark
