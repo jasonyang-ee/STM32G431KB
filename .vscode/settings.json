@@ -73,6 +73,7 @@
 		"xstring": "cpp",
 		"xtr1common": "cpp",
 		"xutility": "cpp",
-		"freertosconfig.h": "c"
+		"freertosconfig.h": "c",
+		"ranges": "cpp"
 	}
 }

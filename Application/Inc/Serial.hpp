@@ -20,25 +20,25 @@ class Serial {
     std::array<uint8_t, UART_BUFFER_SIZE * 4> tx;
     std::array<uint8_t, UART_BUFFER_SIZE> rx;
 
-    /// @brief Initialize Serial
-    /// @param Ports Vector of UART_HandleTypeDef pointer
+    /// @brief Assign UART interface handles for serial communication.
+    /// @param Ports Vector of UART_HandleTypeDef pointers to be used for data transmission.
     void setPort(std::vector<UART_HandleTypeDef *> Ports) { ports = std::move(Ports); }
 
-	/// @brief Get high water mark
-	/// @return High water mark
-	/// @note High water mark is the maximum size of the tx_cache
+	/// @brief Retrieve the peak transmit buffer occupancy.
+	/// @return Maximum bytes ever queued in the transmit cache.
+	/// @note High water mark represents the largest pending data size.
 	uint16_t getHighWaterMark() { return high_water_mark; }
 
-    /// @brief Send a new line character
+    /// @brief Append a newline character to the transmit buffer.
     void sendLn() { tx_cache.append("\n"); };
 
-    /// @brief Buffer a string to be sent
-    /// @param msg string to be sent
+    /// @brief Append a string to the transmit buffer.
+    /// @param msg Null-terminated string to enqueue for transmission.
     void sendString(std::string msg) { tx_cache.append(msg); }
 
-    /// @brief Sending number and bool
-    /// @tparam T Data type
-    /// @param value number to be buffered
+    /// @brief Append a numeric or boolean value to the transmit buffer.
+    /// @tparam T Type of the value; bool is formatted as "ON"/"OFF".
+    /// @param value Value to be converted and buffered.
     template <class T>
     void sendNumber(T value) {
         if (std::is_same<T, bool>::value) {
@@ -48,10 +48,10 @@ class Serial {
         }
     }
 
-    /// @brief Sending 1D array
-    /// @tparam T Data type
-    /// @tparam N 1D array size
-    /// @param elements Array to be buffered
+    /// @brief Append elements of a one-dimensional array to the transmit buffer.
+    /// @tparam T Type of array elements.
+    /// @tparam N Number of elements in the array.
+    /// @param elements Array whose contents will be formatted and buffered; values separated by spaces.
     template <class T, size_t N>
     void sendNumber(std::array<T, N> elements) {
         for (auto &i : elements) {
@@ -60,11 +60,11 @@ class Serial {
         }
     }
 
-    /// @brief Sending 2D array
-    /// @tparam T Data type
-    /// @tparam N 2D array size
-    /// @tparam M 1D array size
-    /// @param elements Array to be buffered
+    /// @brief Append elements of a two-dimensional array to the transmit buffer.
+    /// @tparam T Type of array elements.
+    /// @tparam N Number of rows in the array.
+    /// @tparam M Number of columns in the array.
+    /// @param elements 2D array to format; rows separated by newlines and columns by spaces.
     template <class T, size_t N, size_t M>
     void sendNumber(std::array<std::array<T, M>, N> elements) {
         for (auto &column : elements) {
@@ -76,10 +76,10 @@ class Serial {
         }
     }
 
-    /// @brief Sending number with message
-    /// @tparam T Data type
-    /// @param msg Message to be sent
-    /// @param value number to be buffered
+    /// @brief Append a labeled numeric or boolean value followed by a newline.
+    /// @tparam T Type of the value; bool is formatted as "ON"/"OFF".
+    /// @param msg Descriptive label to prepend.
+    /// @param value Value to be converted and buffered.
     template <class T>
     void sendCombined(std::string msg, T value) {
         sendString(msg);
@@ -88,12 +88,11 @@ class Serial {
         sendLn();
     }
 
-    /// @brief Sending 1D array with message
-    /// @tparam T Data type
-    /// @tparam N 1D array size
-    /// @param msg Message to be sent
-    /// @param elements Array to be buffered
-    /// @param value number to be buffered
+    /// @brief Append a labeled one-dimensional array followed by a newline.
+    /// @tparam T Type of array elements.
+    /// @tparam N Number of elements.
+    /// @param msg Label to prepend.
+    /// @param elements Array whose contents will be formatted and buffered.
     template <class T, size_t N>
     void sendCombined(std::string msg, std::array<T, N> elements) {
         sendString(msg);
@@ -102,13 +101,12 @@ class Serial {
         sendLn();
     }
 
-    /// @brief Sending 2D array with message
-    /// @tparam T Data type
-    /// @tparam N 2D array size
-    /// @tparam M 1D array size
-    /// @param msg Message to be sent
-    /// @param elements Array to be buffered
-    /// @param value number to be buffered
+    /// @brief Append a labeled two-dimensional array followed by a newline.
+    /// @tparam T Type of array elements.
+    /// @tparam N Number of rows.
+    /// @tparam M Number of columns.
+    /// @param msg Label to prepend.
+    /// @param elements 2D array whose contents will be formatted and buffered.
     template <class T, size_t N, size_t M>
     void sendCombined(std::string msg, std::array<std::array<T, M>, N> elements) {
         sendString(msg);
@@ -117,17 +115,17 @@ class Serial {
         sendLn();
     }
 
-    /// @brief Buffer a protobuf payload to be sent
-    /// @param msg protobuf payload
-    /// @param size size of the payload
+    /// @brief Buffer a raw protobuf payload for transmission.
+    /// @param msg Pointer to the protobuf byte array.
+    /// @param size Number of bytes to copy into the internal cache.
     void sendPB(uint8_t *msg, uint32_t size) {
         // copy msg into std::array of pb_cache
         std::copy(msg, msg + size, pb_cache.data());
         pb_size = size;
     }
 
-    /// @brief Send out data with iterrupt mode
-    /// @return True if data is sent
+    /// @brief Transmit pending data via interrupt-driven UART.
+    /// @return true if any data was sent; false if no data was pending.
     bool commit() {
         if (!tx_cache.empty()) {
 			if (tx_cache.size() > high_water_mark) high_water_mark = tx_cache.size();

@@ -1,4 +1,3 @@
-
 #include "main.h"
 
 #include "Instances.hpp"
@@ -36,7 +35,7 @@ int main(void) {
     MX_CRC_Init();
 
     // Instances Dependency Injection
-    serial.setPort(std::vector<UART_HandleTypeDef *>{&huart2});
+    serial.setPort({&huart2});
     led_user.setPort(&htim8.Instance->CCR2);
     dac.setPort(&hdac1, DAC_CHANNEL_2);
     rtc.setPort(&hrtc);
