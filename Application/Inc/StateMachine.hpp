@@ -13,6 +13,9 @@ using Injection = std::vector<std::any>;
 using Action    = std::optional<std::function<void()>>;
 using Guard     = std::optional<std::function<bool()>>;
 
+template <typename Parent>
+class SM;
+
 template<typename Parent>
 struct StateMachineContainer {
     using State      = typename Parent::State;
@@ -26,6 +29,20 @@ struct StateMachineContainer {
     std::vector<Transition> transitions;
     std::vector<Anonymous>  anonymous;
     Injection               injections;
+
+    // Member convenience methods
+    template<typename... ExternalInjection>
+    void triggerEvent(typename Parent::Event event, ExternalInjection&&... args) {
+        SM<Parent>::triggerEvent(event, *this, std::forward<ExternalInjection>(args)...);
+    }
+    template<typename... ExternalInjection>
+    void setState(typename Parent::State state, ExternalInjection&&... args) {
+        SM<Parent>::setState(state, *this, std::forward<ExternalInjection>(args)...);
+    }
+    template<typename... ExternalInjection>
+    bool runAnonymous(ExternalInjection&&... args) {
+        return SM<Parent>::runAnonymous(*this, std::forward<ExternalInjection>(args)...);
+    }
 };
 
 template<typename Parent>

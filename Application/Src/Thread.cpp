@@ -63,7 +63,7 @@ Thread::Thread() {
     // clang-format on
 
     // Set initial state
-    SM<Thread>::setState(State::INIT, thread_sm);
+    thread_sm.setState(State::INIT);
 }
 
 Thread::~Thread() {}
@@ -73,7 +73,7 @@ void Thread::init() {
     while (1) {
         dac.init();
         flash.Load();
-        SM<Thread>::triggerEvent(Event::INIT_DONE, thread_sm);
+        thread_sm.triggerEvent(Event::INIT_DONE);
         serial.sendString("\nCurrent Free Heap: ");
         serial.sendNumber(xPortGetFreeHeapSize());
         serial.sendString("High Water Mark: ");
@@ -100,7 +100,7 @@ Action Thread::actionSystemRun() {
         xTaskCreate(task<&Thread::dacUpdate>, "dacUpdate", 64, this, 4, &dacUpdate_handle);
         vTaskSuspend(dacUpdate_handle);
 
-        SM<Thread>::triggerEvent(Event::CREATE_DONE, thread_sm);
+        thread_sm.triggerEvent(Event::CREATE_DONE);
     };
 }
 
@@ -124,7 +124,7 @@ void Thread::telemetry() {
 		serial.sendNumber(serial.getHighWaterMark());
         serial.sendLn();
 
-        SM<Thread>::triggerEvent(Event::TASK_DONE, telemetry_sm);
+        telemetry_sm.triggerEvent(Event::TASK_DONE);
     }
 }
 Action Thread::actionTelStart() {
@@ -183,7 +183,7 @@ void Thread::parseRX() {
 void Thread::runner() {
     while (1) {
         serial.sendString("Running\n");
-        SM<Thread>::triggerEvent(Event::TASK_DONE, runner_sm);
+        runner_sm.triggerEvent(Event::TASK_DONE);
     }
 }
 Action Thread::actionRotationStart() {
@@ -250,7 +250,7 @@ void Thread::calculator() {
         serial.sendString("CRC Result: ");
         serial.sendNumber(result);
         serial.sendLn();
-        SM<Thread>::triggerEvent(Event::TASK_DONE, runner_sm);
+        runner_sm.triggerEvent(Event::TASK_DONE);
     }
 }
 Action Thread::actionCRCStart() {

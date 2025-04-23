@@ -115,7 +115,7 @@ void CLI::func_info(int32_t argc, char** argv) {
 
     // No Sub Command
     if (argc == 1) {
-        SM<Thread>::triggerEvent(Thread::Event::SINGLE, thread.telemetry_sm);
+        thread.telemetry_sm.triggerEvent(Thread::Event::SINGLE);
     }
 
     // Sub Command
@@ -124,9 +124,9 @@ void CLI::func_info(int32_t argc, char** argv) {
         if (arg == "help" || arg == "?" || arg == "-h") {
             serial.sendString(help_text);
         } else if (arg == "on") {
-            SM<Thread>::triggerEvent(Thread::Event::START, thread.telemetry_sm);
+            thread.telemetry_sm.triggerEvent(Thread::Event::START);
         } else if (arg == "off") {
-            SM<Thread>::triggerEvent(Thread::Event::STOP, thread.telemetry_sm);
+            thread.telemetry_sm.triggerEvent(Thread::Event::STOP);
         } else {
             serial.sendString("Command not found\n");
         }
@@ -146,11 +146,11 @@ void CLI::func_rot(int32_t argc, char** argv) {
         if (arg == "help" || arg == "?" || arg == "-h") {
             serial.sendString(help_text);
         } else if (arg == "on") {
-            SM<Thread>::triggerEvent(Thread::Event::START, thread.runner_sm);
+            thread.runner_sm.triggerEvent(Thread::Event::START);
         } else if (arg == "off") {
-            SM<Thread>::setState(Thread::State::OFF, thread.runner_sm);
+            thread.runner_sm.setState(Thread::State::OFF);
         } else if (arg == "set" && argc == 3) {
-            SM<Thread>::setState(Thread::State::INIT, thread.runner_sm, int{std::stoi(argv[2])});
+            thread.runner_sm.setState(Thread::State::INIT, int{std::stoi(argv[2])});
         } else {
             serial.sendString("Command not found\n");
         }

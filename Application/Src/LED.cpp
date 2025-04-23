@@ -31,7 +31,7 @@ LED::LED(uint16_t period, uint16_t freq) : ratio(period / 100), frequency(freq) 
     // clang-format on
 
     // Set initial state
-    SM<LED>::setState(State::BREATH, led_sm);
+    led_sm.setState(State::BREATH);
 }
 
 /// @brief Destructor for LED instance, cleans up state machine.
@@ -43,28 +43,28 @@ LED::~LED() {}
 void LED::setPort(__IO uint32_t *CCR) { port = CCR; }
 
 /// @brief Transition LED to ON state.
-void LED::on() { SM<LED>::setState(State::ON, led_sm); }
+void LED::on() { led_sm.setState(State::ON); }
 
 /// @brief Transition LED to OFF state.
-void LED::off() { SM<LED>::setState(State::OFF, led_sm); }
+void LED::off() { led_sm.setState(State::OFF); }
 
 /// @brief Transition LED to BREATH state.
-void LED::breath() { SM<LED>::setState(State::BREATH, led_sm); }
+void LED::breath() { led_sm.setState(State::BREATH); }
 
 /// @brief Transition LED to BLINK state.
-void LED::blink() { SM<LED>::setState(State::BLINK, led_sm); }
+void LED::blink() { led_sm.setState(State::BLINK); }
 
 /// @brief Transition LED to RAPID blink state.
-void LED::rapid() { SM<LED>::setState(State::RAPID, led_sm); }
+void LED::rapid() { led_sm.setState(State::RAPID); }
 
 /// @brief Execute three-blink sequence state.
-void LED::three() { SM<LED>::setState(State::THREE, led_sm); }
+void LED::three() { led_sm.setState(State::THREE); }
 
 /// @brief Trigger state machine toggle event.
-void LED::toggle() { SM<LED>::triggerEvent(Event::TOGGLE, led_sm); }
+void LED::toggle() { led_sm.triggerEvent(Event::TOGGLE); }
 
 /// @brief Trigger state machine schedule event.
-void LED::scheduler() { SM<LED>::triggerEvent(Event::SCHEDULE, led_sm); }
+void LED::scheduler() { led_sm.triggerEvent(Event::SCHEDULE); }
 
 /// @brief Set brightness scaling factor.
 /// @param value Divider to adjust duty cycle calculations.

@@ -27,7 +27,7 @@ CustomDAC::CustomDAC() {
     // clang-format on
 
     // Set initial state
-    SM<CustomDAC>::setState(State::OFF, dac_sm);
+    dac_sm.setState(State::OFF);
 }
 
 /// @brief Destructor for CustomDAC.
@@ -70,16 +70,16 @@ void CustomDAC::addLevel(double value) {
 double CustomDAC::getLevel() { return level; }
 
 /// @brief Trigger state machine START event to enable output.
-void CustomDAC::on() { SM<CustomDAC>::triggerEvent(Event::START, dac_sm); }
+void CustomDAC::on() { dac_sm.triggerEvent(Event::START); }
 
 /// @brief Trigger state machine STOP event to disable output.
-void CustomDAC::off() { SM<CustomDAC>::triggerEvent(Event::STOP, dac_sm); }
+void CustomDAC::off() { dac_sm.triggerEvent(Event::STOP); }
 
 /// @brief Trigger state machine BREATH event for breathing effect.
-void CustomDAC::breath() { SM<CustomDAC>::triggerEvent(Event::BREATH, dac_sm); }
+void CustomDAC::breath() { dac_sm.triggerEvent(Event::BREATH); }
 
 /// @brief Trigger state machine SINE event for sine wave output.
-void CustomDAC::sine() { SM<CustomDAC>::triggerEvent(Event::SINE, dac_sm); }
+void CustomDAC::sine() { dac_sm.triggerEvent(Event::SINE); }
 
 /// @brief Generate a sine wave lookup table.
 /// @param amplitude Peak voltage of sine wave.
