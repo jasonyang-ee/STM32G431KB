@@ -1,5 +1,8 @@
 #include "LED.hpp"
 
+/// @brief Construct LED with dimming ratio and update frequency.
+/// @param period Divider base for duty cycle (percent basis).
+/// @param freq Update event frequency in ticks.
 LED::LED(uint16_t period, uint16_t freq) : ratio(period / 100), frequency(freq) {
     // clang-format off
 
@@ -31,28 +34,55 @@ LED::LED(uint16_t period, uint16_t freq) : ratio(period / 100), frequency(freq) 
     SM<LED>::setState(State::BREATH, led_sm);
 }
 
+/// @brief Destructor for LED instance, cleans up state machine.
 LED::~LED() {}
 
 // Public Methods
+/// @brief Assign PWM compare register port for LED control.
+/// @param CCR Pointer to timer CCR register.
 void LED::setPort(__IO uint32_t *CCR) { port = CCR; }
+
+/// @brief Transition LED to ON state.
 void LED::on() { SM<LED>::setState(State::ON, led_sm); }
+
+/// @brief Transition LED to OFF state.
 void LED::off() { SM<LED>::setState(State::OFF, led_sm); }
+
+/// @brief Transition LED to BREATH state.
 void LED::breath() { SM<LED>::setState(State::BREATH, led_sm); }
+
+/// @brief Transition LED to BLINK state.
 void LED::blink() { SM<LED>::setState(State::BLINK, led_sm); }
+
+/// @brief Transition LED to RAPID blink state.
 void LED::rapid() { SM<LED>::setState(State::RAPID, led_sm); }
+
+/// @brief Execute three-blink sequence state.
 void LED::three() { SM<LED>::setState(State::THREE, led_sm); }
+
+/// @brief Trigger state machine toggle event.
 void LED::toggle() { SM<LED>::triggerEvent(Event::TOGGLE, led_sm); }
+
+/// @brief Trigger state machine schedule event.
 void LED::scheduler() { SM<LED>::triggerEvent(Event::SCHEDULE, led_sm); }
+
+/// @brief Set brightness scaling factor.
+/// @param value Divider to adjust duty cycle calculations.
 void LED::setDimmer(uint16_t value) { dimmer = value; }
 
 // Define Actions
+/// @brief Action for turning LED fully on.
+/// Sets CCR register value based on dimmer and ratio.
 Action LED::actionOn() {
     return [this]() { *port = on_percent / dimmer * ratio; };
 }
 
+/// @brief Action for turning LED fully off.
 Action LED::actionOff() {
     return [this]() { *port = 0; };
 }
+
+/// @brief Action for toggling LED output.
 Action LED::actionToggle() {
     return [this]() {
         if (*port == 0)
@@ -61,6 +91,8 @@ Action LED::actionToggle() {
             *port = 0;
     };
 }
+
+/// @brief Action for breath effect, alters duty cycle up/down.
 Action LED::actionBreath() {
     return [this]() {
         if (breath_percent <= 100 && breath_direction) {
@@ -80,6 +112,8 @@ Action LED::actionBreath() {
 }
 
 // Define Guards
+/// @brief Guard for blink timing interval.
+/// @return true every N ticks to toggle output.
 Guard LED::guardBlink() {
     return [this]() {
         if (blink_timer++ > 5) {
@@ -89,6 +123,9 @@ Guard LED::guardBlink() {
         return false;
     };
 }
+
+/// @brief Guard for rapid blink timing interval.
+/// @return true every M ticks to toggle output.
 Guard LED::guardRapid() {
     return [this]() {
         if (rapid_timer++ > 1) {
@@ -98,6 +135,9 @@ Guard LED::guardRapid() {
         return false;
     };
 }
+
+/// @brief Guard for three-flash sequence completion.
+/// @return true when three cycles complete, else false.
 Guard LED::guardThree() {
     // blink 3 times
     return [this]() {

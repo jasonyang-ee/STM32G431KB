@@ -56,22 +56,8 @@ class CustomDAC {
     enum class State { OFF, ON, BREATH, SINE };
     enum class Event { START, STOP, BREATH, SINE };
 
-    // State Machine Mechanism
-    template <typename Parent>
-    friend class SM;
-    using Entry = std::tuple<State, Guard, Action, Injection>;
-    using Transition = std::tuple<State, Event, State, Guard, Action, Injection>;
-    using Anonymous = std::tuple<State, State, Guard, Action, Injection>;
-    struct StateMachine {
-        State currentState;
-        std::vector<Entry> entries;
-        std::vector<Transition> transitions;
-        std::vector<Anonymous> anonymous;
-        Injection injections;
-    };
-
     // State Machine Instance
-    StateMachine dac_sm;
+    SM<CustomDAC>::StateMachine dac_sm;
 
    private:
     // Action and Guard Functions

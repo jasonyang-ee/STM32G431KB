@@ -2,10 +2,15 @@
 
 #include "Instances.hpp"
 
+/// @brief Default constructor for Flash memory interface.
+/// Initializes internal state.
 Flash::Flash() {}
 
+/// @brief Destructor for Flash memory interface.
 Flash::~Flash() {}
 
+/// @brief Save current settings to flash memory.
+/// @return true if write operation succeeded; false otherwise.
 bool Flash::Save() {
     Payload payload{};
     payload.dac_level = dac.getLevel();
@@ -13,6 +18,8 @@ bool Flash::Save() {
     return Write(payload);
 }
 
+/// @brief Load the most recent saved settings from flash memory.
+/// Sends loaded values over serial and restores device state.
 void Flash::Load() {
     std::array<uint32_t, user_pages> write_level{};
     for (uint8_t page = 0; page < user_pages; page++) {
@@ -37,6 +44,9 @@ void Flash::Load() {
     SM<LED>::setState(static_cast<LED::State>(payload.led_state), led_user.led_sm);
 }
 
+/// @brief Write given payload to flash with wear leveling.
+/// @param payload Data to program into flash pages.
+/// @return true if write and erase operations succeeded; false otherwise.
 bool Flash::Write(Payload payload) {
     // read the write_level of each user page
     std::array<uint32_t, user_pages> write_level{};
@@ -80,12 +90,17 @@ bool Flash::Write(Payload payload) {
     return true;
 }
 
+/// @brief Read a payload from specified flash memory address.
+/// @param address Byte address to read from.
+/// @return Payload struct containing stored data.
 Flash::Payload Flash::Read(uint32_t address) {
     Payload payload{};
     std::copy_n(reinterpret_cast<const uint8_t *>(address), sizeof(Payload), reinterpret_cast<uint8_t *>(&payload));
     return payload;
 }
 
+/// @brief Erase all configured user flash pages.
+/// @return true if erase operation succeeded; false otherwise.
 bool Flash::Purge() {
     // erase the page with min write count
     FLASH_EraseInitTypeDef EraseInitStruct{0};
@@ -104,6 +119,9 @@ bool Flash::Purge() {
     return true;
 }
 
+/// @brief Initialize and blank user flash pages.
+/// Erases pages then writes default payloads.
+/// @return true if initialization succeeded; false otherwise.
 bool Flash::Init() {
     // erase all user page
     FLASH_EraseInitTypeDef EraseInitStruct{0};

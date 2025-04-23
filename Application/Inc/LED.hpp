@@ -55,22 +55,8 @@ class LED {
     enum class State { ON, OFF, BREATH, BLINK, RAPID, THREE };
     enum class Event { ON, OFF, TOGGLE, BREATH, BLINK, RAPID, SCHEDULE };
 
-    // State Machine Mechanism
-    template <typename Parent>
-    friend class SM;
-    using Entry = std::tuple<State, Guard, Action, Injection>;
-    using Transition = std::tuple<State, Event, State, Guard, Action, Injection>;
-    using Anonymous = std::tuple<State, State, Guard, Action, Injection>;
-    struct StateMachine {
-        State currentState;
-        std::vector<Entry> entries;
-        std::vector<Transition> transitions;
-        std::vector<Anonymous> anonymous;
-        Injection injections;
-    };
-
-    // State Machine Instances
-    StateMachine led_sm;
+    // State Machine Instance
+    SM<LED>::StateMachine led_sm;
 
    private:
     // Action and Guard Functions
