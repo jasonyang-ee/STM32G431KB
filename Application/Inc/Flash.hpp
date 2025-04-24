@@ -24,10 +24,10 @@ class Flash {
     bool Init();
 
    private:
-    static constexpr uint8_t page_total = 63;
+    static constexpr uint8_t last_page{63};
     static constexpr uint32_t page_size{0x800};
     static constexpr uint32_t user_pages{3};
-    static constexpr uint32_t address_end{0x08020000 - page_size};
+    static constexpr uint32_t last_page_address{0x08000000 + (last_page * page_size)};
 
     bool Write(Payload payload);
     Payload Read(uint32_t address);
