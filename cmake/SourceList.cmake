@@ -3,7 +3,6 @@ ${PROJ_PATH}/Application/Src/ADC.cpp
 ${PROJ_PATH}/Application/Src/CLI.cpp
 ${PROJ_PATH}/Application/Src/CRC.cpp
 ${PROJ_PATH}/Application/Src/DAC.cpp
-${PROJ_PATH}/Application/Src/Flash.cpp
 ${PROJ_PATH}/Application/Src/GPIO.cpp
 ${PROJ_PATH}/Application/Src/LED.cpp
 ${PROJ_PATH}/Application/Src/main.cpp

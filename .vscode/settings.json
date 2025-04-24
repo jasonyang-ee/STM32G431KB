@@ -74,6 +74,7 @@
 		"xtr1common": "cpp",
 		"xutility": "cpp",
 		"freertosconfig.h": "c",
-		"ranges": "cpp"
+		"ranges": "cpp",
+		"xtree": "cpp"
 	}
 }
