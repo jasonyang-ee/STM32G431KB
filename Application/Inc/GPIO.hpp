@@ -1,6 +1,7 @@
 #ifndef APPLICATION_INC_GPIO
 #define APPLICATION_INC_GPIO
 
+#include "StateMachine.hpp"
 #include "main.h"
 
 /**
@@ -12,27 +13,41 @@
 class CustomGPIO {
    public:
     CustomGPIO();
-    CustomGPIO(uint16_t);
+    CustomGPIO(uint16_t PollPeriod);
     virtual ~CustomGPIO();
-    void setPort(GPIO_TypeDef *, uint16_t);
+    void setPort(GPIO_TypeDef *Port, uint16_t Pin);
 
-	void on();
-	void off();
-	void toggle();
-
+    // Public Methods
+    void on();
+    void off();
+    void toggle();
     bool getStatus();
+    void scheduler();
 
-    void schedulerLowActive();
-    void schedulerHighActive();
-
+    // Hardware Data
    private:
-    GPIO_TypeDef *m_port;
-    uint16_t m_pin;
+    GPIO_TypeDef *port;
+    uint16_t pin;
 
-    uint16_t m_roll_period{100};
-    uint16_t m_roll_timer{0};
-    bool m_stable{true};
-    bool m_pressed{false};
+    // State Machine
+   public:
+    enum class State { ON, OFF, LOW_INACTIVE, LOW_SETTLING, LOW_ACTIVE, HIGH_INACTIVE, HIGH_SETTLING, HIGH_ACTIVE };
+    enum class Event { ON, OFF, TOGGLE, POLL };
+    SM<CustomGPIO>::StateMachine gpio_sm;
+
+    // Action and Guard
+   private:
+    Action actionOn();
+    Action actionOff();
+    Action actionToggle();
+
+    Guard guardLowSense();
+    Guard guardHighSense();
+    Guard guardStable();
+
+    // State Machine Data
+    uint16_t roll_period{100};
+    uint16_t roll_timer{0};
 };
 
 #endif /* APPLICATION_INC_GPIO */
