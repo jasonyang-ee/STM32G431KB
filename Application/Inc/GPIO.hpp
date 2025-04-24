@@ -22,8 +22,7 @@ class CustomGPIO {
     void off();
     void toggle();
     bool getStatus();
-    void schedulerLowActive();
-    void schedulerHighActive();
+    void scheduler();
 
     // Hardware Data
    private:

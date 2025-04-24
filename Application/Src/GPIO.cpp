@@ -44,13 +44,27 @@ void CustomGPIO::setPort(GPIO_TypeDef *Port, uint16_t Pin) {
 }
 
 /// @brief Set the GPIO pin to a high logic level.
-void CustomGPIO::on() {}
+void CustomGPIO::on() { gpio_sm.triggerEvent(Event::ON); }
 
 /// @brief Set the GPIO pin to a low logic level.
-void CustomGPIO::off() {}
+void CustomGPIO::off() { gpio_sm.triggerEvent(Event::OFF); }
 
 /// @brief Toggle the current state of the GPIO pin.
-void CustomGPIO::toggle() { HAL_GPIO_TogglePin(port, pin); }
+void CustomGPIO::toggle() { gpio_sm.triggerEvent(Event::TOGGLE); }
+
+bool CustomGPIO::getStatus() {
+    if (gpio_sm.currentState == State::ON) {
+        return true;
+    } else if (gpio_sm.currentState == State::LOW_ACTIVE) {
+        return true;
+    } else if (gpio_sm.currentState == State::HIGH_ACTIVE) {
+        return true;
+    }
+    return false;
+}
+
+/// @brief Scheduler for state-driven GPIO updates.
+void CustomGPIO::scheduler() { gpio_sm.triggerEvent(Event::POLL); }
 
 Action CustomGPIO::actionOn() {
     return [this]() { HAL_GPIO_WritePin(port, pin, GPIO_PIN_SET); };
